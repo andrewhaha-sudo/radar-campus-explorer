@@ -60,6 +60,8 @@ Permissions are enforced by the API, not just hidden in the UI.
 
 ## Publish on Vercel
 
+To host the full app at a separate web address, create a **new Vercel project** connected to **`andrewhaha-sudo/radar-campus-explorer` → `main`**. Use Vite, Node.js 24.x, build command `npm run build`, and output directory `dist`. Configure Supabase using the guide below, then deploy. Vercel assigns the new project's address; the original RADAR project's domains stay unchanged. Reusing the same Supabase project shares accounts and school data; choose a new Supabase project for independent data.
+
 Use [the Vercel guide](docs/VERCEL.md) to deploy the frontend and Node API with Supabase persistence. New users can register with Gmail or another valid email, select a school and request access. Administrators approve school roles and set a verified campus location in **Buildings & rooms**. The **Campus operations → Setup & launch** checklist shows actual prerequisites.
 
 ## Getting started

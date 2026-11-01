@@ -1,10 +1,17 @@
-# Publish RADAR on Vercel with Supabase
+# Publish the full app as a separate website
 
-The repository now includes a Vercel SPA + Node API deployment. **It has not been published to a live Vercel account.** You need to create/sign in to Vercel, authorize the GitHub repository, and enter private server settings there. No private passwords or tokens should be sent in chat or committed.
+This guide deploys `andrewhaha-sudo/radar-campus-explorer`, branch `main`, as a new Vercel project with its own web address. It includes the full RADAR app, login, dashboard, database-backed tools and the illustrated campus explorer. Create a new hosting project; keep the original RADAR hosting project's repository and domains unchanged.
+
+The repository includes the Vite frontend and Node API configuration. Uploading it to GitHub does not deploy a website. Sign in to Vercel, authorize this repository, and enter the server settings below in the new project's environment settings. No private passwords or tokens should be sent in chat or committed.
 
 ## 1. Prepare Supabase
 
-Use the existing project `https://xtfbdaphayodkkgzwecb.supabase.co`. In Supabase enable **Authentication → Providers → Email** and permit sign-ups. Gmail and other valid email domains work; RADAR has no `.edu` restriction. Enable email confirmation and configure production SMTP for dependable confirmation/recovery mail. A Gmail address does not grant school permissions.
+Choose the Supabase project for this website:
+
+- Reuse your existing Supabase project if both websites should access the same accounts, school records and uploaded files. Changes to those records are shared; a different web address does not create a separate database.
+- Use a new Supabase project if this website should have independent accounts and data. Set all Supabase values below from that new project. The public identifiers in `.env.example` belong to the earlier project and must not be mixed with another project's keys or database URL.
+
+In the chosen project enable **Authentication → Providers → Email** and permit sign-ups. Gmail and other valid email domains work; RADAR has no `.edu` restriction. Enable email confirmation and configure production SMTP for dependable confirmation/recovery mail. A Gmail address does not grant school permissions.
 
 Have these private server values ready in the Supabase dashboard:
 
@@ -19,16 +26,16 @@ For local SQLite development, Gmail sign-up also works. If you own the local ser
 ## 2. Import GitHub in Vercel
 
 1. Create/sign in at Vercel using your GitHub account.
-2. Add New → Project → import `andrewhaha-sudo/radar`.
-3. Select `design/radar-command-dashboard` as the deployment/production branch. The updated code is on this branch; importing old `main` will deploy old code.
+2. **Add New → Project** → import `andrewhaha-sudo/radar-campus-explorer`. If it is missing from the list, grant the Vercel GitHub integration access to this repository, then refresh the list.
+3. Name the new Vercel project `radar-campus-explorer` (or another available name) and select **main** as the production branch. Vercel will assign this project its own `.vercel.app` address. Use the address shown in its dashboard rather than assuming the name is available.
 4. Framework: **Vite**. Root directory: repository root. Build: `npm run build`. Output: `dist`. Node: **24.x**. Use the included `vercel.json`; do not deploy only a copied `dist` folder, since accounts/API need the function too.
 5. Add the following server environment variables to the production deployment. Private keys must **not** start with `VITE_`.
 
 | Variable | Value / source |
 | --- | --- |
 | `RADAR_DATABASE_DRIVER` | `postgres` (required; disposable serverless SQLite is blocked) |
-| `SUPABASE_URL` | `https://xtfbdaphayodkkgzwecb.supabase.co` |
-| `SUPABASE_PUBLISHABLE_KEY` | Public publishable/anon key from Supabase (the existing project's public key is in `.env.example`) |
+| `SUPABASE_URL` | Project URL from the Supabase project chosen above |
+| `SUPABASE_PUBLISHABLE_KEY` | Public publishable/anon key from that same project |
 | `SUPABASE_DB_URL` | Private session-pooler PostgreSQL URI |
 | `SUPABASE_SERVICE_ROLE_KEY` | Private service-role API key |
 | `SUPABASE_STORAGE_BUCKET` | `radar-uploads` |
@@ -40,7 +47,9 @@ Deploy. If Vercel assigns the public hostname only after the first deployment, s
 
 ## 3. Finish Auth URLs and school setup
 
-In **Supabase → Authentication → URL Configuration**, set Site URL to the final HTTPS Vercel origin and add the corresponding confirmation/recovery redirect URLs (including `/reset-password`). Redeploy after changing app environment variables.
+In **Supabase → Authentication → URL Configuration**, add the new site's final HTTPS origin and its `/reset-password` URL to the allowed Redirect URLs. The app uses its `RADAR_PUBLIC_URL` for confirmation and recovery links.
+
+For a new Supabase project dedicated to this site, also set Site URL to the new HTTPS origin. If the Supabase project is shared with your existing RADAR site, preserve its existing Site URL and allowed redirects; add the new site's redirects alongside them. Redeploy the new Vercel project after changing its environment variables.
 
 Register with your administrator Gmail/email, confirm it, and sign in. Select a Camarines Norte school and create its empty workspace. Open **Buildings & rooms → Set your school’s location**: click the actual school on the map, or use GPS while on campus; enter the verification source, confirm the pin, and save. Then add each actual building's own position, floors and rooms. Changing the school center does not move buildings.
 
@@ -74,6 +83,7 @@ The repository does not install a paid plan, create provider accounts, send live
 2. Test fresh Gmail sign-up, email confirmation, login, logout and password recovery. Check cookies remain HttpOnly/Secure.
 3. Test a school join request, approval and revocation with separate accounts; verify one school's records do not appear in another school.
 4. Save the school location and a real inspection/photo, then reload and redeploy to verify persistence.
+   Open **Campus map → Campus explorer** and check that the campus artwork loads, building selection works, and the supplied indoor floor plans open. This illustration view is separate from verified school records and evacuation guidance.
 5. Test optional providers independently, including a file above 3 MB, actual browser push permission/delivery, signed SMS receipts and scheduler batches. Configured flags do not establish those outcomes.
 6. Review Vercel function logs, database backups, Storage privacy and restore procedures. Do not publish secret keys in screenshots, support messages or frontend environment variables.
 
