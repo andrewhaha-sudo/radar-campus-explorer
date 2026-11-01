@@ -6,13 +6,8 @@
   "functions": {
     "api/index.mjs": {
       "maxDuration": 300,
-      "includeFiles": ["server/**", "src/data/camarines-norte-schools.json"],
-      "excludeFiles": [
-        "server/data/**",
-        "server/uploads/**",
-        "tests/**",
-        ".backups/**"
-      ]
+      "includeFiles": "{server/**,src/data/camarines-norte-schools.json}",
+      "excludeFiles": "{server/data/**,server/uploads/**,tests/**,.backups/**}"
     }
   },
   "rewrites": [
