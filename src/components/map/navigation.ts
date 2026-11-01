@@ -9,7 +9,25 @@ export interface Rect {
   height: number;
 }
 
-// A positive walkability mask keeps the image, fences, trees and buildings intact.
+// Subtract solid scenery from open grounds to keep one collision mask for both
+// click-to-walk routes and keyboard movement. Adjacent pieces remain connected.
+export function subtractObstacles(grounds: Rect[], obstacles: Rect[]): Rect[] {
+  return obstacles.reduce((areas, obstacle) => areas.flatMap((area) => {
+    const left = Math.max(area.x, obstacle.x);
+    const top = Math.max(area.y, obstacle.y);
+    const right = Math.min(area.x + area.width, obstacle.x + obstacle.width);
+    const bottom = Math.min(area.y + area.height, obstacle.y + obstacle.height);
+    if (left >= right || top >= bottom) return [area];
+    return [
+      { x: area.x, y: area.y, width: area.width, height: top - area.y },
+      { x: area.x, y: bottom, width: area.width, height: area.y + area.height - bottom },
+      { x: area.x, y: top, width: left - area.x, height: bottom - top },
+      { x: right, y: top, width: area.x + area.width - right, height: bottom - top },
+    ].filter((piece) => piece.width > 0 && piece.height > 0);
+  }), grounds);
+}
+
+// A positive walkability mask keeps fences, water and buildings solid.
 // Coordinates are always source-image pixels, independent of display size or zoom.
 export function isWalkable(point: Point, areas: Rect[], radius = 3) {
   return [
@@ -49,7 +67,44 @@ export function canTravel(from: Point, to: Point, areas: Rect[]) {
   return true;
 }
 
-/** Four-way A*, with no diagonal corner cutting or teleporting across obstacles. */
+interface PathNode { point: Point; cost: number; remaining: number }
+const priority = (a: PathNode, b: PathNode) =>
+  a.cost + a.remaining - b.cost - b.remaining || a.remaining - b.remaining;
+
+// A heap avoids scanning the entire frontier for every step across the open lawns.
+class PathQueue {
+  private nodes: PathNode[] = [];
+  get length() { return this.nodes.length; }
+  push(node: PathNode) {
+    this.nodes.push(node);
+    let index = this.nodes.length - 1;
+    while (index > 0) {
+      const parent = Math.floor((index - 1) / 2);
+      if (priority(this.nodes[parent], node) <= 0) break;
+      this.nodes[index] = this.nodes[parent];
+      index = parent;
+    }
+    this.nodes[index] = node;
+  }
+  pop() {
+    const first = this.nodes[0];
+    const last = this.nodes.pop()!;
+    if (this.nodes.length) {
+      let index = 0;
+      while (index * 2 + 1 < this.nodes.length) {
+        let child = index * 2 + 1;
+        if (child + 1 < this.nodes.length && priority(this.nodes[child + 1], this.nodes[child]) < 0) child++;
+        if (priority(last, this.nodes[child]) <= 0) break;
+        this.nodes[index] = this.nodes[child];
+        index = child;
+      }
+      this.nodes[index] = last;
+    }
+    return first;
+  }
+}
+
+/** Straight clear routes, or four-way A* without cutting blocked corners. */
 export function findPath(
   from: Point,
   to: Point,
@@ -75,27 +130,23 @@ export function findPath(
     );
   };
   if (!isWalkable(from, areas) || !isWalkable(to, areas)) return null;
+  if (canTravel(from, to, areas)) return [from, to];
   const start = snap(from),
     goal = snap(to);
   if (!start || !goal) return null;
   const key = (p: Point) => `${p.x},${p.y}`;
   const heuristic = (p: Point) =>
     Math.abs(p.x - goal.x) + Math.abs(p.y - goal.y);
-  const open = [start];
+  const open = new PathQueue();
+  open.push({ point: start, cost: 0, remaining: heuristic(start) });
   const cost = new Map([[key(start), 0]]);
   const parent = new Map<string, Point>();
   const closed = new Set<string>();
   while (open.length) {
-    let best = 0;
-    for (let i = 1; i < open.length; i++) {
-      if (
-        cost.get(key(open[i]))! + heuristic(open[i]) <
-        cost.get(key(open[best]))! + heuristic(open[best])
-      )
-        best = i;
-    }
-    const current = open.splice(best, 1)[0];
+    const node = open.pop();
+    const current = node.point;
     const currentKey = key(current);
+    if (closed.has(currentKey) || node.cost !== cost.get(currentKey)) continue;
     if (currentKey === key(goal)) {
       const points = [to, goal];
       let cursor = current;
@@ -128,7 +179,7 @@ export function findPath(
       if (closed.has(nextKey) || !canTravel(current, next, areas)) continue;
       const nextCost = cost.get(currentKey)! + size;
       if (nextCost >= (cost.get(nextKey) ?? Infinity)) continue;
-      if (!cost.has(nextKey)) open.push(next);
+      open.push({ point: next, cost: nextCost, remaining: heuristic(next) });
       cost.set(nextKey, nextCost);
       parent.set(nextKey, current);
     }

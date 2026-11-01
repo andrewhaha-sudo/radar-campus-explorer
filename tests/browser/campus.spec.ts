@@ -21,7 +21,7 @@ test("opens directly to the campus with no login, API, external services or miss
       name: /sign in|log in|dashboard|geographic map/i,
     }),
   ).toHaveCount(0);
-  await page.locator("#campus-map image").evaluate(async (element) => {
+  await page.locator("#campus-map image").first().evaluate(async (element) => {
     const image = new Image();
     image.src = element.getAttribute("href")!;
     await image.decode();

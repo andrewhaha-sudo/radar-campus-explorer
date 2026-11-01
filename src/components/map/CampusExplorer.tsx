@@ -28,6 +28,7 @@ import {
 } from "./campus-data";
 import { RoomPhotoDialog } from "./RoomPhotoDialog";
 import { RouteOverlay } from "./RouteOverlay";
+import { CampusBreeze } from "./CampusBreeze";
 import type { Place, Room, SceneId } from "./campus-data";
 import { canTravel, findPath } from "./navigation";
 import type { Point } from "./navigation";
@@ -141,6 +142,7 @@ export function CampusExplorer() {
   );
   const [route, setRoute] = useState<Point[]>([]);
   const [showRoute, setShowRoute] = useState(true);
+  const [breeze, setBreeze] = useState(true);
   const [photoRoom, setPhotoRoom] = useState<Room | null>(null);
   const photoReturnFocus = useRef<HTMLElement | null>(null);
   const [zoom, setZoom] = useState(1);
@@ -190,7 +192,7 @@ export function CampusExplorer() {
       const next = findPath(player.current, point, scenes[sceneId].walkable);
       if (!next) {
         setMessage(
-          "That spot is outside the mapped walkways. Choose a connected path or a building.",
+          "That spot is blocked. Choose open grass, a walkway or a destination.",
         );
         return false;
       }
@@ -449,7 +451,8 @@ export function CampusExplorer() {
       matrix.inverse(),
     );
     cancelMovement();
-    walkTo(point);
+    if (walkTo(point, () => setMessage("You reached this spot. Click another place or keep exploring.")))
+      setMessage("Walking to this spot…");
     viewport.current?.focus({ preventScroll: true });
   };
   const touchStart = (key: string, event: PointerEvent<HTMLButtonElement>) => {
@@ -669,6 +672,9 @@ export function CampusExplorer() {
                   ))}
               {!artOnly && !floorSheet && (
                 <>
+                  {sceneId === "campus" && breeze && (
+                    <CampusBreeze paused={Boolean(photoRoom)} />
+                  )}
                   {showAreas &&
                     scene.walkable.map((r, i) => (
                       <rect
@@ -808,6 +814,17 @@ export function CampusExplorer() {
               />{" "}
               Original artwork only
             </label>
+            {sceneId === "campus" && !floorSheet && (
+              <label>
+                <input
+                  type="checkbox"
+                  checked={breeze}
+                  onChange={(event) => setBreeze(event.target.checked)}
+                  disabled={artOnly}
+                />{" "}
+                Breeze animation
+              </label>
+            )}
             <label>
               <input
                 type="checkbox"
@@ -1023,7 +1040,7 @@ export function CampusExplorer() {
             <span className="campus-eyebrow">A LITTLE EXPLORATION</span>
             <h2>Make your way around.</h2>
             <p>
-              Click a place to walk there. Use the arrow keys or <b>W A S D</b>{" "}
+              Click a place or open grass to walk there. Use the arrow keys or <b>W A S D</b>{" "}
               to take over. Turn route arrows on to see the direction of travel.
               Click a room door to view its photo.
             </p>

@@ -4,6 +4,7 @@ import {
   findPath,
   canTravel,
   isWalkable,
+  subtractObstacles,
 } from "../src/components/map/navigation.ts";
 import {
   scenes,
@@ -23,12 +24,12 @@ test("every mapped campus entrance is reachable without crossing a blocked area"
   }
 });
 
-test("all twenty room doors and both sets of stairs have connected approaches", () => {
+test("all 35 room doors and every floor's stairs have connected approaches", () => {
   assert.deepEqual(
-    ["a1", "b1", "b2", "c1", "lab1", "d1", "six1", "six2"].map(
+    ["a1", "b1", "b2", "c1", "c2", "lab1", "d1", "e1", "e2", "six1", "six2"].map(
       (id) => scenes[id].rooms.length,
     ),
-    [2, 2, 2, 1, 1, 2, 5, 5],
+    [2, 2, 2, 5, 5, 1, 2, 3, 3, 5, 5],
   );
   for (const scene of Object.values(scenes).filter(
     (scene) => scene.rooms.length,
@@ -93,13 +94,14 @@ test("A* follows an L-shaped hallway without cutting its corner", () => {
     assert.ok(canTravel(route[i - 1], route[i], areas));
 });
 
-test("new interiors have unique photo IDs and return to their matching outdoor entrances", () => {
-  assert.equal(allRooms.length, 20);
+test("interiors have unique photo IDs and return to their matching outdoor entrances", () => {
+  assert.equal(allRooms.length, 35);
   assert.equal(new Set(allRooms.map((room) => room.id)).size, allRooms.length);
   for (const [sceneId, buildingId] of [
     ["c1", "c"],
     ["lab1", "lab"],
     ["d1", "d"],
+    ["e1", "e"],
   ]) {
     const building = entranceForScene(sceneId);
     assert.equal(building.id, buildingId);
@@ -116,6 +118,39 @@ test("new interiors have unique photo IDs and return to their matching outdoor e
   const pondSide = places.find((place) => place.id === "e");
   assert.equal(pondSide.name, "Building E");
   assert.ok(pondSide.bounds.x < 400);
-  assert.equal(pondSide.interior, undefined);
+  assert.equal(pondSide.interior, "e1");
+  for (const buildingId of ["c", "e"]) {
+    assert.equal(entranceForScene(`${buildingId}2`).id, buildingId);
+    assert.equal(scenes[`${buildingId}2`].stairs.to, `${buildingId}1`);
+  }
   assert.equal(entranceForScene("six1"), undefined);
+});
+
+test("grass, pond bank, court and garden clearings connect through the campus gates", () => {
+  const { spawn, walkable } = scenes.campus;
+  for (const target of [
+    { x: 720, y: 490 }, { x: 470, y: 610 }, { x: 1100, y: 660 },
+    { x: 247, y: 714 }, { x: 547, y: 1057 }, { x: 215, y: 1035 },
+    { x: 624, y: 660 }, { x: 862, y: 736 },
+  ]) {
+    const route = findPath(spawn, target, walkable);
+    assert.ok(route, `Open ground at ${JSON.stringify(target)} must be reachable`);
+    assert.deepEqual(route.at(-1), target);
+    for (let index = 1; index < route.length; index++)
+      assert.ok(canTravel(route[index - 1], route[index], walkable));
+  }
+});
+
+test("carving an obstacle leaves connected ground without allowing travel through it", () => {
+  const areas = subtractObstacles(
+    [{ x: 0, y: 0, width: 100, height: 100 }],
+    [{ x: 35, y: 20, width: 30, height: 60 }],
+  );
+  const from = { x: 10, y: 50 }, to = { x: 90, y: 50 };
+  assert.equal(isWalkable({ x: 50, y: 50 }, areas), false);
+  assert.equal(canTravel(from, to, areas), false);
+  const route = findPath(from, to, areas);
+  assert.ok(route);
+  for (let index = 1; index < route.length; index++)
+    assert.ok(canTravel(route[index - 1], route[index], areas));
 });

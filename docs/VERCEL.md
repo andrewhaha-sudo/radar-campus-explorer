@@ -33,7 +33,10 @@ old `functions.api/index.mjs.excludeFiles` error does not apply to this version.
 - Click **Building B**, enter the building, and navigate to a floor-two classroom.
 - Open **Indoor floor plans** and inspect Building 6's five doors on each floor.
 - Check touch controls at a phone-sized viewport.
-- Open Building C, Chemistry Lab and Building D; verify their one-, one- and two-room interiors.
+- Open Building C and verify five rooms on each of two floors; check Building E's
+  three rooms on each of two floors. Chemistry Lab has one room and Building D has two.
+- Click open grass and visit the pond bank or canteen. Toggle **Breeze animation**
+  and check that reduced-motion preferences keep foliage still.
 - Toggle route arrows and click a room door to add a local photo. Reload and reopen that room.
 - In the browser's Network panel, confirm the map images load and no `/api/` requests occur.
 

@@ -1,0 +1,26 @@
+.campus-tree-sway {
+  animation: campus-leaf-breeze 4.8s ease-in-out infinite;
+}
+.campus-grass-sway {
+  transform-origin: 0 0;
+  animation: campus-grass-breeze 3.4s ease-in-out infinite;
+}
+.campus-breeze[data-active="false"] .campus-tree-sway,
+.campus-breeze[data-active="false"] .campus-grass-sway {
+  animation-play-state: paused;
+}
+@keyframes campus-leaf-breeze {
+  0%, 100% { transform: skewX(-1.5deg) translateX(-0.5px); }
+  50% { transform: skewX(2deg) translateX(0.7px); }
+}
+@keyframes campus-grass-breeze {
+  0%, 100% { transform: skewX(-10deg); }
+  50% { transform: skewX(18deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .campus-tree-sway,
+  .campus-grass-sway {
+    animation: none;
+    transform: none;
+  }
+}

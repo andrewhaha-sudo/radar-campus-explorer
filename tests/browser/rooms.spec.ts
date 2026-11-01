@@ -5,31 +5,38 @@ const photo = Buffer.from(
   "base64",
 );
 
-test("new C, lab and D interiors are connected, have correct room counts, and exit at their own buildings", async ({
+test("C and E have two connected floors with correct counts; all new interiors exit at their own buildings", async ({
   page,
 }) => {
-  test.setTimeout(90_000);
+  test.setTimeout(150_000);
   await page.goto("/");
   await expect(page.locator('[aria-label="Building E sign"]')).toBeVisible();
   await expect(
     page.getByRole("button", { name: "Explore Building E", exact: true }),
   ).toBeVisible();
   for (const destination of [
-    { room: "C-101", building: "Building C", count: 1, x: 181, y: 409 },
-    { room: "LAB-101", building: "Chemistry Lab", count: 1, x: 408, y: 408 },
-    { room: "D-102", building: "Building D", count: 2, x: 1112, y: 411 },
+    { room: "C-205", building: "Building C", floor: 2, count: 5, total: 10, x: 181, y: 409 },
+    { room: "E-203", building: "Building E", floor: 2, count: 3, total: 6, x: 347, y: 716 },
+    { room: "LAB-101", building: "Chemistry Lab", floor: 1, count: 1, total: 1, x: 408, y: 408 },
+    { room: "D-102", building: "Building D", floor: 1, count: 2, total: 2, x: 1112, y: 411 },
   ]) {
     await page.locator("#campus-room").selectOption(destination.room);
     await expect(page.locator(".campus-status")).toContainText(
-      `Room ${destination.room} · Floor 1. You have reached`,
+      `Room ${destination.room} · Floor ${destination.floor}. You have reached`,
       { timeout: 30_000 },
     );
     await expect(page.locator(".campus-map-toolbar")).toContainText(
-      `${destination.building} · Floor 1`,
+      `${destination.building} · Floor ${destination.floor}`,
     );
     await expect(page.locator(".campus-hotspot[data-room-id]")).toHaveCount(
       destination.count,
     );
+    await expect(page.locator("#campus-room option")).toHaveCount(destination.total + 1);
+    if (destination.floor === 2) {
+      await page.getByRole("button", { name: "Walk to floor 1", exact: true }).click();
+      await expect(page.locator(".campus-map-toolbar")).toContainText(`${destination.building} · Floor 1`);
+      await expect(page.locator(".campus-hotspot[data-room-id]")).toHaveCount(destination.count);
+    }
     await page
       .getByRole("button", { name: "Walk to exit", exact: true })
       .click();
@@ -155,7 +162,8 @@ test("every interior door and original-sheet room opens the matching photo viewe
     .getByRole("button", { name: "Close room photo", exact: true })
     .click();
   for (const building of [
-    "Building C 1 floor · 1 room",
+    "Building C 2 floors · 10 rooms",
+    "Building E 2 floors · 6 rooms",
     "Chemistry Lab 1 floor · 1 room",
     "Building A 1 floor · 2 classrooms",
     "Building 6 2 floors · 10 classrooms",
@@ -221,4 +229,40 @@ test("published photos work without local storage and a failed upload never repo
   await expect(
     dialog.getByText("Photo saved. Click this room again to view it."),
   ).toHaveCount(0);
+});
+
+test("every upstairs C and E door opens its own photo and saves independently of floor one", async ({ page }) => {
+  test.setTimeout(90_000);
+  await page.goto("/");
+  for (const building of [
+    { name: "Building C 2 floors · 10 rooms", prefix: "C", count: 5 },
+    { name: "Building E 2 floors · 6 rooms", prefix: "E", count: 3 },
+  ]) {
+    await page.getByRole("button", { name: "Indoor floor plans", exact: true }).click();
+    await page.getByRole("button", { name: building.name, exact: true }).click();
+    await page.getByRole("button", { name: "Walk to floor 2", exact: true }).click();
+    await expect(page.locator(".campus-map-toolbar")).toContainText(`Building ${building.prefix} · Floor 2`);
+    await expect(page.locator(".campus-hotspot[data-room-id]")).toHaveCount(building.count);
+    for (let index = 1; index <= building.count; index++) {
+      await page.getByRole("button", { name: `Open Room ${building.prefix}-20${index} photo`, exact: true }).click();
+      const dialog = page.getByRole("dialog");
+      await expect(dialog.getByRole("heading")).toHaveText(`Room ${building.prefix}-20${index}`);
+      await expect(dialog.getByText("No photo for this room yet")).toBeVisible();
+      if (index === building.count) {
+        await dialog.getByLabel("Add room photo", { exact: true }).setInputFiles({
+          name: `${building.prefix}-upstairs.png`, mimeType: "image/png", buffer: photo,
+        });
+        await expect(dialog.getByRole("status")).toContainText("Photo saved.");
+      }
+      await dialog.getByRole("button", { name: "Close room photo", exact: true }).click();
+    }
+    await page.getByRole("button", { name: `Open Room ${building.prefix}-20${building.count} photo`, exact: true }).click();
+    await expect(page.getByRole("dialog").getByRole("img")).toBeVisible();
+    await page.getByRole("button", { name: "Close room photo", exact: true }).click();
+    await page.getByRole("button", { name: "Walk to floor 1", exact: true }).click();
+    await expect(page.locator(".campus-map-toolbar")).toContainText(`Building ${building.prefix} · Floor 1`);
+    await page.getByRole("button", { name: `Open Room ${building.prefix}-10${building.count} photo`, exact: true }).click();
+    await expect(page.getByRole("dialog").getByText("No photo for this room yet")).toBeVisible();
+    await page.getByRole("button", { name: "Close room photo", exact: true }).click();
+  }
 });

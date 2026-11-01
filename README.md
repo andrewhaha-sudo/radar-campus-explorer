@@ -24,25 +24,35 @@ again with `npm run dev`. There is no seed command or API server to start.
 
 ## Use the map
 
-- Click a building or a mapped walkway to walk there.
+- Click a building, walkway or open grass to walk there. The lawns, garden clearings,
+  court, pond bank, gazebo, flagpole and canteen entrance have connected routes.
 - Use **WASD**, **arrow keys**, or the on-screen direction buttons to move manually.
   Manual movement cancels an automatic route.
 - Press **E** near an entrance, staircase, or exit to interact.
 - Choose a classroom to follow its connected route, including stairs when needed.
 - Toggle **Show route arrows** to show or hide the direction of travel. The character
   keeps walking when the arrows are hidden; keyboard movement cancels the route.
+- Toggle **Breeze animation** for gently moving tree foliage and grass. It pauses
+  offscreen and in background tabs, and stays still with reduced-motion preferences.
 - Click any room door to open its photo viewer. Choose **Add room photo** to save an
   image, then click the same room later to see it. **Walk to this room** starts a route.
 - Open **Indoor floor plans** to view the complete source sheet or an individual building.
 - Use zoom, expand, or **Original artwork only** to inspect the maps.
 
-Building A has one floor and two classroom doors. Building B has two floors with
-two doors per floor. Building C and Chemistry Lab each have one room, and the
-upper-right Building D has two. These added interiors reuse sections of the supplied
-floor plan, with connected exits. The pond-side building is now **Building E**;
-it has no assigned interior. Building 6 has two floors with five doors per floor;
-its interior can be explored independently because the campus artwork does not
-identify its outdoor entrance.
+| Building | Floors | Rooms per floor | Total rooms |
+| --- | --- | --- | --- |
+| A | 1 | 2 | 2 |
+| B | 2 | 2 | 4 |
+| C | 2 | 5 | 10 |
+| Chemistry Lab | 1 | 1 | 1 |
+| D (upper right) | 1 | 2 | 2 |
+| E (beside the pond) | 2 | 3 | 6 |
+| 6 | 2 | 5 | 10 |
+
+Every two-floor building has working stairs. Added interiors reuse sections of the
+supplied floor plan, with connected exits. Building 6 can be explored independently
+because the campus artwork does not identify its outdoor entrance. Open grounds
+are walkable; solid buildings, pond water, fences and dense tree clusters block travel.
 
 The original artwork is preserved as extracted from the design PDF. Gameplay and
 selection indicators are separate overlays. These are illustration-based walking
@@ -104,6 +114,7 @@ installed on your machine, set `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` when runnin
 - `src/components/map/CampusExplorer.tsx`: map, controls, character and scene transitions
 - `src/components/map/campus-data.ts`: map bounds, walking corridors, rooms and entrances
 - `src/components/map/navigation.ts`: collision checks and A* pathfinding
+- `src/components/map/CampusBreeze.tsx`: tree and grass animation overlays
 - `src/components/map/campus-explorer.css`: interface styling
 - `public/maps/`: original embedded artwork
 
