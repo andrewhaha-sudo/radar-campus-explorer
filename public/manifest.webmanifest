@@ -1,25 +1,11 @@
 {
-  "name": "RADAR — Campus Safety",
-  "short_name": "RADAR",
-  "description": "Campus safety, hazard tracking, room scanning, alerts, evacuation, recovery and analytics for schools.",
+  "name": "Campus Explorer",
+  "short_name": "Campus Explorer",
+  "description": "Explore the original pixel-art campus and school hallways.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "orientation": "any",
-  "background_color": "#070C16",
-  "theme_color": "#12233F",
-  "icons": [
-    {
-      "src": "/favicon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any"
-    },
-    {
-      "src": "/favicon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "maskable"
-    }
-  ]
+  "background_color": "#f7f6fa",
+  "theme_color": "#7352b5",
+  "icons": [{ "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
 }

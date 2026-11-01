@@ -23,6 +23,7 @@ import type { Place, Room, SceneId } from "./campus-data";
 import { canTravel, findPath } from "./navigation";
 import type { Point } from "./navigation";
 import "./campus-explorer.css";
+import { cn } from "../../lib/cn";
 
 const distance = (a: Point, b: Point) => Math.hypot(a.x - b.x, a.y - b.y);
 const movementKeys: Record<string, Point> = {
@@ -48,7 +49,7 @@ function Student({
   return (
     <g
       transform={`translate(${position.x},${position.y})`}
-      className={`campus-student ${moving ? "is-walking" : ""}`}
+      className={cn("campus-student", moving && "is-walking")}
       aria-label="Your character"
       pointerEvents="none"
     >
@@ -470,15 +471,15 @@ export function CampusExplorer() {
   return (
     <div
       ref={explorer}
-      className={`campus-explorer ${expanded ? "campus-explorer--expanded" : ""}`}
+      className={cn("campus-explorer", expanded && "campus-explorer--expanded")}
       onKeyDown={keyDown}
     >
       <header className="campus-heading">
         <div>
           <span className="campus-eyebrow">
-            <span /> RADAR / EXPLORE YOUR CAMPUS
+            <span /> EXPLORE YOUR CAMPUS
           </span>
-          <h1>Every path. Every place.</h1>
+          <h1>Campus Explorer</h1>
           <p>
             Your school map, brought to life. Pick a destination and explore.
           </p>
@@ -543,7 +544,12 @@ export function CampusExplorer() {
             </div>
           </div>
           <div
-            className={`campus-viewport ${indoor ? "campus-viewport--indoor" : ""}`}
+            id="campus-map"
+            data-zoomed={zoom > 1}
+            className={cn(
+              "campus-viewport",
+              indoor && "campus-viewport--indoor",
+            )}
             ref={viewport}
             tabIndex={0}
             aria-label="Map controls: arrow keys or WASD to walk, E to interact"
@@ -600,7 +606,11 @@ export function CampusExplorer() {
                         role="button"
                         tabIndex={0}
                         aria-label={`Explore ${place.name}`}
-                        className={`campus-hotspot ${selected?.id === place.id ? "campus-hotspot--selected" : ""}`}
+                        className={cn(
+                          "campus-hotspot",
+                          selected?.id === place.id &&
+                            "campus-hotspot--selected",
+                        )}
                         onClick={(e) => {
                           e.stopPropagation();
                           choosePlace(place);
@@ -622,7 +632,11 @@ export function CampusExplorer() {
                       role="button"
                       tabIndex={0}
                       aria-label={`Walk to ${room.name}`}
-                      className={`campus-hotspot ${selectedRoom?.id === room.id ? "campus-hotspot--selected" : ""}`}
+                      className={cn(
+                        "campus-hotspot",
+                        selectedRoom?.id === room.id &&
+                          "campus-hotspot--selected",
+                      )}
                       onClick={(e) => {
                         e.stopPropagation();
                         chooseRoom(room);
@@ -798,7 +812,10 @@ export function CampusExplorer() {
                       {visiblePlaces.map((place) => (
                         <button
                           key={place.id}
-                          className={`campus-location ${selected?.id === place.id ? "is-selected" : ""}`}
+                          className={cn(
+                            "campus-location",
+                            selected?.id === place.id && "is-selected",
+                          )}
                           onClick={() => choosePlace(place)}
                           disabled={artOnly}
                         >
@@ -933,14 +950,14 @@ export function CampusExplorer() {
           </section>
           <p className="campus-note">
             <span>REFERENCE MAP</span>Exploration routes illustrate the supplied
-            artwork. Check the geographic map for school records; these routes
-            are not verified evacuation guidance.
+            artwork. These are illustrative walking routes, not verified
+            evacuation guidance.
           </p>
         </aside>
       </div>
       <footer className="campus-footer">
         <span>
-          RADAR <i>✦</i> A familiar place. A new perspective.
+          Campus Explorer <i>✦</i> A familiar place. A new perspective.
         </span>
         <span>Click to explore · E to interact</span>
       </footer>

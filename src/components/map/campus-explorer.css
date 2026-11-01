@@ -7,7 +7,7 @@
   color: var(--campus-ink);
   padding: 28px clamp(16px, 3vw, 40px) 20px;
   font-family: var(--app-font-sans);
-  min-height: calc(100svh - 120px);
+  min-height: 100dvh;
 }
 .campus-explorer--expanded {
   position: fixed;
@@ -103,7 +103,7 @@
 }
 .campus-viewport {
   overflow: auto;
-  max-height: 85svh;
+  max-height: none;
   background: #292642;
   scrollbar-width: thin;
   scrollbar-color: #9d84c7 #292642;
@@ -611,4 +611,14 @@
   .campus-controls .campus-dpad {
     display: none;
   }
+}
+
+.campus-viewport[data-zoomed="true"] {
+  max-height: 80dvh;
+}
+.campus-explorer.campus-explorer--expanded {
+  padding-top: max(28px, env(safe-area-inset-top));
+  padding-right: max(16px, env(safe-area-inset-right));
+  padding-bottom: max(20px, env(safe-area-inset-bottom));
+  padding-left: max(16px, env(safe-area-inset-left));
 }

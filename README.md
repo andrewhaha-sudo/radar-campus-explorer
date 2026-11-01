@@ -1,209 +1,91 @@
-# RADAR
+# Campus Explorer
 
-**RADAR** is a campus safety and disaster-response platform for schools. It brings the
-campus map, guided room inspections, hazard findings, alerts, evacuation routes,
-emergency resources, safety check-ins, recovery tasks and analytics into one auditable
-record with server-enforced role permissions.
+A standalone, interactive pixel-art school map. The home page opens directly to the
+campus. Walk between buildings, explore the supplied indoor hallways, choose a
+classroom, and travel between floors using the internal stairs.
 
-RADAR is deliberately honest about its limits:
+This version runs entirely in the browser. It has no RADAR dashboard, login,
+backend, database, Supabase configuration, or required API keys.
 
-- It **never contacts emergency services**. Call your local emergency number when there
-  is immediate danger.
-- AI-assisted detection is reported as **unconfigured** until a provider is connected.
-  Observations entered by people require verification.
-- Live disaster feeds are reported as **unconfigured** until a connector is configured.
-  Nothing is fabricated to look live.
-- Numbers come from stored records. Local SQLite initializes a demonstration school;
-  selected Camarines Norte workspaces begin empty and require verified campus records.
-  Hosted mode does not seed demonstration users or school activity.
+## Run on your computer
 
-For the supplied PDF implementation checklist, new operations screens, external-service requirements and known gaps, see [RADAR 2.0 features](docs/RADAR-2-FEATURES.md).
-
-## Features
-
-| Area | What it does |
-| --- | --- |
-| Campus map | Buildings, floors, rooms, equipment, hazards, evacuation routes and assembly points with keyless tile basemaps. |
-| Guided scans | Room-by-room inspections with observations, evidence uploads and review workflow. |
-| Hazard workspace | Severity, verification, ownership, corrective actions, evidence and full history. |
-| Incidents | Open, update and close incidents, with linked hazards and roll call. |
-| Roll call | Class expectations, individual rosters/statuses, teacher ownership, authenticated QR check-ins, history and CSV reports. |
-| Alerts | Four-level alerts (green / yellow / orange / red) with delivery and read tracking, plus manual advisories. |
-| Disaster watch | Source-linked advisories with freshness states and an opt-in USGS earthquake adapter; other unconfigured feeds remain explicit. |
-| Safety check-ins | “I’m safe” / “I need help” status with optional location sharing and staff board. |
-| Evacuation | Route and assembly-point status, accessible alternatives, roll-call snapshot and printable directory. |
-| Resources | AEDs, extinguishers, first aid, eyewash, spill kits, lighting and radios with expiry and last-checked state. |
-| Recovery | Repair and inspection tasks plus damage assessments with an explicit clearance decision. |
-| Analytics | Trends, severity mix, building coverage, alert reach and CSV exports scoped to permissions. |
-| Offline | Installable PWA shell, user-triggered read-only data pack, and an explicit outbox that never replays silently. |
-| Administration | Users, roles, audit log and school settings. |
-
-## Roles
-
-Permissions are enforced by the API, not just hidden in the UI.
-
-- **Administrator** — full access, user management and audit history.
-- **Safety inspector** — scans, hazards, incidents, alerts, evacuation, resources and recovery.
-- **Teacher** — class roll call, safety check-ins, hazard reporting and read access to campus safety state.
-- **Responder** — incident, evacuation, resource and alert response.
-- **Student / parent** — campus map, alerts addressed to them, safety check-in and their own class information.
-
-## Tech stack
-
-- React 19 + TypeScript + Vite
-- Tailwind CSS v4 (semantic tokens, four themes, light/dark/system modes, custom accent)
-- Leaflet with OpenStreetMap / Esri World Imagery / OpenTopoMap tiles (no API key required)
-- Recharts for analytics
-- Node.js API (`node:http`, `node:sqlite`) with optional PostgreSQL/Supabase, scrypt password hashing,
-  HttpOnly session cookies, server-side RBAC and an append-only audit log
-- Service worker for the production app shell; explicit Cache API data pack for offline reads
-
-## Publish on Vercel
-
-To host the full app at a separate web address, create a **new Vercel project** connected to **`andrewhaha-sudo/radar-campus-explorer` → `main`**. Use Vite, Node.js 24.x, build command `npm run build`, and output directory `dist`. Configure Supabase using the guide below, then deploy. Vercel assigns the new project's address; the original RADAR project's domains stay unchanged. Reusing the same Supabase project shares accounts and school data; choose a new Supabase project for independent data.
-
-Use [the Vercel guide](docs/VERCEL.md) to deploy the frontend and Node API with Supabase persistence. New users can register with Gmail or another valid email, select a school and request access. Administrators approve school roles and set a verified campus location in **Buildings & rooms**. The **Campus operations → Setup & launch** checklist shows actual prerequisites.
-
-## Getting started
-
-Requirements: Node.js 24+ and npm.
+Install Node.js **24 LTS**, then:
 
 ```bash
+git clone https://github.com/andrewhaha-sudo/radar-campus-explorer.git
+cd radar-campus-explorer
 npm ci
-npm run seed      # create server/data/radar.db and seed the demo school
-npm run dev       # starts matching API + Vite; uses free ports when defaults are busy
+npm run dev
 ```
 
-Open the **Local** address printed by this Vite process. Restart after pulling backend updates; an old terminal/tab may still serve an earlier version.
+Open the **Local** address printed by Vite. If you already cloned this repository,
+stop the previous development server, run `git pull` and `npm ci`, then start it
+again with `npm run dev`. There is no seed command or API server to start.
 
-Production build:
+## Use the map
+
+- Click a building or a mapped walkway to walk there.
+- Use **WASD**, **arrow keys**, or the on-screen direction buttons to move manually.
+  Manual movement cancels an automatic route.
+- Press **E** near an entrance, staircase, or exit to interact.
+- Choose a classroom to follow its connected route, including stairs when needed.
+- Open **Indoor floor plans** to view the complete source sheet or an individual building.
+- Use zoom, expand, or **Original artwork only** to inspect the maps.
+
+Building A has one floor and two classroom doors. Building B has two floors with
+two doors per floor. Building 6 has two floors with five doors per floor; its
+interior can be explored independently because the campus artwork does not identify
+its outdoor entrance. No interiors are invented for buildings without supplied art.
+
+The original artwork is preserved as extracted from the design PDF. Gameplay and
+selection indicators are separate overlays. These are illustration-based walking
+routes, not verified evacuation guidance. See [asset provenance](public/maps/README.md).
+
+## Publish your own website
+
+Import **andrewhaha-sudo/radar-campus-explorer**, branch **main**, into a Vercel project:
+
+| Setting | Value |
+| --- | --- |
+| Framework | Vite |
+| Root directory | Repository root |
+| Node.js | 24.x |
+| Install command | `npm ci` |
+| Build command | `npm run build` |
+| Output directory | `dist` |
+| Environment variables | None required |
+
+Click **Deploy** and open the address Vercel assigns. To update an existing Vercel
+project, deploy the latest commit on `main`. Previous Supabase settings are no longer
+used. [Full deployment instructions](docs/VERCEL.md).
+
+The generated `dist` directory also works on a static host at the site's root.
+The browser requests only the app bundle and local artwork; it does not call a school API.
+
+## Checks
 
 ```bash
+npm test
+npm run lint
 npm run build
-npm start         # serves the built app and API from 127.0.0.1:8787
+npx playwright install chromium
+npm run test:e2e
 ```
 
-### Seeded accounts
+The browser tests serve the production build with a static file server and verify
+that the app works without accounts or an API. To use a Chromium binary already
+installed on your machine, set `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` when running
+`npm run test:e2e`. `npm run preview` previews the built app locally.
 
-| Role | Email | Password |
-| --- | --- | --- |
-| Administrator | `admin@northridge.edu` | `Admin#2026` |
-| Safety inspector | `inspector@northridge.edu` | `Inspect#2026` |
-| Teacher | `teacher@northridge.edu` | `Teach#2026` |
-| Responder | `responder@northridge.edu` | `Respond#2026` |
-| Student | `student@northridge.edu` | `Student#2026` |
-| Parent | `parent@northridge.edu` | `Parent#2026` |
+## Source
 
-Change these credentials before using a real deployment.
+- `src/App.tsx`: standalone entry page
+- `src/components/map/CampusExplorer.tsx`: map, controls, character and scene transitions
+- `src/components/map/campus-data.ts`: map bounds, walking corridors, rooms and entrances
+- `src/components/map/navigation.ts`: collision checks and A* pathfinding
+- `src/components/map/campus-explorer.css`: interface styling
+- `public/maps/`: original embedded artwork
 
-### Data and migration
-
-- The SQLite database lives at `server/data/radar.db` (WAL mode).
-- If a pre-rename `hazardlink.db` exists and `radar.db` does not, the server copies it
-  once so existing installations keep their records.
-- Sessions use the `radar_session` cookie. Theme and offline preferences are stored under
-  `radar:*` keys; legacy `hazardlink:*` preferences are migrated on first load.
-- Run `npm run seed` only against an empty database — it skips seeding when users exist.
-
-## Environment
-
-| Variable | Default | Purpose |
-| --- | --- | --- |
-| `PORT` | `8787` | API/HTTP port |
-| `HOST` | `127.0.0.1` | Bind address |
-| `NODE_ENV` | `development` | `production` serves `dist` with SPA fallback |
-| `RADAR_DB_DIR` | `server/data` | Optional database directory override |
-
-No external service keys are required. Map tiles use keyless providers; if a tile
-provider is unreachable the map degrades rather than inventing features.
-
-## Accessibility and safety conventions
-
-- Severity and alert level are always shown with an icon, a symbol **and** a text label —
-  never colour alone.
-- Destructive or public actions (publishing an alert, closing a route, clearing a room)
-  require confirmation and are written to the audit log.
-- Offline writes stay in the local outbox until the user explicitly chooses **Send queued**.
-- Cached data is labelled as a snapshot; the UI never implies it is live.
-- Reduced-motion preferences are respected across the radar ambient background and page
-  transitions.
-
-## Scripts
-
-| Script | Description |
-| --- | --- |
-| `npm run dev` | API + Vite dev server |
-| `npm run dev:ui` | Vite only |
-| `npm run dev:api` | API only |
-| `npm run seed` | Seed an empty database |
-| `npm run lint` | Oxlint |
-| `npm test` | API integration tests (isolated temporary database) |
-| `npm run build` | Type-check and production build |
-| `npm start` | Production server |
-
-## Project layout
-
-### Illustrated campus explorer
-
-Open **Campus map → Campus explorer** to use the original campus and indoor artwork
-supplied in the design-reference PDF. Click buildings or classroom destinations,
-walk with WASD / arrow keys or the touch controls, and press **E** at entrances,
-stairs, or exits. The classroom selector follows connected paths through Building A
-or B; Building 6 is available through **Indoor floor plans** because its outdoor
-entrance is not identified in the campus artwork. **Geographic map** retains the
-database-backed map view.
-
-**Original artwork only** hides the character and interactive layers. These are
-illustration-based exploration routes, not verified evacuation guidance. Asset
-provenance and geometry configuration are documented in [public/maps/README.md](public/maps/README.md).
-
-### Source directories
-
-```
-server/            Node HTTP API, SQLite schema, seed data, uploads
-src/components/    Reusable UI, layout and domain components
-src/context/       Theme, auth and offline providers
-src/lib/           Typed API client, types, tokens, offline helpers
-src/pages/         Route-level pages
-public/            Manifest, favicon, service worker
-```
-
-## License
-
-Internal school deployment software. Add your organisation's licence before distributing.
-
-## Camarines Norte school workspaces
-
-Sign in as an administrator, click the school selector in the top bar, and choose a school. Click **Create school workspace** to create a separate, empty campus database and open its dashboard. Existing workspaces have an **Open school workspace** button. The selector also lets you return to the original workspace.
-
-On the new dashboard, choose **Add buildings & rooms**. Expand **Add buildings, floors & rooms**, then add a building with its real latitude/longitude, a floor, and rooms. The first building supplies the campus map's initial center. Until then, map views show a labelled Camarines Norte overview; no school coordinates or inspection results are fabricated. Buildings, rooms, hazards, alerts and other operational records are never copied from the demonstration campus.
-
-The directory remains a historical 2020–2021 masterlist, with the source documented in `src/data/README.md`. Creating a workspace is local RADAR setup, not verification of official school affiliation. School administrators can approve membership requests and assign school-specific roles. Approved members can open that school workspace; new membership requests still require approval.
-
-The original account database stays in `server/data/radar.db` (or `RADAR_DB_DIR/radar.db`). School databases are stored at `RADAR_DB_DIR/workspaces/<BEIS ID>/radar.db`, with each school's uploaded files in that directory's `uploads/` subfolder. Back up the entire data directory, including SQLite WAL files when present, and the original `server/uploads/` directory. Workspace databases are created without demo seeding. Existing original-campus records are retained; schema upgrades add workspace registration, session selection, and school-location metadata automatically on server startup.
-
-The last authorized workspace selection is remembered on the account and restored at sign-in, including school-specific roles. Each session carries its active school scope. A request's workspace expectation prevents stale tabs and queued writes from being applied to another school after a switch. Offline data packs and outboxes are separated by account and workspace; older unscoped data packs and queued items are not automatically migrated or replayed. Downloads and uploads use the selected school scope. New workspace uploads require the owner's authenticated session and are not publicly cached.
-
-After updating this code, stop the old development server with Ctrl+C and run `npm run dev` again so the API loads the new routes and migrations. `npm test` includes integration checks for ownership, empty-school creation, campus record creation, isolation, stale requests, uploads, and persistence across server restart.
-
-## Supabase accounts and cloud storage
-
-RADAR can use Supabase Auth, PostgreSQL and private Storage instead of local SQLite/files. See [Supabase connection instructions](docs/SUPABASE.md). Copy `.env.example` to `.env` and configure the server-only database connection, storage key and administrator email before enabling `RADAR_DATABASE_DRIVER=postgres`. Local records are retained and are not automatically migrated or uploaded.
-
-## Advanced tools and isolated testing
-
-Open **Campus operations → Advanced tools & testing** for campus video survey, roster imports, custom reports, official datasets, measured footprint models, calibrated pins, aggregate count devices, foreground GPS and peer relay. See [Testing and configuration](docs/TESTING-AND-CONFIGURATION.md) for prerequisites and honest integration limits.
-
-Run `npm run build` then `npm run test:lab` for disposable local practice on port 8799. Use `npm run setup:integrations` to configure private optional providers locally and `npm run config:check` for presence diagnostics. No live deployment or private provider activation is implied.
-
-## Interface refresh
-
-The dashboard now uses one bounded campus panel, and **Tools & setup** provides searchable tasks and pinned shortcuts. The new Photo Route Studio supports manual image sketches, optional AI proposals, field notes and school-scoped saving. [See the interface preview and workflow guide](docs/INTERFACE-REFRESH.md). Image sketches remain separate from verified evacuation routes.
-
-## Welcome and account continuity
-
-Animated preparedness slides introduce the sign-in screen, followed by a role-aware getting-started tour. The selected authorized school now survives logout and login. [See behavior, previews and update instructions](docs/WELCOME-AND-ACCOUNT-RESTORATION.md).
-
-## GIS hazard mapping
-
-Upload a school photo or video and generate an editable image-map draft with the configured vision provider, or draw manually. Optionally place a top-down draft using three known coordinates. Compare building pins with geographic hazard areas and separately reviewed CNN segmentation outputs. Export overlap results to QGIS. [GIS workflow and CNN prerequisites](docs/GIS-AND-CNN.md). CNN training/inference is external; RADAR does not bundle a trained hazard model.
+Map coordinates use the images' original pixels, independent of screen size or zoom.
+The `public/sw.js` file retires an old full-app service worker if this site previously
+hosted that version; the standalone app does not register a new service worker.
