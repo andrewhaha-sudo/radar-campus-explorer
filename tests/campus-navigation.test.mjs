@@ -5,7 +5,12 @@ import {
   canTravel,
   isWalkable,
 } from "../src/components/map/navigation.ts";
-import { scenes, places } from "../src/components/map/campus-data.ts";
+import {
+  scenes,
+  places,
+  allRooms,
+  entranceForScene,
+} from "../src/components/map/campus-data.ts";
 
 test("every mapped campus entrance is reachable without crossing a blocked area", () => {
   const { spawn, walkable } = scenes.campus;
@@ -18,10 +23,12 @@ test("every mapped campus entrance is reachable without crossing a blocked area"
   }
 });
 
-test("all sixteen classroom doors and both sets of stairs have connected approaches", () => {
+test("all twenty room doors and both sets of stairs have connected approaches", () => {
   assert.deepEqual(
-    ["a1", "b1", "b2", "six1", "six2"].map((id) => scenes[id].rooms.length),
-    [2, 2, 2, 5, 5],
+    ["a1", "b1", "b2", "c1", "lab1", "d1", "six1", "six2"].map(
+      (id) => scenes[id].rooms.length,
+    ),
+    [2, 2, 2, 1, 1, 2, 5, 5],
   );
   for (const scene of Object.values(scenes).filter(
     (scene) => scene.rooms.length,
@@ -84,4 +91,31 @@ test("A* follows an L-shaped hallway without cutting its corner", () => {
   assert.ok(route);
   for (let i = 1; i < route.length; i++)
     assert.ok(canTravel(route[i - 1], route[i], areas));
+});
+
+test("new interiors have unique photo IDs and return to their matching outdoor entrances", () => {
+  assert.equal(allRooms.length, 20);
+  assert.equal(new Set(allRooms.map((room) => room.id)).size, allRooms.length);
+  for (const [sceneId, buildingId] of [
+    ["c1", "c"],
+    ["lab1", "lab"],
+    ["d1", "d"],
+  ]) {
+    const building = entranceForScene(sceneId);
+    assert.equal(building.id, buildingId);
+    assert.equal(building.interior, sceneId);
+    assert.ok(
+      findPath(scenes.campus.spawn, building.arrival, scenes.campus.walkable),
+    );
+    for (const room of scenes[sceneId].rooms) {
+      assert.ok(
+        findPath(room.point, scenes[sceneId].exit, scenes[sceneId].walkable),
+      );
+    }
+  }
+  const pondSide = places.find((place) => place.id === "e");
+  assert.equal(pondSide.name, "Building E");
+  assert.ok(pondSide.bounds.x < 400);
+  assert.equal(pondSide.interior, undefined);
+  assert.equal(entranceForScene("six1"), undefined);
 });

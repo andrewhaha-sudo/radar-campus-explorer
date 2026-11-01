@@ -7,6 +7,7 @@ import {
   ArrowUp,
   ArrowUpRight,
   Building2,
+  Image as PhotoIcon,
   Check,
   ChevronLeft,
   Crosshair,
@@ -18,7 +19,15 @@ import {
   Plus,
   RotateCcw,
 } from "lucide-react";
-import { allRooms, places, scenes } from "./campus-data";
+import {
+  allRooms,
+  places,
+  scenes,
+  interiorBuildings,
+  entranceForScene,
+} from "./campus-data";
+import { RoomPhotoDialog } from "./RoomPhotoDialog";
+import { RouteOverlay } from "./RouteOverlay";
 import type { Place, Room, SceneId } from "./campus-data";
 import { canTravel, findPath } from "./navigation";
 import type { Point } from "./navigation";
@@ -86,6 +95,40 @@ function Student({
   );
 }
 
+function RoomDoor({
+  room,
+  selected,
+  onOpen,
+}: {
+  room: Room;
+  selected: boolean;
+  onOpen: (room: Room) => void;
+}) {
+  return (
+    <g
+      role="button"
+      tabIndex={0}
+      data-room-id={room.id}
+      aria-label={`Open ${room.name} photo`}
+      className={cn("campus-hotspot", selected && "campus-hotspot--selected")}
+      onClick={(event) => {
+        event.stopPropagation();
+        onOpen(room);
+      }}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          event.stopPropagation();
+          onOpen(room);
+        }
+      }}
+    >
+      <title>{room.name} — view or add a photo</title>
+      <rect {...room.door} />
+    </g>
+  );
+}
+
 export function CampusExplorer() {
   const [sceneId, setSceneId] = useState<SceneId>("campus");
   const [position, setPosition] = useState<Point>(scenes.campus.spawn);
@@ -97,6 +140,9 @@ export function CampusExplorer() {
     "Welcome! Choose a building, or walk in through the main gate.",
   );
   const [route, setRoute] = useState<Point[]>([]);
+  const [showRoute, setShowRoute] = useState(true);
+  const [photoRoom, setPhotoRoom] = useState<Room | null>(null);
+  const photoReturnFocus = useRef<HTMLElement | null>(null);
   const [zoom, setZoom] = useState(1);
   const [artOnly, setArtOnly] = useState(false);
   const [showAreas, setShowAreas] = useState(false);
@@ -182,7 +228,7 @@ export function CampusExplorer() {
     setSelectedRoom(room);
     pendingRoom.current = room;
     if (sceneId === "campus") {
-      const building = places.find((p) => p.id === room.scene[0]);
+      const building = entranceForScene(room.scene);
       if (!building?.arrival || !building.interior) {
         setMessage(
           "Building 6’s outdoor entrance is not identified. Open its floor-plan view to explore.",
@@ -208,6 +254,14 @@ export function CampusExplorer() {
     }
   };
 
+  const openRoomPhoto = (room: Room) => {
+    cancelMovement();
+    held.current.clear();
+    photoReturnFocus.current = document.activeElement as HTMLElement | null;
+    setSelectedRoom(room);
+    setPhotoRoom(room);
+  };
+
   useEffect(() => {
     const room = pendingRoom.current;
     if (!room || sceneId === "campus") return;
@@ -226,7 +280,7 @@ export function CampusExplorer() {
   }, [sceneId, scene, walkTo, changeScene]);
 
   useEffect(() => {
-    if (artOnly || floorSheet) return;
+    if (artOnly || floorSheet || photoRoom) return;
     let frame = 0,
       previous = 0;
     const animate = (time: number) => {
@@ -326,21 +380,22 @@ export function CampusExplorer() {
       window.removeEventListener("blur", release);
       document.removeEventListener("visibilitychange", release);
     };
-  }, [scene, sceneId, artOnly, floorSheet, zoom]);
+  }, [scene, sceneId, artOnly, floorSheet, zoom, photoRoom]);
 
   useEffect(() => {
     if (!expanded) return;
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     const close = (event: globalThis.KeyboardEvent) => {
-      if (event.key === "Escape") setExpanded(false);
+      if (event.key === "Escape" && !event.defaultPrevented && !photoRoom)
+        setExpanded(false);
     };
     window.addEventListener("keydown", close);
     return () => {
       document.body.style.overflow = previousOverflow;
       window.removeEventListener("keydown", close);
     };
-  }, [expanded]);
+  }, [expanded, photoRoom]);
 
   const nearbyBuilding =
     sceneId === "campus"
@@ -358,7 +413,7 @@ export function CampusExplorer() {
       setMessage("Building 6 has no assigned outdoor entrance.");
       return;
     }
-    const building = places.find((p) => p.id === sceneId[0]);
+    const building = entranceForScene(sceneId);
     changeScene("campus", building?.arrival);
   };
   const interact = () => {
@@ -372,6 +427,7 @@ export function CampusExplorer() {
     if (
       artOnly ||
       floorSheet ||
+      photoRoom ||
       (event.target as HTMLElement).matches("input, select, textarea, button")
     )
       return;
@@ -386,7 +442,7 @@ export function CampusExplorer() {
     }
   };
   const clickMap = (event: React.MouseEvent<SVGSVGElement>) => {
-    if (artOnly || floorSheet) return;
+    if (artOnly || floorSheet || photoRoom) return;
     const matrix = svg.current?.getScreenCTM();
     if (!matrix) return;
     const point = new DOMPoint(event.clientX, event.clientY).matrixTransform(
@@ -405,7 +461,7 @@ export function CampusExplorer() {
   const displayedRooms = allRooms.filter((room) =>
     sceneId === "campus"
       ? !room.scene.startsWith("six")
-      : room.scene.replace(/\d$/, "") === sceneId.replace(/\d$/, ""),
+      : scenes[room.scene].buildingId === scene.buildingId,
   );
   const visiblePlaces = places.filter((p) =>
     `${p.name} ${p.kind}`.toLowerCase().includes(query.toLowerCase()),
@@ -567,12 +623,50 @@ export function CampusExplorer() {
                   : `${scene.name} interactive map`
               }
             >
-              <image
-                href={floorSheet ? "/maps/floor-plans.jpg" : scene.image}
-                width={floorSheet ? 2048 : scene.imageWidth}
-                height={floorSheet ? 682 : scene.imageHeight}
-                style={{ imageRendering: "pixelated" }}
-              />
+              {!floorSheet && scene.artworkPieces ? (
+                scene.artworkPieces.map((piece, index) => (
+                  <svg
+                    key={index}
+                    x={piece.target.x}
+                    y={piece.target.y}
+                    width={piece.source.width}
+                    height={piece.source.height}
+                    viewBox={`${piece.source.x} ${piece.source.y} ${piece.source.width} ${piece.source.height}`}
+                    overflow="hidden"
+                  >
+                    <image
+                      href={scene.image}
+                      width={scene.imageWidth}
+                      height={scene.imageHeight}
+                      style={{ imageRendering: "pixelated" }}
+                    />
+                  </svg>
+                ))
+              ) : (
+                <image
+                  href={floorSheet ? "/maps/floor-plans.jpg" : scene.image}
+                  width={floorSheet ? 2048 : scene.imageWidth}
+                  height={floorSheet ? 682 : scene.imageHeight}
+                  style={{ imageRendering: "pixelated" }}
+                />
+              )}
+              {floorSheet &&
+                !artOnly &&
+                allRooms
+                  .filter((room) =>
+                    ["a1", "b1", "b2", "six1", "six2"].includes(room.scene),
+                  )
+                  .map((room) => (
+                    <RoomDoor
+                      key={room.id}
+                      room={room}
+                      selected={selectedRoom?.id === room.id}
+                      onOpen={(room) => {
+                        changeScene(room.scene);
+                        openRoomPhoto(room);
+                      }}
+                    />
+                  ))}
               {!artOnly && !floorSheet && (
                 <>
                   {showAreas &&
@@ -587,17 +681,32 @@ export function CampusExplorer() {
                         pointerEvents="none"
                       />
                     ))}
-                  {route.length > 1 && (
-                    <polyline
-                      points={[position, ...route]
-                        .map((p) => `${p.x},${p.y}`)
-                        .join(" ")}
-                      fill="none"
-                      stroke="#ffffff"
-                      strokeWidth={4}
-                      strokeDasharray="6 6"
-                      pointerEvents="none"
-                    />
+                  {showRoute && route.length > 0 && (
+                    <RouteOverlay points={[position, ...route]} />
+                  )}
+                  {sceneId === "campus" && (
+                    <g aria-label="Building E sign" pointerEvents="none">
+                      <rect
+                        x="301"
+                        y="477"
+                        width="87"
+                        height="24"
+                        fill="#fff6d8"
+                      />
+                      <text
+                        x="344"
+                        y="498"
+                        textAnchor="middle"
+                        fontFamily="Arial, sans-serif"
+                        fontWeight="700"
+                        fontSize="25"
+                        textLength="87"
+                        lengthAdjust="spacingAndGlyphs"
+                        fill="#181719"
+                      >
+                        Bldg. E
+                      </text>
+                    </g>
                   )}
                   {sceneId === "campus" &&
                     places.map((place) => (
@@ -627,30 +736,12 @@ export function CampusExplorer() {
                       </g>
                     ))}
                   {scene.rooms.map((room) => (
-                    <g
+                    <RoomDoor
                       key={room.id}
-                      role="button"
-                      tabIndex={0}
-                      aria-label={`Walk to ${room.name}`}
-                      className={cn(
-                        "campus-hotspot",
-                        selectedRoom?.id === room.id &&
-                          "campus-hotspot--selected",
-                      )}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        chooseRoom(room);
-                      }}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" || e.key === " ") {
-                          e.preventDefault();
-                          chooseRoom(room);
-                        }
-                      }}
-                    >
-                      <title>{room.name}</title>
-                      <rect {...room.door} />
-                    </g>
+                      room={room}
+                      selected={selectedRoom?.id === room.id}
+                      onOpen={openRoomPhoto}
+                    />
                   ))}
                   {scene.stairs && (
                     <g
@@ -717,7 +808,15 @@ export function CampusExplorer() {
               />{" "}
               Original artwork only
             </label>
-            <span>Source artwork preserved</span>
+            <label>
+              <input
+                type="checkbox"
+                checked={showRoute}
+                onChange={(event) => setShowRoute(event.target.checked)}
+                disabled={artOnly || floorSheet}
+              />{" "}
+              Show route arrows
+            </label>
           </div>
           {!artOnly && !floorSheet && (
             <div className="campus-status" role="status">
@@ -746,36 +845,25 @@ export function CampusExplorer() {
             {floorSheet ? (
               <>
                 <p className="campus-small">
-                  Choose a building to explore its original hallways.
+                  Choose a building to explore its hallways. Click a room door
+                  to view or add a photo.
                 </p>
-                {(["a1", "b1", "six1"] as const).map((id) => (
+                {interiorBuildings.map((building) => (
                   <button
                     className="campus-location"
-                    key={id}
+                    key={building.scene}
                     onClick={() => {
                       cancelMovement();
                       setSelectedRoom(null);
-                      changeScene(id);
+                      changeScene(building.scene);
                     }}
                   >
                     <span className="campus-location-icon">
                       <Building2 size={18} />
                     </span>
                     <span>
-                      <strong>
-                        {id === "a1"
-                          ? "Building A"
-                          : id === "b1"
-                            ? "Building B"
-                            : "Building 6"}
-                      </strong>
-                      <small>
-                        {id === "a1"
-                          ? "1 floor · 2 classrooms"
-                          : id === "b1"
-                            ? "2 floors · 4 classrooms"
-                            : "2 floors · 10 classrooms"}
-                      </small>
+                      <strong>{building.name}</strong>
+                      <small>{building.kind}</small>
                     </span>
                     <ArrowUpRight size={15} />
                   </button>
@@ -889,6 +977,15 @@ export function CampusExplorer() {
                     </option>
                   ))}
                 </select>
+                {selectedRoom && (
+                  <button
+                    className="campus-secondary campus-room-photo-button"
+                    disabled={artOnly}
+                    onClick={() => openRoomPhoto(selectedRoom)}
+                  >
+                    <PhotoIcon size={16} /> View / add room photo
+                  </button>
+                )}
                 {scene.stairs && (
                   <button
                     className="campus-secondary campus-wide"
@@ -927,7 +1024,8 @@ export function CampusExplorer() {
             <h2>Make your way around.</h2>
             <p>
               Click a place to walk there. Use the arrow keys or <b>W A S D</b>{" "}
-              to take over.
+              to take over. Turn route arrows on to see the direction of travel.
+              Click a room door to view its photo.
             </p>
             {directionPad}
             <label className="campus-walking-toggle">
@@ -961,6 +1059,23 @@ export function CampusExplorer() {
         </span>
         <span>Click to explore · E to interact</span>
       </footer>
+      {photoRoom && (
+        <RoomPhotoDialog
+          key={photoRoom.id}
+          room={photoRoom}
+          onClose={() => setPhotoRoom(null)}
+          onWalk={() => {
+            const room = photoRoom;
+            setPhotoRoom(null);
+            chooseRoom(room);
+          }}
+          onRestoreFocus={() => {
+            if (photoReturnFocus.current?.isConnected)
+              photoReturnFocus.current.focus({ preventScroll: true });
+            else viewport.current?.focus({ preventScroll: true });
+          }}
+        />
+      )}
     </div>
   );
 }

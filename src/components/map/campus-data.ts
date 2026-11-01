@@ -1,6 +1,7 @@
 import type { Point, Rect } from "./navigation";
 
-export type SceneId = "campus" | "a1" | "b1" | "b2" | "six1" | "six2";
+export type SceneId =
+  "campus" | "a1" | "b1" | "b2" | "c1" | "lab1" | "d1" | "six1" | "six2";
 export interface Room {
   id: string;
   name: string;
@@ -9,6 +10,7 @@ export interface Room {
   door: Rect;
 }
 export interface Scene {
+  buildingId?: string;
   name: string;
   image: string;
   imageWidth: number;
@@ -19,6 +21,7 @@ export interface Scene {
   rooms: Room[];
   stairs?: { point: Point; to: SceneId };
   exit?: Point;
+  artworkPieces?: { source: Rect; target: Point }[];
 }
 export interface Place {
   id: string;
@@ -39,20 +42,22 @@ export const places: Place[] = [
   {
     id: "c",
     name: "Building C",
-    kind: "Campus building",
+    kind: "1 floor · 1 room",
     bounds: rect(80, 260, 208, 143),
     arrival: { x: 181, y: 409 },
+    interior: "c1",
     description:
-      "The yellow classroom building beside the chemistry laboratory. No interior artwork was supplied for this building.",
+      "One classroom in a compact hallway, using the same tiles, green door and cream walls as the supplied floor plan.",
   },
   {
     id: "lab",
     name: "Chemistry Lab",
-    kind: "Laboratory",
+    kind: "1 floor · 1 room",
     bounds: rect(305, 291, 189, 107),
     arrival: { x: 408, y: 408 },
+    interior: "lab1",
     description:
-      "The red laboratory building on the north campus walkway. Its original flask sign and entrance are preserved.",
+      "A single laboratory room, reached through a hallway in the supplied floor-plan style.",
   },
   {
     id: "b",
@@ -75,22 +80,23 @@ export const places: Place[] = [
       "A single hallway with two classroom doors and the original central exit.",
   },
   {
-    id: "east-d",
-    name: "Building d · East",
-    kind: "Campus building",
+    id: "d",
+    name: "Building D",
+    kind: "1 floor · 2 rooms",
     bounds: rect(1005, 309, 204, 95),
     arrival: { x: 1112, y: 411 },
+    interior: "d1",
     description:
-      "The east building keeps the lowercase “bldg. d” label in your artwork. No interior floor plan was supplied.",
+      "The upper-right campus building. Explore its two rooms in a hallway matching the supplied floor plan.",
   },
   {
-    id: "west-d",
-    name: "Building D · West",
+    id: "e",
+    name: "Building E",
     kind: "Campus building",
     bounds: rect(286, 452, 111, 253),
     arrival: { x: 347, y: 716 },
     description:
-      "The long classroom building beside the pond. No interior floor plan was supplied.",
+      "The pond-side building is now named Building E. An interior has not been assigned to this building.",
   },
   {
     id: "court",
@@ -134,7 +140,11 @@ function rooms(
   doorY: number,
   floor: number,
 ): Room[] {
-  const prefix = scene.startsWith("six") ? "6" : scene[0].toUpperCase();
+  const prefix = scene.startsWith("six")
+    ? "6"
+    : scene.startsWith("lab")
+      ? "LAB"
+      : scene[0].toUpperCase();
   return xs.map((x, i) => ({
     id: `${prefix}-${floor}0${i + 1}`,
     name: `Room ${prefix}-${floor}0${i + 1}`,
@@ -147,6 +157,19 @@ const indoor = {
   image: "/maps/floor-plans.jpg",
   imageWidth: 2048,
   imageHeight: 682,
+};
+// Reuse source sections of the A hallway, omitting its second doorway. The right
+// end wall and plant move next to the first section; source image bytes stay intact.
+const singleRoomHallway = {
+  ...indoor,
+  crop: rect(58, 286, 422, 357),
+  spawn: { x: 328, y: 602 },
+  walkable: [rect(87, 396, 363, 43), rect(308, 428, 41, 199)],
+  exit: { x: 328, y: 604 },
+  artworkPieces: [
+    { source: rect(58, 286, 360, 357), target: { x: 58, y: 286 } },
+    { source: rect(540, 286, 62, 357), target: { x: 418, y: 286 } },
+  ],
 };
 export const scenes: Record<SceneId, Scene> = {
   campus: {
@@ -178,6 +201,7 @@ export const scenes: Record<SceneId, Scene> = {
   },
   a1: {
     ...indoor,
+    buildingId: "a",
     name: "Building A · Floor 1",
     crop: rect(58, 286, 544, 357),
     spawn: { x: 328, y: 602 },
@@ -187,6 +211,7 @@ export const scenes: Record<SceneId, Scene> = {
   },
   b1: {
     ...indoor,
+    buildingId: "b",
     name: "Building B · Floor 1",
     crop: rect(637, 410, 567, 229),
     spawn: { x: 936, y: 607 },
@@ -197,6 +222,7 @@ export const scenes: Record<SceneId, Scene> = {
   },
   b2: {
     ...indoor,
+    buildingId: "b",
     name: "Building B · Floor 2",
     crop: rect(637, 242, 567, 167),
     spawn: { x: 735, y: 381 },
@@ -204,8 +230,31 @@ export const scenes: Record<SceneId, Scene> = {
     rooms: rooms("b2", [900, 1103], 315, 2),
     stairs: { point: { x: 735, y: 381 }, to: "b1" },
   },
+  c1: {
+    ...singleRoomHallway,
+    buildingId: "c",
+    name: "Building C · Floor 1",
+    rooms: rooms("c1", [183], 338, 1),
+  },
+  lab1: {
+    ...singleRoomHallway,
+    buildingId: "lab",
+    name: "Chemistry Lab · Floor 1",
+    rooms: rooms("lab1", [183], 338, 1),
+  },
+  d1: {
+    ...indoor,
+    buildingId: "d",
+    name: "Building D · Floor 1",
+    crop: rect(58, 286, 544, 357),
+    spawn: { x: 328, y: 602 },
+    walkable: [rect(87, 396, 485, 43), rect(308, 428, 41, 199)],
+    rooms: rooms("d1", [183, 483], 338, 1),
+    exit: { x: 328, y: 604 },
+  },
   six1: {
     ...indoor,
+    buildingId: "six",
     name: "Building 6 · Floor 1",
     crop: rect(1241, 410, 759, 229),
     spawn: { x: 1626, y: 607 },
@@ -216,6 +265,7 @@ export const scenes: Record<SceneId, Scene> = {
   },
   six2: {
     ...indoor,
+    buildingId: "six",
     name: "Building 6 · Floor 2",
     crop: rect(1241, 242, 759, 167),
     spawn: { x: 1334, y: 381 },
@@ -226,3 +276,24 @@ export const scenes: Record<SceneId, Scene> = {
 };
 
 export const allRooms = Object.values(scenes).flatMap((scene) => scene.rooms);
+
+export const interiorBuildings = [
+  ...places
+    .filter((place): place is Place & { interior: SceneId } =>
+      Boolean(place.interior),
+    )
+    .map((place) => ({
+      name: place.name,
+      kind: place.kind,
+      scene: place.interior,
+    })),
+  {
+    name: "Building 6",
+    kind: "2 floors · 10 classrooms",
+    scene: "six1" as SceneId,
+  },
+];
+
+export function entranceForScene(id: SceneId) {
+  return places.find((place) => place.id === scenes[id].buildingId);
+}

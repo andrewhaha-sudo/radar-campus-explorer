@@ -33,7 +33,14 @@ old `functions.api/index.mjs.excludeFiles` error does not apply to this version.
 - Click **Building B**, enter the building, and navigate to a floor-two classroom.
 - Open **Indoor floor plans** and inspect Building 6's five doors on each floor.
 - Check touch controls at a phone-sized viewport.
+- Open Building C, Chemistry Lab and Building D; verify their one-, one- and two-room interiors.
+- Toggle route arrows and click a room door to add a local photo. Reload and reopen that room.
 - In the browser's Network panel, confirm the map images load and no `/api/` requests occur.
+
+Room photo uploads save in the visitor's browser and do not need server configuration.
+For photos everyone can view, deploy actual image files in `public/room-photos/` and
+their room mappings in `public/room-photos.json`; see that folder's README. Do not add
+Supabase variables solely for this feature.
 
 If this origin previously served the full RADAR app, refresh after the new deployment.
 The replacement `sw.js` retires the previous shell cache without deleting saved

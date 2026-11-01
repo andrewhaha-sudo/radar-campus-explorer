@@ -81,14 +81,14 @@ test("preserves Building 6 rooms and supports original-artwork view and controls
     .getByRole("button", { name: "Building 6 2 floors · 10 classrooms" })
     .click();
   await expect(
-    page.locator('.campus-hotspot[aria-label^="Walk to Room"]'),
+    page.locator('.campus-hotspot[data-room-id]'),
   ).toHaveCount(5);
   await page.getByRole("button", { name: "Walk to floor 2" }).click();
   await expect(page.locator(".campus-map-toolbar")).toContainText(
     "Building 6 · Floor 2",
   );
   await expect(
-    page.locator('.campus-hotspot[aria-label^="Walk to Room"]'),
+    page.locator('.campus-hotspot[data-room-id]'),
   ).toHaveCount(5);
   await page.getByLabel("Original artwork only").check();
   await expect(page.locator(".campus-student")).toHaveCount(0);
