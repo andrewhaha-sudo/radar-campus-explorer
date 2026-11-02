@@ -1,5 +1,14 @@
 import { expect, test } from "@playwright/test";
 
+test("selecting Building B lists only its illustrated rooms", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: "Explore Building B", exact: true }).click();
+  await expect(page.getByText("Illustration room labels from this map.")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Room B-101" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Room B-201" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Room C-101" })).toHaveCount(0);
+});
+
 test("gps stays off the character until the device is calibrated", async ({
   page,
   context,
@@ -10,6 +19,10 @@ test("gps stays off the character until the device is calibrated", async ({
   await expect(page.locator("[data-gps-status]")).toHaveAttribute(
     "data-gps-status",
     "disabled",
+  );
+  await expect(page.locator("[data-movement-mode]")).toHaveAttribute(
+    "data-movement-mode",
+    "manual",
   );
   const player = page.locator("[data-player='you']");
   await expect(player).toHaveAttribute("data-x", "387");
@@ -127,6 +140,10 @@ test("saving the current location creates a demo calibration the character can f
     "data-gps-status",
     "connected",
     { timeout: 20_000 },
+  );
+  await expect(page.locator("[data-movement-mode]")).toHaveAttribute(
+    "data-movement-mode",
+    "follow",
   );
   const player = page.locator("[data-player='you']");
   await expect

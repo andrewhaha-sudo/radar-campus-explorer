@@ -5,6 +5,7 @@ import {
   directionFromHeading,
   distanceMeters,
   LocationWatcher,
+  movementMode,
   predictReading,
   shouldPublishPose,
 } from "../src/lib/location-sync.ts";
@@ -115,6 +116,23 @@ test("heading follows the calibrated map axes instead of raw screen direction", 
   assert.equal(
     directionFromHeading(180, { north: { x: 0, y: -10 }, east: { x: 10, y: 0 } }),
     "down",
+  );
+});
+
+test("manual exploration stays distinct from location follow", () => {
+  assert.equal(movementMode({ enabled: false, paused: false, status: "disabled" }).id, "manual");
+  assert.equal(
+    movementMode({ enabled: true, paused: false, status: "calibration_required" }).label,
+    "Manual exploration",
+  );
+  assert.equal(movementMode({ enabled: true, paused: false, status: "connected" }).id, "follow");
+  assert.equal(
+    movementMode({ enabled: true, paused: true, status: "connected" }).id,
+    "manual",
+  );
+  assert.equal(
+    movementMode({ enabled: true, paused: false, status: "low_accuracy" }).id,
+    "approximate",
   );
 });
 

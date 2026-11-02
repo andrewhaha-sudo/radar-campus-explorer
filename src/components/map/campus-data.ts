@@ -370,3 +370,14 @@ export const interiorBuildings = [
 export function entranceForScene(id: SceneId) {
   return places.find((place) => place.id === scenes[id].buildingId);
 }
+
+export function illustrationBuilding(placeId: string) {
+  const floors = (Object.entries(scenes) as [SceneId, Scene][])
+    .filter(([, scene]) => scene.buildingId === placeId)
+    .map(([sceneId, scene]) => ({
+      sceneId,
+      name: scene.name,
+      rooms: scene.rooms.map((room) => ({ id: room.id, name: room.name })),
+    }));
+  return floors;
+}

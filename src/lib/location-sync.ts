@@ -209,6 +209,18 @@ export function accuracyRadiusPixels(
   return radius;
 }
 
+export function movementMode(input: {
+  enabled: boolean;
+  paused: boolean;
+  status: GpsStatus;
+}): { id: "manual" | "follow" | "approximate"; label: string } {
+  if (input.enabled && !input.paused && input.status === "connected")
+    return { id: "follow", label: "Location follow" };
+  if (input.enabled && !input.paused && input.status === "low_accuracy")
+    return { id: "approximate", label: "Approximate location" };
+  return { id: "manual", label: "Manual exploration" };
+}
+
 export function shouldPublishPose(input: {
   sharing: boolean;
   hidden: boolean;

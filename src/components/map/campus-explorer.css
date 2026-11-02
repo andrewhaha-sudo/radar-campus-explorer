@@ -647,6 +647,43 @@
   margin: 8px 0;
   font-size: 13px;
 }
+.campus-mode,
+.campus-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.campus-mode {
+  color: #5d566e;
+}
+.campus-mode::before,
+.campus-live::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+.campus-mode::before {
+  background: #8d84a0;
+}
+.campus-mode--approximate {
+  color: #8a5a12;
+}
+.campus-mode--approximate::before {
+  background: #d39a2c;
+}
+.campus-building-rooms {
+  display: grid;
+  gap: 6px;
+  margin: 8px 0;
+}
+.campus-building-rooms button {
+  font-size: 11px;
+}
 .campus-live {
   display: inline-flex;
   align-items: center;

@@ -12,6 +12,7 @@ import {
   places,
   allRooms,
   entranceForScene,
+  illustrationBuilding,
 } from "../src/components/map/campus-data.ts";
 
 test("every mapped campus entrance is reachable without crossing a blocked area", () => {
@@ -140,6 +141,18 @@ test("grass, pond bank, court and garden clearings connect through the campus ga
     for (let index = 1; index < route.length; index++)
       assert.ok(canTravel(route[index - 1], route[index], walkable));
   }
+});
+
+test("building B lists only its illustrated floors and rooms", () => {
+  const floors = illustrationBuilding("b");
+  assert.deepEqual(
+    floors.map((floor) => floor.rooms.map((room) => room.id)),
+    [
+      ["B-101", "B-102"],
+      ["B-201", "B-202"],
+    ],
+  );
+  assert.equal(illustrationBuilding("court").length, 0);
 });
 
 test("gps follow catches up in a straight line and stops at a wall", () => {

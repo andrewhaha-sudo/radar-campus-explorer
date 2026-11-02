@@ -26,6 +26,7 @@ import {
   scenes,
   interiorBuildings,
   entranceForScene,
+  illustrationBuilding,
 } from "./campus-data";
 import { RoomPhotoDialog } from "./RoomPhotoDialog";
 import { RouteOverlay } from "./RouteOverlay";
@@ -40,7 +41,8 @@ import { advanceToward, canTravel, findPath, isWalkable } from "./navigation";
 import type { Point } from "./navigation";
 import { LocationSyncPanel } from "./LocationSyncPanel";
 import { useLocationSync } from "./useLocationSync";
-import { followTarget } from "../../lib/location-sync";
+import { followTarget, movementMode } from "../../lib/location-sync";
+import type { GpsStatus } from "../../lib/location-sync";
 import "./campus-explorer.css";
 import { cn } from "../../lib/cn";
 
@@ -131,6 +133,63 @@ function RoomDoor({
       <title>{room.name} — view or add a photo</title>
       <rect {...room.door} />
     </g>
+  );
+}
+
+function MovementMode(props: {
+  enabled: boolean;
+  paused: boolean;
+  status: GpsStatus;
+}) {
+  const mode = movementMode(props);
+  return (
+    <span
+      className={cn(
+        mode.id === "follow" ? "campus-live" : "campus-mode",
+        mode.id === "approximate" && "campus-mode--approximate",
+      )}
+      data-movement-mode={mode.id}
+    >
+      {mode.label}
+    </span>
+  );
+}
+
+function BuildingRooms({
+  placeId,
+  onRoom,
+}: {
+  placeId: string;
+  onRoom: (room: Room) => void;
+}) {
+  const floors = illustrationBuilding(placeId);
+  if (!floors.length) return null;
+  return (
+    <div className="campus-building-rooms">
+      <p className="campus-small">
+        Illustration room labels from this map. Not a school database.
+      </p>
+      {floors.map((floor) => (
+        <div key={floor.sceneId}>
+          <strong>{floor.name}</strong>
+          <div className="campus-location-actions">
+            {floor.rooms.map((room) => (
+              <button
+                key={room.id}
+                type="button"
+                className="campus-secondary"
+                onClick={() => {
+                  const full = allRooms.find((item) => item.id === room.id);
+                  if (full) onRoom(full);
+                }}
+              >
+                {room.name}
+              </button>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
   );
 }
 
@@ -736,9 +795,11 @@ export function CampusExplorer() {
               <strong>
                 {floorSheet ? "Original school floor plans" : scene.name}
               </strong>
-              {gps.tracking && (
-                <span className="campus-live">Live location</span>
-              )}
+              <MovementMode
+                enabled={gps.enabled}
+                paused={gpsPausedByUser}
+                status={gps.status}
+              />
             </span>
             <div>
               <button
@@ -1223,6 +1284,10 @@ export function CampusExplorer() {
                   <div className="campus-place-details">
                     <strong>{selected.name}</strong>
                     <p>{selected.description}</p>
+                    <BuildingRooms
+                      placeId={selected.id}
+                      onRoom={(room) => chooseRoom(room)}
+                    />
                     {selected.interior && (
                       <button
                         className="campus-primary"
