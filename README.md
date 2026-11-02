@@ -122,7 +122,7 @@ communicate with the configured Supabase project over authenticated requests.
 ## Live location
 
 GPS is off until you choose **Enable GPS** in **Live location**. For a quick
-try, stand on the outdoor map and choose **Save my current location for demo**.
+try, stand on the outdoor map and choose **Save my location** at the top of the page.
 That stores this phone’s current GPS at the character’s current spot. It is a
 DEMO: north is toward the top of the map and about 8 pixels equal 1 meter. It
 is not a surveyed school map. Then walk a few steps outdoors.

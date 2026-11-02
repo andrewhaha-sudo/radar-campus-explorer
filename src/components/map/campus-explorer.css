@@ -623,6 +623,16 @@
   padding-bottom: max(20px, env(safe-area-inset-bottom));
   padding-left: max(16px, env(safe-area-inset-left));
 }
+.campus-save-location {
+  font-size: 14px;
+  min-height: 42px;
+}
+@media (max-width: 600px) {
+  .campus-save-location {
+    width: 100%;
+    justify-content: center;
+  }
+}
 .campus-location-sync {
   background: #fff;
   border: 1px solid var(--campus-line);

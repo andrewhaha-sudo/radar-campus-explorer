@@ -653,6 +653,18 @@ export function CampusExplorer() {
         </div>
         <div className="campus-profile-actions">
           <button
+            type="button"
+            className="campus-primary campus-save-location"
+            onClick={() => {
+              setGpsPausedByUser(false);
+              gps.saveDemoAt({ x: player.current.x, y: player.current.y });
+            }}
+            disabled={gps.savingDemo || sceneId !== "campus" || floorSheet}
+          >
+            <MapPin size={16} />
+            {gps.savingDemo ? "Reading location…" : "Save my location"}
+          </button>
+          <button
             className="campus-secondary"
             onClick={() => openStudent("self")}
           >
@@ -1054,12 +1066,6 @@ export function CampusExplorer() {
             calibration={gps.calibration}
             onSaveCalibration={gps.saveCalibration}
             onClearCalibration={gps.clearCalibration}
-            onSaveDemo={() => {
-              setGpsPausedByUser(false);
-              gps.saveDemoAt({ x: player.current.x, y: player.current.y });
-            }}
-            savingDemo={gps.savingDemo}
-            indoors={sceneId !== "campus"}
             picking={calibrationPick}
             onPick={setCalibrationPick}
             pickedPixel={pickedPixel}

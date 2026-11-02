@@ -119,7 +119,7 @@ test("saving the current location creates a demo calibration the character can f
   await context.grantPermissions(["geolocation"]);
   await context.setGeolocation({ latitude: 14, longitude: 121, accuracy: 5 });
   await page.goto("/");
-  await page.getByRole("button", { name: "Save my current location for demo" }).click();
+  await page.getByRole("button", { name: "Save my location" }).click();
   await expect(page.getByText("DEMO calibration saved").first()).toBeVisible({
     timeout: 20_000,
   });

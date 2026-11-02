@@ -44,9 +44,6 @@ export function LocationSyncPanel({
   calibration,
   onSaveCalibration,
   onClearCalibration,
-  onSaveDemo,
-  savingDemo,
-  indoors,
   picking,
   onPick,
   pickedPixel,
@@ -65,9 +62,6 @@ export function LocationSyncPanel({
   calibration: MapCalibration;
   onSaveCalibration: (points: CalibrationPoint[]) => string | null;
   onClearCalibration: () => void;
-  onSaveDemo: () => void;
-  savingDemo: boolean;
-  indoors: boolean;
   picking: number | null;
   onPick: (index: number | null) => void;
   pickedPixel: { index: number; x: number; y: number } | null;
@@ -155,19 +149,12 @@ export function LocationSyncPanel({
           Use GPS again
         </button>
       )}
-      <button
-        type="button"
-        className="campus-primary campus-wide"
-        onClick={onSaveDemo}
-        disabled={savingDemo || indoors}
-      >
-        {savingDemo ? "Reading location…" : "Save my current location for demo"}
-      </button>
       <p className="campus-small">
-        DEMO only. Saves this phone’s current GPS at the character’s current
-        spot and assumes north is toward the top of the map, about 8 pixels per
-        meter. It is not a surveyed school map. Coordinates stay on this device
-        and are not shown to other students.
+        Use <strong>Save my location</strong> at the top of the page. DEMO only:
+        it saves this phone’s current GPS at the character’s current spot.
+        North is toward the top of the map, about 8 pixels per meter. It is not
+        a surveyed school map. Coordinates stay on this device and are not
+        shown to other students.
       </p>
       <details className="campus-calibration">
         <summary>Calibrate this device</summary>
