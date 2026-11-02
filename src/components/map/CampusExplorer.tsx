@@ -45,7 +45,7 @@ import { LocationSyncPanel } from "./LocationSyncPanel";
 import { useLocationSync } from "./useLocationSync";
 import { followTarget, movementMode } from "../../lib/location-sync";
 import { useRadar } from "../radar/radar-context";
-import { collectStamp } from "../../lib/radar-records";
+import { collectStamp, hazardsForBuilding } from "../../lib/radar-records";
 import type { GpsStatus } from "../../lib/location-sync";
 import "./campus-explorer.css";
 import { cn } from "../../lib/cn";
@@ -156,6 +156,38 @@ function MovementMode(props: {
     >
       {mode.label}
     </span>
+  );
+}
+
+function PlaceHazards({ placeId }: { placeId: string }) {
+  const { records } = useRadar();
+  const hazards = hazardsForBuilding(records, placeId);
+  return (
+    <div className="campus-place-hazards">
+      <p className="campus-small">
+        {hazards.length === 0
+          ? "No hazard reports for this building."
+          : `${hazards.length} device hazard report${hazards.length === 1 ? "" : "s"}. Not school-verified.`}
+      </p>
+      {hazards.length > 0 && (
+        <ul className="campus-hazard-list">
+          {hazards.map((hazard) => (
+            <li key={hazard.id}>
+              <strong>{hazard.status}</strong> {hazard.description}
+            </li>
+          ))}
+        </ul>
+      )}
+      <button
+        type="button"
+        className="campus-secondary"
+        onClick={() => {
+          window.location.hash = "hazards";
+        }}
+      >
+        Open hazard reports
+      </button>
+    </div>
   );
 }
 
@@ -1362,6 +1394,7 @@ export function CampusExplorer() {
                       placeId={selected.id}
                       onRoom={(room) => chooseRoom(room)}
                     />
+                    <PlaceHazards placeId={selected.id} />
                     {selected.interior && (
                       <button
                         className="campus-primary"

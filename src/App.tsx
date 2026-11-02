@@ -1,3 +1,4 @@
+import { ErrorBoundary } from "./components/radar/ErrorBoundary";
 import { RadarProvider } from "./components/radar/RadarProvider";
 import { RadarShell } from "./components/radar/RadarShell";
 import { StudentProfilesProvider } from "./components/student/StudentProfiles";
@@ -11,7 +12,9 @@ export default function App() {
       <main>
         <StudentProfilesProvider>
           <RadarProvider>
-            <RadarShell />
+            <ErrorBoundary>
+              <RadarShell />
+            </ErrorBoundary>
           </RadarProvider>
         </StudentProfilesProvider>
       </main>

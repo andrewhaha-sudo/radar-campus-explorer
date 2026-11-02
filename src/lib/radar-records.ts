@@ -144,6 +144,12 @@ export function emptyRecords(): RadarRecords {
   };
 }
 
+export function hazardsForBuilding(records: RadarRecords, buildingId: string) {
+  return records.hazards.filter(
+    (hazard) => hazard.buildingId === buildingId && hazard.status !== "rejected",
+  );
+}
+
 export function createHazard(
   input: Omit<HazardReport, "id" | "source" | "status" | "createdAt" | "reviewedAt">,
   now = new Date().toISOString(),
@@ -153,7 +159,7 @@ export function createHazard(
   return {
     ...input,
     description,
-    id: `hazard-${now}`,
+    id: `hazard-${now}-${description.length}`,
     source: "DEMO",
     status: "reported",
     createdAt: now,

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CampusExplorer } from "../map/CampusExplorer";
 import { allRooms, places } from "../map/campus-data";
 import { illustrationBuilding } from "../map/campus-data";
@@ -15,36 +15,45 @@ import { safetyGuidance } from "../../lib/safety-guidance";
 import { useRadar } from "./radar-context";
 import { PeopleScreen, ReportsScreen, ResourcesScreen } from "./Operations";
 import { checkInWithCode } from "../../lib/radar-records";
+import { formatRoute, parseRoute, radarScreens } from "../../lib/radar-route";
 import "./radar.css";
 
-const screens = [
-  ["campus", "Campus"],
-  ["hazards", "Hazards"],
-  ["inspect", "Inspect"],
-  ["alerts", "Alerts"],
-  ["safety", "Safety"],
-  ["sos", "SOS"],
-  ["people", "People"],
-  ["resources", "Resources"],
-  ["reports", "Reports"],
-] as const;
-
-type Screen = (typeof screens)[number][0];
+const screenLabels: Record<(typeof radarScreens)[number], string> = {
+  campus: "Campus",
+  hazards: "Hazards",
+  inspect: "Inspect",
+  alerts: "Alerts",
+  safety: "Safety",
+  sos: "SOS",
+  people: "People",
+  resources: "Resources",
+  reports: "Reports",
+};
 
 export function RadarShell() {
-  const [screen, setScreen] = useState<Screen>("campus");
+  const [screen, setScreen] = useState(() => parseRoute(window.location.hash));
   const { records } = useRadar();
+  useEffect(() => {
+    const sync = () => setScreen(parseRoute(window.location.hash));
+    window.addEventListener("hashchange", sync);
+    return () => window.removeEventListener("hashchange", sync);
+  }, []);
+  const open = (id: (typeof radarScreens)[number]) => {
+    const next = formatRoute(id);
+    if (window.location.hash === next) setScreen(id);
+    else window.location.hash = next;
+  };
   return (
     <>
       <nav className="radar-nav" aria-label="RADAR sections">
-        {screens.map(([id, label]) => (
+        {radarScreens.map((id) => (
           <button
             key={id}
             type="button"
             aria-current={screen === id ? "page" : undefined}
-            onClick={() => setScreen(id)}
+            onClick={() => open(id)}
           >
-            {label}
+            {screenLabels[id]}
             {id === "alerts" && records.alerts.length > 0
               ? ` (${records.alerts.length})`
               : ""}

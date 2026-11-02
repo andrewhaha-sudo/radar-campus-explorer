@@ -8,6 +8,7 @@ import {
   collectStamp,
   createAlert,
   createHazard,
+  hazardsForBuilding,
   emptyRecords,
   lowStock,
   markAttendance,
@@ -18,6 +19,27 @@ import {
   searchRecords,
 } from "../src/lib/radar-records.ts";
 import { safetyGuidance } from "../src/lib/safety-guidance.ts";
+
+test("rejected hazards stay off the building they belong to", () => {
+  const open = createHazard({
+    category: "fire",
+    buildingId: "b",
+    roomId: "",
+    description: "Practice scorch mark",
+    severity: "low",
+  });
+  const other = createHazard({
+    category: "flood",
+    buildingId: "e",
+    roomId: "",
+    description: "Practice puddle",
+    severity: "low",
+  });
+  let records = { ...emptyRecords(), hazards: [open, other] };
+  assert.equal(hazardsForBuilding(records, "b").length, 1);
+  records = reviewHazard(records, open.id, "rejected");
+  assert.equal(hazardsForBuilding(records, "b").length, 0);
+});
 
 test("a hazard stays a demo report until a person reviews it", () => {
   const hazard = createHazard({

@@ -1,5 +1,13 @@
 import { expect, test } from "@playwright/test";
 
+test("a section address survives reload", async ({ page }) => {
+  await page.goto("/#safety");
+  await expect(page.getByRole("heading", { name: "Safety" })).toBeVisible();
+  await page.reload();
+  await expect(page.getByRole("heading", { name: "Safety" })).toBeVisible();
+  await expect(page).toHaveURL(/#safety$/);
+});
+
 test("hazard, safety, and sos records stay on this device", async ({ page }) => {
   await page.goto("/");
   await page.getByRole("button", { name: "Hazards", exact: true }).click();
@@ -48,6 +56,7 @@ test("selecting Building B lists only its illustrated rooms", async ({ page }) =
   await expect(page.locator("[data-stamp='b']")).toHaveAttribute("data-stamped", "true");
   await expect(page.getByText("Stamp collected: Building B")).toBeVisible();
   await expect(page.getByText("Illustration room labels from this map.")).toBeVisible();
+  await expect(page.getByText("No hazard reports for this building.")).toBeVisible();
   await expect(page.getByRole("button", { name: "Room B-101" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Room B-201" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Room C-101" })).toHaveCount(0);
