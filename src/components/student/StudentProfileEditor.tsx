@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { campusRoles, readCampusRole, writeCampusRole } from "../../lib/campus-role";
+import type { CampusRole } from "../../lib/campus-role";
 import { grades, identityFields } from "../../lib/student-profile";
 import { CharacterSelection } from "./CharacterSelection";
 import { ProfilePhotoUploader } from "./ProfilePhotoUploader";
@@ -18,6 +20,9 @@ export function StudentProfileEditor({
   const [photoChanged, setPhotoChanged] = useState(false);
   const [photoPending, setPhotoPending] = useState(false);
   const [chooseCharacter, setChooseCharacter] = useState(false);
+  const [role, setRole] = useState<CampusRole | "">(() =>
+    readCampusRole(profile.user_id),
+  );
   const [error, setError] = useState("");
   return (
     <form
@@ -28,6 +33,7 @@ export function StudentProfileEditor({
         if (photoPending) return;
         try {
           await save(draft, draftPhoto, photoChanged);
+          writeCampusRole(profile.user_id, role);
           onDone(true);
         } catch (cause) {
           setError(
@@ -88,6 +94,24 @@ export function StudentProfileEditor({
             placeholder="Teacher's name"
           />
         </label>
+        <label>
+          Role on this device
+          <select
+            aria-label="Role on this device"
+            value={role}
+            onChange={(event) => setRole(event.target.value as CampusRole | "")}
+          >
+            <option value="">Not set</option>
+            {campusRoles.map((item) => (
+              <option key={item}>{item}</option>
+            ))}
+          </select>
+        </label>
+        <p className="campus-small">
+          Student, Teacher, Staff or Visitor. This role stays in this browser.
+          It is not sent with the student account and other students cannot see
+          it.
+        </p>
         <label>
           Sex
           <select

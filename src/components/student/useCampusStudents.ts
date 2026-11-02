@@ -1,20 +1,24 @@
 import { useEffect, useRef, useState } from "react";
 import { studentCloud, listCampusStudents } from "../../lib/student-cloud";
+import { shouldPublishPose } from "../../lib/location-sync.ts";
 import type { CampusStudent, Direction } from "../../lib/student-profile";
 import { useStudentProfile } from "./student-context";
 
-export function useCampusStudents(pose: {
-  scene: string;
-  x: number;
-  y: number;
-  direction: Direction;
-  moving: boolean;
-}) {
+export function useCampusStudents(
+  pose: {
+    scene: string;
+    x: number;
+    y: number;
+    direction: Direction;
+    moving: boolean;
+  },
+  gpsEnabled = false,
+) {
   const { user, profile, loading } = useStudentProfile();
-  const latest = useRef(pose);
+  const latest = useRef({ pose, gpsEnabled });
   useEffect(() => {
-    latest.current = pose;
-  }, [pose]);
+    latest.current = { pose, gpsEnabled };
+  }, [pose, gpsEnabled]);
   const [result, setResult] = useState<{
     owner: string;
     students: CampusStudent[];
@@ -30,12 +34,18 @@ export function useCampusStudents(pose: {
       if (busy || !active) return;
       busy = true;
       try {
-        if (document.hidden || !profile.sharing) {
+        if (
+          !shouldPublishPose({
+            sharing: profile.sharing,
+            hidden: document.hidden,
+            gpsEnabled: latest.current.gpsEnabled,
+          })
+        ) {
           await client.from("explorer_presence").delete().eq("user_id", id);
         } else {
           const sent = await client
             .from("explorer_presence")
-            .upsert({ user_id: id, ...latest.current });
+            .upsert({ user_id: id, ...latest.current.pose });
           if (sent.error)
             throw new Error(
               "Your character could not connect to other students.",
@@ -73,7 +83,7 @@ export function useCampusStudents(pose: {
         .eq("user_id", id)
         .then(() => {});
     };
-  }, [id, profile.sharing, loading]);
+  }, [id, profile.sharing, loading, gpsEnabled]);
   return {
     students: id && !loading && result?.owner === id ? result.students : [],
     error: id && result?.owner === id ? result.error : "",
