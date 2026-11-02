@@ -17,7 +17,7 @@ serverless function or private server key is required.
 6. The public student project settings are included. Apply the
    [student profile SQL setup](STUDENT-PROFILES.md) in Supabase to enable accounts.
    Environment overrides are optional. The included `vercel.json` configures static hosting.
-6. Click **Deploy**, then open the address assigned by Vercel.
+7. Click **Deploy**, then open the address assigned by Vercel.
 
 The original RADAR application's hosting project is separate. This repository's
 home page is the explorer itself, without a RADAR shell or login redirect.
