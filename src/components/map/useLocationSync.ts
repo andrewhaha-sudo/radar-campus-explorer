@@ -75,7 +75,7 @@ export function useLocationSync(indoors: boolean, mapActive: boolean) {
       if (!point) return null;
       if (
         current &&
-        Math.hypot(current.x - point.x, current.y - point.y) < 12
+        Math.hypot(current.x - point.x, current.y - point.y) < 4
       )
         return current;
       return point;
@@ -156,7 +156,7 @@ export function useLocationSync(indoors: boolean, mapActive: boolean) {
       setStatus("connected");
       setMessage(
         calibrationRef.current.demo
-          ? "DEMO calibration saved. GPS Connected. Walk outdoors to see the character follow. North is toward the top of the map, about 8 pixels per meter. This is not a surveyed campus."
+          ? "DEMO calibration saved. GPS Connected. The character moves straight to the latest fix. North is toward the top of the map, about 8 pixels per meter. This is not a surveyed campus."
           : "GPS Connected. The character follows reliable outdoor fixes on this device only.",
       );
       setHeading(headingDirection(reading, calibrationRef.current));

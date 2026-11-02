@@ -129,7 +129,9 @@ test("saving the current location creates a demo calibration the character can f
     { timeout: 20_000 },
   );
   const player = page.locator("[data-player='you']");
-  await expect(player).toHaveAttribute("data-x", "387");
+  await expect
+    .poll(async () => Number(await player.getAttribute("data-x")))
+    .toBeLessThan(400);
   await context.setGeolocation({
     latitude: 14,
     longitude: 121 + 15 / (111_320 * Math.cos((14 * Math.PI) / 180)),

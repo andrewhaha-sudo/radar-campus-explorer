@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {
+  advanceToward,
   findPath,
   canTravel,
   isWalkable,
@@ -139,6 +140,18 @@ test("grass, pond bank, court and garden clearings connect through the campus ga
     for (let index = 1; index < route.length; index++)
       assert.ok(canTravel(route[index - 1], route[index], walkable));
   }
+});
+
+test("gps follow catches up in a straight line and stops at a wall", () => {
+  const open = [{ x: 0, y: 0, width: 200, height: 40 }];
+  const arrived = advanceToward({ x: 10, y: 20 }, { x: 150, y: 20 }, open, 1);
+  assert.ok(Math.abs(arrived.x - 150) < 1);
+  assert.ok(Math.abs(arrived.y - 20) < 1);
+  const blocked = subtractObstacles(open, [{ x: 80, y: 0, width: 20, height: 40 }]);
+  const stopped = advanceToward({ x: 10, y: 20 }, { x: 150, y: 20 }, blocked, 1);
+  assert.ok(stopped.x < 80);
+  assert.ok(stopped.x > 10);
+  assert.equal(canTravel({ x: 10, y: 20 }, stopped, blocked), true);
 });
 
 test("carving an obstacle leaves connected ground without allowing travel through it", () => {

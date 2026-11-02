@@ -211,8 +211,8 @@ export class LocationWatcher {
     this.stop();
     this.id = this.source.watchPosition(success, error, {
       enableHighAccuracy: true,
-      maximumAge: 1000,
-      timeout: 20000,
+      maximumAge: 0,
+      timeout: 10000,
     });
   }
 

@@ -186,3 +186,31 @@ export function findPath(
   }
   return null;
 }
+
+// Move directly toward a GPS point and stop at the first wall. A long path
+// around the campus makes the character feel late and off the real direction.
+export function advanceToward(
+  from: Point,
+  to: Point,
+  areas: Rect[],
+  dt: number,
+) {
+  const dx = to.x - from.x;
+  const dy = to.y - from.y;
+  const length = Math.hypot(dx, dy);
+  if (length < 2) return { x: to.x, y: to.y };
+  const stride = Math.min(length, Math.max(length / 0.2, 700) * dt);
+  const at = (t: number): Point => ({
+    x: from.x + dx * t,
+    y: from.y + dy * t,
+  });
+  let lo = 0;
+  let hi = stride / length;
+  if (canTravel(from, at(hi), areas)) return at(hi);
+  for (let i = 0; i < 8; i++) {
+    const mid = (lo + hi) / 2;
+    if (mid > 0 && canTravel(from, at(mid), areas)) lo = mid;
+    else hi = mid;
+  }
+  return lo < 0.001 ? { x: from.x, y: from.y } : at(lo);
+}

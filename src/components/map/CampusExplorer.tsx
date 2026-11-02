@@ -36,7 +36,7 @@ import { useStudentProfile } from "../student/student-context";
 import { useCampusStudents } from "../student/useCampusStudents";
 import type { Character, Direction } from "../../lib/student-profile";
 import type { Place, Room, SceneId } from "./campus-data";
-import { canTravel, findPath, isWalkable } from "./navigation";
+import { advanceToward, canTravel, findPath, isWalkable } from "./navigation";
 import type { Point } from "./navigation";
 import { LocationSyncPanel } from "./LocationSyncPanel";
 import { useLocationSync } from "./useLocationSync";
@@ -179,6 +179,7 @@ export function CampusExplorer() {
     !artOnly && !floorSheet && !photoRoom && !studentId,
   );
   const gpsHeading = useRef(gps.heading);
+  const gpsGoal = useRef<Point | null>(null);
   const { profile, user } = useStudentProfile();
   const { students, error: studentsError } = useCampusStudents(
     {
@@ -343,30 +344,32 @@ export function CampusExplorer() {
 
   useEffect(() => {
     gpsHeading.current = gps.heading;
-  }, [gps.heading]);
-
-  useEffect(() => {
-    const point = gps.placement;
-    if (
-      !point ||
+    const point =
+      !gps.placement ||
       gpsPausedByUser ||
       sceneId !== "campus" ||
       artOnly ||
       floorSheet
-    )
-      return;
-    if (distance(player.current, point) < 12) {
-      if (gpsHeading.current) setDirection(gpsHeading.current);
+        ? null
+        : gps.placement;
+    gpsGoal.current = point;
+    if (!point) return;
+    if (canTravel(player.current, point, scenes.campus.walkable)) {
+      if (routeSource.current === "gps") {
+        path.current = [];
+        arrival.current = null;
+        routeSource.current = null;
+        setRoute([]);
+      }
       return;
     }
-    walkTo(
-      point,
-      () => {
-        if (gpsHeading.current) setDirection(gpsHeading.current);
-      },
-      "gps",
-    );
-  }, [artOnly, floorSheet, gps.placement, gpsPausedByUser, sceneId, walkTo]);
+    const route = findPath(player.current, point, scenes.campus.walkable);
+    if (!route) return;
+    routeSource.current = "gps";
+    path.current = route.slice(1);
+    arrival.current = null;
+    setRoute(route);
+  }, [artOnly, floorSheet, gps.heading, gps.placement, gpsPausedByUser, sceneId]);
 
   useEffect(() => {
     if (artOnly || floorSheet || photoRoom || studentId) return;
@@ -377,14 +380,33 @@ export function CampusExplorer() {
       previous = time;
       const key = [...held.current].at(-1);
       const manual = key ? movementKeys[key] : null;
+      const goal = gpsGoal.current;
       const target = path.current[0];
       let next: Point | null = null;
+      let gpsStepped = false;
       if (manual) {
         const stride = (sceneId === "campus" ? 110 : 145) * dt;
         next = {
           x: player.current.x + manual.x * stride,
           y: player.current.y + manual.y * stride,
         };
+      } else if (goal && sceneId === "campus" && routeSource.current === "gps" && target) {
+        const length = distance(player.current, target);
+        const stride = Math.min(length, Math.max(length / 0.2, 700) * dt);
+        gpsStepped = true;
+        if (length <= stride) {
+          next = target;
+          path.current.shift();
+          setRoute([player.current, ...path.current]);
+        } else {
+          next = {
+            x: player.current.x + ((target.x - player.current.x) / length) * stride,
+            y: player.current.y + ((target.y - player.current.y) / length) * stride,
+          };
+        }
+      } else if (goal && sceneId === "campus") {
+        next = advanceToward(player.current, goal, scene.walkable, dt);
+        gpsStepped = distance(player.current, next) > 0.4;
       } else if (target) {
         const length = distance(player.current, target),
           stride = (sceneId === "campus" ? 155 : 190) * dt;
@@ -442,7 +464,7 @@ export function CampusExplorer() {
         arrival.current = null;
         setMoving(false);
       }
-      if (!manual && !path.current.length) {
+      if (!manual && !path.current.length && !gpsStepped) {
         setMoving(false);
         if (arrival.current) {
           const callback = arrival.current;
