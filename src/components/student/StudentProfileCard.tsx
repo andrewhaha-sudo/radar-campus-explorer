@@ -5,6 +5,7 @@ import {
   Users,
   VenusAndMars,
 } from "lucide-react";
+import { readCampusRole } from "../../lib/campus-role";
 import type { SharedStudent, StudentProfile } from "../../lib/student-profile";
 import { CharacterPortrait, StudentSprite } from "./StudentSprite";
 
@@ -29,6 +30,7 @@ export function StudentProfileCard({
   photoUrl: string | null;
   own?: boolean;
 }) {
+  const role = own ? readCampusRole(profile.user_id) : "";
   return (
     <article
       className="trainer-card"
@@ -78,6 +80,17 @@ export function StudentProfileCard({
           </div>
         </div>
         <dl className="trainer-fields">
+          {own && (
+            <div className="trainer-field">
+              <span className="trainer-field-icon">
+                <IdCard aria-hidden="true" strokeWidth={2.5} />
+              </span>
+              <div>
+                <dt>ROLE:</dt>
+                <dd>{role || "NOT SET"}</dd>
+              </div>
+            </div>
+          )}
           {fields.map(({ key, label, fallback, icon: Icon }) => (
             <div key={key} className="trainer-field">
               <span className="trainer-field-icon">

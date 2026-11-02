@@ -623,3 +623,88 @@
   padding-bottom: max(20px, env(safe-area-inset-bottom));
   padding-left: max(16px, env(safe-area-inset-left));
 }
+.campus-location-sync {
+  background: #fff;
+  border: 1px solid var(--campus-line);
+  border-radius: 12px;
+  padding: 14px;
+}
+.campus-location-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 8px 0;
+  font-size: 13px;
+}
+.campus-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #1f7a49;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.campus-live::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #2f9d62;
+}
+.campus-location-facts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin: 0 0 10px;
+}
+.campus-location-facts dt {
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #736583;
+}
+.campus-location-facts dd {
+  margin: 2px 0 0;
+  font-size: 12px;
+}
+.campus-location-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 8px 0;
+}
+.campus-location-sync .campus-primary,
+.campus-location-sync .campus-secondary {
+  font-size: 11px;
+}
+.campus-calibration summary {
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 750;
+}
+.campus-calibration-point {
+  border: 1px solid #e1dfe8;
+  border-radius: 8px;
+  margin: 8px 0;
+  padding: 8px;
+  display: grid;
+  gap: 6px;
+}
+.campus-calibration-point label {
+  display: grid;
+  gap: 2px;
+  font-size: 10px;
+  color: #5d566e;
+}
+.campus-calibration-point input {
+  font: inherit;
+  font-size: 12px;
+  min-width: 0;
+  padding: 4px 6px;
+  border: 1px solid #d3c8e1;
+  border-radius: 6px;
+  background: #fff;
+}

@@ -119,6 +119,25 @@ The generated `dist` directory also works on a static host at the site's root.
 The map itself does not call a school API. Signed-in profiles and shared characters
 communicate with the configured Supabase project over authenticated requests.
 
+## Live location
+
+GPS is off until you choose **Enable GPS** in **Live location**. The character
+follows the device only on the outdoor map, and only after this browser has three
+surveyed calibration points. The project does not include the school’s latitude
+and longitude. Open **Calibrate this device**, enter each surveyed latitude and
+longitude, and either type the matching outdoor map pixel or choose **Pick on
+map** and click open grass. Save the calibration on this device.
+
+Until that calibration exists, the status stays **Map Calibration Required** and
+the character does not move. Weak, stale, or implausible fixes stay approximate
+and do not move the character or change floors. Coordinates are not stored as a
+history and are not sent to the server or to other students. Keyboard and map
+clicks still walk manually; choose **Use GPS again** to follow the device.
+
+The role on your trainer card (Student, Teacher, Staff, or Visitor) is saved in
+this browser only. It is separate from the walking character and the optional
+profile photo, and it is not uploaded with a student account.
+
 ## Checks
 
 ```bash

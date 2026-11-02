@@ -38,6 +38,8 @@ import type { Character, Direction } from "../../lib/student-profile";
 import type { Place, Room, SceneId } from "./campus-data";
 import { canTravel, findPath, isWalkable } from "./navigation";
 import type { Point } from "./navigation";
+import { LocationSyncPanel } from "./LocationSyncPanel";
+import { useLocationSync } from "./useLocationSync";
 import "./campus-explorer.css";
 import { cn } from "../../lib/cn";
 
@@ -73,6 +75,9 @@ function Student({
       transform={`translate(${position.x},${position.y})`}
       className="campus-student"
       data-animate={animate}
+      data-player="you"
+      data-x={position.x}
+      data-y={position.y}
       role="button"
       tabIndex={0}
       aria-label="Your character"
@@ -161,13 +166,29 @@ export function CampusExplorer() {
   const viewport = useRef<HTMLDivElement>(null);
   const explorer = useRef<HTMLDivElement>(null);
   const scene = scenes[sceneId];
+  const [gpsPausedByUser, setGpsPausedByUser] = useState(false);
+  const [calibrationPick, setCalibrationPick] = useState<number | null>(null);
+  const [pickedPixel, setPickedPixel] = useState<{
+    index: number;
+    x: number;
+    y: number;
+  } | null>(null);
+  const routeSource = useRef<"user" | "gps" | null>(null);
+  const gps = useLocationSync(
+    sceneId !== "campus",
+    mapVisible && !artOnly && !floorSheet && !photoRoom && !studentId,
+  );
+  const gpsHeading = useRef(gps.heading);
   const { profile, user } = useStudentProfile();
-  const { students, error: studentsError } = useCampusStudents({
-    scene: sceneId,
-    ...position,
-    direction,
-    moving,
-  });
+  const { students, error: studentsError } = useCampusStudents(
+    {
+      scene: sceneId,
+      ...position,
+      direction,
+      moving,
+    },
+    gps.enabled,
+  );
   const nearbyStudents = students.filter(
     (student) =>
       student.scene === sceneId && isWalkable(student, scene.walkable),
@@ -192,6 +213,7 @@ export function CampusExplorer() {
     path.current = [];
     arrival.current = null;
     pendingRoom.current = null;
+    routeSource.current = null;
     setRoute([]);
     setMoving(false);
   }, []);
@@ -222,15 +244,19 @@ export function CampusExplorer() {
   }, []);
 
   const walkTo = useCallback(
-    (point: Point, onArrival?: () => void) => {
+    (point: Point, onArrival?: () => void, source: "user" | "gps" = "user") => {
       const next = findPath(player.current, point, scenes[sceneId].walkable);
       if (!next) {
         setMessage(
-          "That spot is blocked. Choose open grass, a walkway or a destination.",
+          source === "gps"
+            ? "The GPS fix is not on a connected outdoor path. The character stayed in place."
+            : "That spot is blocked. Choose open grass, a walkway or a destination.",
         );
         return false;
       }
+      if (source === "user") setGpsPausedByUser(true);
       held.current.clear();
+      routeSource.current = source;
       path.current = next.slice(1);
       arrival.current = onArrival ?? null;
       setRoute(next);
@@ -314,6 +340,33 @@ export function CampusExplorer() {
       );
     }
   }, [sceneId, scene, walkTo, changeScene]);
+
+  useEffect(() => {
+    gpsHeading.current = gps.heading;
+  }, [gps.heading]);
+
+  useEffect(() => {
+    const point = gps.placement;
+    if (
+      !point ||
+      gpsPausedByUser ||
+      sceneId !== "campus" ||
+      artOnly ||
+      floorSheet
+    )
+      return;
+    if (distance(player.current, point) < 12) {
+      if (gpsHeading.current) setDirection(gpsHeading.current);
+      return;
+    }
+    walkTo(
+      point,
+      () => {
+        if (gpsHeading.current) setDirection(gpsHeading.current);
+      },
+      "gps",
+    );
+  }, [artOnly, floorSheet, gps.placement, gpsPausedByUser, sceneId, walkTo]);
 
   useEffect(() => {
     if (artOnly || floorSheet || photoRoom || studentId) return;
@@ -476,6 +529,7 @@ export function CampusExplorer() {
     const key = event.key.length === 1 ? event.key.toLowerCase() : event.key;
     if (movementKeys[key]) {
       event.preventDefault();
+      setGpsPausedByUser(true);
       if (!held.current.has(key)) cancelMovement();
       held.current.add(key);
     } else if (key === "e") {
@@ -490,6 +544,14 @@ export function CampusExplorer() {
     const point = new DOMPoint(event.clientX, event.clientY).matrixTransform(
       matrix.inverse(),
     );
+    if (calibrationPick !== null && sceneId === "campus") {
+      setPickedPixel({ index: calibrationPick, x: point.x, y: point.y });
+      setCalibrationPick(null);
+      setMessage(
+        "Map pixel saved in the calibration form. Add the surveyed latitude and longitude, then save.",
+      );
+      return;
+    }
     cancelMovement();
     if (
       walkTo(point, () =>
@@ -622,6 +684,9 @@ export function CampusExplorer() {
               <strong>
                 {floorSheet ? "Original school floor plans" : scene.name}
               </strong>
+              {gps.tracking && (
+                <span className="campus-live">Live location</span>
+              )}
             </span>
             <div>
               <button
@@ -873,6 +938,30 @@ export function CampusExplorer() {
                       </text>
                     </g>
                   ))}
+                  {gps.marker && sceneId === "campus" && (
+                    <g className="campus-gps-marker" pointerEvents="none">
+                      {gps.marker.radius && (
+                        <circle
+                          cx={gps.marker.point.x}
+                          cy={gps.marker.point.y}
+                          r={gps.marker.radius}
+                          fill="#2f9d6218"
+                          stroke="#1f7a49"
+                          strokeDasharray="4 3"
+                        />
+                      )}
+                      <text
+                        x={gps.marker.point.x}
+                        y={gps.marker.point.y - (gps.marker.radius ?? 12) - 6}
+                        textAnchor="middle"
+                        fill="#1f7a49"
+                        fontSize="11"
+                        fontWeight="700"
+                      >
+                        GPS
+                      </text>
+                    </g>
+                  )}
                   <Student
                     position={position}
                     direction={direction}
@@ -946,6 +1035,29 @@ export function CampusExplorer() {
         </section>
 
         <aside className="campus-sidebar">
+          <LocationSyncPanel
+            status={gps.status}
+            statusLabel={gps.statusLabel}
+            message={gps.message}
+            accuracy={gps.accuracy}
+            lastUpdate={gps.lastUpdate}
+            enabled={gps.enabled}
+            tracking={gps.tracking}
+            pausedByUser={gpsPausedByUser}
+            onEnable={gps.enable}
+            onDisable={() => {
+              if (routeSource.current === "gps") cancelMovement();
+              setGpsPausedByUser(false);
+              gps.disable();
+            }}
+            onResume={() => setGpsPausedByUser(false)}
+            calibration={gps.calibration}
+            onSaveCalibration={gps.saveCalibration}
+            onClearCalibration={gps.clearCalibration}
+            picking={calibrationPick}
+            onPick={setCalibrationPick}
+            pickedPixel={pickedPixel}
+          />
           {user && (
             <section className="campus-directory">
               <span className="campus-eyebrow">STUDENTS HERE</span>
