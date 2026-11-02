@@ -1,5 +1,6 @@
 import { test, expect, type Page } from "@playwright/test";
 import { readFileSync } from "node:fs";
+import { installDeviceLocation, sendLocation } from "./helpers/device-location";
 
 const config = JSON.parse(
   readFileSync(
@@ -71,6 +72,7 @@ async function accountService(page: Page, signedIn = true) {
     photoWrites: 0,
     lookedUp: [] as string[],
     authRequests: 0,
+    presenceWrites: [] as unknown[],
   };
   if (signedIn)
     await page.addInitScript(
@@ -120,7 +122,10 @@ async function accountService(page: Page, signedIn = true) {
           : [state.owner],
       );
     }
-    if (url.pathname === "/rest/v1/explorer_presence") return json([]);
+    if (url.pathname === "/rest/v1/explorer_presence") {
+      if (method === "POST") state.presenceWrites.push(request.postDataJSON());
+      return json([]);
+    }
     if (url.pathname === "/rest/v1/rpc/list_explorer_students")
       return json([
         {
@@ -333,4 +338,77 @@ test("student sign-in uses the separate account and leaves device identity separ
     page.getByRole("dialog").locator(".trainer-fields"),
   ).toContainText("Alice");
   expect(state.authRequests).toBe(1);
+});
+
+test("GPS never publishes location through shared characters, remains private after stop and ends on account sign-out", async ({
+  page,
+}) => {
+  const { state } = await accountService(page);
+  state.owner.sharing = true;
+  await installDeviceLocation(page);
+  await page.clock.install();
+  const writes: string[] = [];
+  page.on("request", (request) => {
+    if (request.url().startsWith(config.url) && request.method() !== "GET")
+      writes.push(request.postData() || "");
+  });
+  await page.goto("/");
+  await expect.poll(() => state.presenceWrites.length).toBeGreaterThan(0);
+  await page
+    .getByRole("button", { name: "Enable location sync", exact: true })
+    .click();
+  const virtualWrites = state.presenceWrites.length;
+  await sendLocation(page, 620, 490);
+  await page.clock.runFor(2000);
+  await sendLocation(page, 670, 490);
+  await page.clock.runFor(7000);
+  expect(state.presenceWrites).toHaveLength(virtualWrites);
+  expect(JSON.stringify(writes)).not.toMatch(
+    /latitude|longitude|accuracy|heading/,
+  );
+  expect(JSON.stringify(state.presenceWrites)).not.toContain('"x":670');
+  await page
+    .getByRole("button", { name: "Disable location sync", exact: true })
+    .click();
+  await page.clock.runFor(7000);
+  expect(state.presenceWrites).toHaveLength(virtualWrites);
+  await page
+    .getByRole("button", { name: "Correct location manually", exact: true })
+    .click();
+  const map = page.locator("#campus-map > svg");
+  await map.scrollIntoViewIfNeeded();
+  const destination = await map.evaluate((element) => {
+    const point = new DOMPoint(735, 490).matrixTransform(
+      (element as SVGSVGElement).getScreenCTM()!,
+    );
+    return { x: point.x, y: point.y };
+  });
+  await page.mouse.click(destination.x, destination.y);
+  await expect(page.locator(".campus-status")).toContainText(
+    "Location set manually",
+  );
+  await page.clock.runFor(7000);
+  expect(state.presenceWrites).toHaveLength(virtualWrites);
+  await page
+    .getByRole("button", { name: "Enable location sync", exact: true })
+    .click();
+  await sendLocation(page, 720, 490);
+  await page
+    .getByRole("button", { name: "Student profile", exact: true })
+    .click();
+  await page
+    .getByRole("dialog")
+    .getByRole("button", { name: "Sign out", exact: true })
+    .click();
+  await expect
+    .poll(() => page.evaluate(() => (window as any).__gps.active()))
+    .toBe(0);
+  await expect(page.locator(".location-status")).toHaveAttribute(
+    "data-status",
+    "inactive",
+  );
+  await expect(page.locator(".location-uncertainty")).toHaveCount(0);
+  await page.clock.runFor(1000);
+  await sendLocation(page, 750, 490, { late: true });
+  await expect(page.locator(".location-uncertainty")).toHaveCount(0);
 });

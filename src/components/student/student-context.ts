@@ -1,8 +1,11 @@
 import { createContext, useContext } from "react";
 import type { User } from "@supabase/supabase-js";
 import type { StudentProfile } from "../../lib/student-profile";
+import type { MapIdentity } from "../../lib/map-identity";
 
 export interface ProfilesContext {
+  identity: MapIdentity;
+  saveIdentity: (identity: MapIdentity) => void;
   profile: StudentProfile;
   photo: Blob | null;
   user: User | null;

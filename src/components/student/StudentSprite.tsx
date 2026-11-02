@@ -1,14 +1,18 @@
 import type { Character, Direction } from "../../lib/student-profile";
 import { cn } from "../../lib/cn";
+import { uniformColors } from "../../lib/map-identity";
+import type { UniformColor } from "../../lib/map-identity";
 
 export function StudentSprite({
   avatar,
   direction = "down",
   moving = false,
+  color = "Green",
 }: {
   avatar: Character;
   direction?: Direction;
   moving?: boolean;
+  color?: UniformColor;
 }) {
   const side = direction === "left" || direction === "right";
   const back = direction === "up";
@@ -20,6 +24,7 @@ export function StudentSprite({
       )}
       data-avatar={avatar}
       data-direction={direction}
+      data-color={color}
     >
       <ellipse cx="0" cy="-1" rx="8" ry="3" fill="#14182d" opacity=".25" />
       <g
@@ -35,17 +40,25 @@ export function StudentSprite({
             fill="#263b48"
           />
           <path className="sprite-leg-b" d="M1-8h5v7H1z" fill="#263b48" />
-          {avatar === "girl" && <path d="M-6-13H5L8-5H-8z" fill="#2d6848" />}
+          {avatar === "girl" && (
+            <path d="M-6-13H5L8-5H-8z" fill={uniformColors[color]} />
+          )}
           <path
             d={side ? "M-5-18H4v10H-5z" : "M-7-18H7v10H-7z"}
             fill="#f8f5e8"
           />
           {side ? (
-            <path d="M-8-18h4v11h-4z" fill="#3c853d" />
+            <path d="M-8-18h4v11h-4z" fill={uniformColors[color]} />
           ) : back ? (
-            <path d="M-6-18H6v11H-6zM-3-15H3v5H-3z" fill="#388445" />
+            <path
+              d="M-6-18H6v11H-6zM-3-15H3v5H-3z"
+              fill={uniformColors[color]}
+            />
           ) : (
-            <path d="M-5-18h2v8h-2zm8 0h2v8H3zM-1-17H1v7H-1z" fill="#39794a" />
+            <path
+              d="M-5-18h2v8h-2zm8 0h2v8H3zM-1-17H1v7H-1z"
+              fill={uniformColors[color]}
+            />
           )}
           <path
             className="sprite-arm"

@@ -82,6 +82,21 @@ to see only the permitted fields and photo. Hidden photos use the character port
 
 See [Student profiles: setup and privacy](docs/STUDENT-PROFILES.md).
 
+## Live location and identity
+
+**My live location** can move your character from actual device GPS readings.
+First use **Calibrate map** to match at least three verified campus geographic
+references to points on the supplied image, then choose **Enable location sync**
+and grant browser permission. No campus GPS coordinates are invented or preset.
+Use HTTPS (or localhost). The panel shows signal status and accuracy; unreliable
+readings preserve the last reliable marker. GPS never guesses a classroom or floor.
+
+**Edit identity** sets a nickname, role, avatar and uniform color. Nickname, role
+and color stay on this device. Live location is private, is never uploaded or kept
+as history, and pauses existing character sharing for the page session. **Disable
+location sync** stops the watch; **Correct location manually** allows an explicit
+correction. See [calibration, privacy and phone testing](docs/LIVE-LOCATION.md).
+
 ## Room photos
 
 Every room door is clickable, including the doors on the original floor-plan overview.

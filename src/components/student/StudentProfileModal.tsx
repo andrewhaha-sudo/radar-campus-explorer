@@ -114,6 +114,7 @@ export function StudentProfileModal({
     configured,
     reload,
     signOut,
+    identity,
   } = useStudentProfile();
   const photoUrl = usePhotoUrl(photo);
   const [view, setView] = useState<"card" | "edit" | "character" | "account">(
@@ -187,6 +188,13 @@ export function StudentProfileModal({
                     photoUrl={photoUrl}
                     own
                   />
+                  <p
+                    className="student-help"
+                    data-testid="profile-map-identity"
+                  >
+                    {identity.displayName || profile.name || "Your character"} ·{" "}
+                    {identity.role} · {identity.color} uniform
+                  </p>
                   {notice && (
                     <p role="status" className="student-success">
                       {notice}

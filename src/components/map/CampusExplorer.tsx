@@ -40,6 +40,13 @@ import { canTravel, findPath, isWalkable } from "./navigation";
 import type { Point } from "./navigation";
 import "./campus-explorer.css";
 import { cn } from "../../lib/cn";
+import { LiveLocationPanel } from "../location/LiveLocationPanel";
+import { CalibrationDialog } from "../location/CalibrationDialog";
+import { IdentityDialog } from "../location/IdentityDialog";
+import { useDeviceLocation } from "../location/useDeviceLocation";
+import { loadCalibration } from "../../lib/map-calibration";
+import type { Calibration } from "../../lib/map-calibration";
+import type { UniformColor } from "../../lib/map-identity";
 
 const distance = (a: Point, b: Point) => Math.hypot(a.x - b.x, a.y - b.y);
 const movementKeys: Record<string, Point> = {
@@ -60,6 +67,10 @@ function Student({
   avatar,
   animate,
   onOpen,
+  name,
+  color,
+  live = false,
+  smooth = false,
 }: {
   position: Point;
   direction: Direction;
@@ -67,12 +78,23 @@ function Student({
   avatar: Character;
   animate: boolean;
   onOpen: () => void;
+  name: string;
+  color: UniformColor;
+  live?: boolean;
+  smooth?: boolean;
 }) {
   return (
     <g
       transform={`translate(${position.x},${position.y})`}
       className="campus-student"
       data-animate={animate}
+      data-location={live}
+      data-smooth={smooth}
+      style={
+        live
+          ? { transform: `translate(${position.x}px, ${position.y}px)` }
+          : undefined
+      }
       role="button"
       tabIndex={0}
       aria-label="Your character"
@@ -89,7 +111,15 @@ function Student({
       }}
     >
       <title>Open your student profile</title>
-      <StudentSprite avatar={avatar} direction={direction} moving={moving} />
+      <StudentSprite
+        avatar={avatar}
+        direction={direction}
+        moving={moving}
+        color={color}
+      />
+      <text y="-40" className="campus-own-label">
+        {name.slice(0, 24)}
+      </text>
     </g>
   );
 }
@@ -152,6 +182,15 @@ export function CampusExplorer() {
   const [floorSheet, setFloorSheet] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [query, setQuery] = useState("");
+  const [calibration, setCalibration] = useState<Calibration | null>(
+    loadCalibration,
+  );
+  const [locationView, setLocationView] = useState(false);
+  const [privateSession, setPrivateSession] = useState(false);
+  const [correction, setCorrection] = useState(false);
+  const [locationDialog, setLocationDialog] = useState<
+    "identity" | "calibration" | null
+  >(null);
   const player = useRef(position);
   const path = useRef<Point[]>([]);
   const arrival = useRef<(() => void) | null>(null);
@@ -161,13 +200,17 @@ export function CampusExplorer() {
   const viewport = useRef<HTMLDivElement>(null);
   const explorer = useRef<HTMLDivElement>(null);
   const scene = scenes[sceneId];
-  const { profile, user } = useStudentProfile();
-  const { students, error: studentsError } = useCampusStudents({
-    scene: sceneId,
-    ...position,
-    direction,
-    moving,
-  });
+  const { profile, user, identity } = useStudentProfile();
+  const location = useDeviceLocation(calibration, user?.id ?? "device");
+  const { students, error: studentsError } = useCampusStudents(
+    {
+      scene: sceneId,
+      ...position,
+      direction,
+      moving,
+    },
+    !privateSession,
+  );
   const nearbyStudents = students.filter(
     (student) =>
       student.scene === sceneId && isWalkable(student, scene.walkable),
@@ -223,6 +266,7 @@ export function CampusExplorer() {
 
   const walkTo = useCallback(
     (point: Point, onArrival?: () => void) => {
+      if (locationView) return false;
       const next = findPath(player.current, point, scenes[sceneId].walkable);
       if (!next) {
         setMessage(
@@ -237,10 +281,11 @@ export function CampusExplorer() {
       setMoving(true);
       return true;
     },
-    [sceneId],
+    [sceneId, locationView],
   );
 
   const choosePlace = (place: Place) => {
+    if (locationView) return;
     cancelMovement();
     setSelected(place);
     setSelectedRoom(null);
@@ -260,6 +305,7 @@ export function CampusExplorer() {
   };
 
   const chooseRoom = (room: Room) => {
+    if (locationView) return;
     cancelMovement();
     setSelectedRoom(room);
     pendingRoom.current = room;
@@ -300,7 +346,7 @@ export function CampusExplorer() {
 
   useEffect(() => {
     const room = pendingRoom.current;
-    if (!room || sceneId === "campus") return;
+    if (!room || sceneId === "campus" || locationView) return;
     if (room.scene === sceneId) {
       pendingRoom.current = null;
       walkTo(room.point, () =>
@@ -313,10 +359,18 @@ export function CampusExplorer() {
         changeScene(room.scene, scenes[room.scene].stairs!.point),
       );
     }
-  }, [sceneId, scene, walkTo, changeScene]);
+  }, [sceneId, scene, walkTo, changeScene, locationView]);
 
   useEffect(() => {
-    if (artOnly || floorSheet || photoRoom || studentId) return;
+    if (
+      artOnly ||
+      floorSheet ||
+      photoRoom ||
+      studentId ||
+      locationView ||
+      locationDialog
+    )
+      return;
     let frame = 0,
       previous = 0;
     const animate = (time: number) => {
@@ -416,7 +470,17 @@ export function CampusExplorer() {
       window.removeEventListener("blur", release);
       document.removeEventListener("visibilitychange", release);
     };
-  }, [scene, sceneId, artOnly, floorSheet, zoom, photoRoom, studentId]);
+  }, [
+    scene,
+    sceneId,
+    artOnly,
+    floorSheet,
+    zoom,
+    photoRoom,
+    studentId,
+    locationView,
+    locationDialog,
+  ]);
 
   useEffect(() => {
     if (!expanded) return;
@@ -427,7 +491,8 @@ export function CampusExplorer() {
         event.key === "Escape" &&
         !event.defaultPrevented &&
         !photoRoom &&
-        !studentId
+        !studentId &&
+        !locationDialog
       )
         setExpanded(false);
     };
@@ -436,7 +501,7 @@ export function CampusExplorer() {
       document.body.style.overflow = previousOverflow;
       window.removeEventListener("keydown", close);
     };
-  }, [expanded, photoRoom, studentId]);
+  }, [expanded, photoRoom, studentId, locationDialog]);
 
   const nearbyBuilding =
     sceneId === "campus"
@@ -458,6 +523,7 @@ export function CampusExplorer() {
     changeScene("campus", building?.arrival);
   };
   const interact = () => {
+    if (locationView) return;
     if (nearbyBuilding?.interior) changeScene(nearbyBuilding.interior);
     else if (nearStairs && scene.stairs) {
       cancelMovement();
@@ -470,6 +536,8 @@ export function CampusExplorer() {
       floorSheet ||
       photoRoom ||
       studentId ||
+      locationView ||
+      locationDialog ||
       (event.target as HTMLElement).matches("input, select, textarea, button")
     )
       return;
@@ -484,13 +552,36 @@ export function CampusExplorer() {
     }
   };
   const clickMap = (event: React.MouseEvent<SVGSVGElement>) => {
-    if (artOnly || floorSheet || photoRoom || studentId) return;
+    if (
+      artOnly ||
+      floorSheet ||
+      photoRoom ||
+      studentId ||
+      locationView ||
+      locationDialog
+    )
+      return;
     const matrix = svg.current?.getScreenCTM();
     if (!matrix) return;
     const point = new DOMPoint(event.clientX, event.clientY).matrixTransform(
       matrix.inverse(),
     );
     cancelMovement();
+    if (correction) {
+      if (!isWalkable(point, scene.walkable)) {
+        setMessage(
+          "Choose open ground or a hallway for your manual correction.",
+        );
+        return;
+      }
+      player.current = { x: point.x, y: point.y };
+      setPosition(player.current);
+      setCorrection(false);
+      setMessage(
+        "Location set manually. GPS is off; this correction stays private on this device.",
+      );
+      return;
+    }
     if (
       walkTo(point, () =>
         setMessage(
@@ -502,6 +593,7 @@ export function CampusExplorer() {
     viewport.current?.focus({ preventScroll: true });
   };
   const touchStart = (key: string, event: PointerEvent<HTMLButtonElement>) => {
+    if (locationView) return;
     event.preventDefault();
     event.currentTarget.setPointerCapture(event.pointerId);
     cancelMovement();
@@ -552,7 +644,7 @@ export function CampusExplorer() {
           key={control.key}
           style={{ gridArea: control.area }}
           aria-label={control.label}
-          disabled={artOnly || floorSheet}
+          disabled={artOnly || floorSheet || locationView}
           onPointerDown={(e) => touchStart(control.key, e)}
           onPointerUp={() => held.current.delete(control.key)}
           onPointerCancel={() => held.current.clear()}
@@ -599,6 +691,7 @@ export function CampusExplorer() {
           </button>
           <button
             className="campus-secondary"
+            disabled={locationView}
             onClick={() => {
               cancelMovement();
               setFloorSheet(!floorSheet);
@@ -610,6 +703,57 @@ export function CampusExplorer() {
           </button>
         </div>
       </header>
+
+      <LiveLocationPanel
+        location={location}
+        calibrated={Boolean(calibration)}
+        privateSession={privateSession}
+        locationView={locationView}
+        correction={correction}
+        onEnable={() => {
+          cancelMovement();
+          held.current.clear();
+          setPrivateSession(true);
+          setCorrection(false);
+          if (sceneId !== "campus") changeScene("campus");
+          setFloorSheet(false);
+          setArtOnly(false);
+          setLocationView(true);
+          setMessage(
+            "Device location controls your character. Use the live location panel to stop or correct it.",
+          );
+          location.enable();
+        }}
+        onIdentity={() => {
+          cancelMovement();
+          held.current.clear();
+          setLocationDialog("identity");
+        }}
+        onCalibrate={() => {
+          location.stop();
+          cancelMovement();
+          held.current.clear();
+          setLocationDialog("calibration");
+        }}
+        onManual={() => {
+          location.stop();
+          setLocationView(false);
+          setCorrection(false);
+          setMessage(
+            "Manual exploration resumed at your previous exploration position. This is not a GPS location.",
+          );
+        }}
+        onCorrect={() => {
+          location.stop();
+          cancelMovement();
+          held.current.clear();
+          setLocationView(false);
+          setCorrection(true);
+          setMessage(
+            "Tap open ground to set your location manually, or choose a building and floor in Indoor floor plans.",
+          );
+        }}
+      />
 
       <div className="campus-layout">
         <section
@@ -666,7 +810,11 @@ export function CampusExplorer() {
             )}
             ref={viewport}
             tabIndex={0}
-            aria-label="Map controls: arrow keys or WASD to walk, E to interact"
+            aria-label={
+              locationView
+                ? "Device location map; manual walking is paused"
+                : "Map controls: arrow keys or WASD to walk, E to interact"
+            }
             onBlur={() => held.current.clear()}
           >
             <svg
@@ -674,6 +822,15 @@ export function CampusExplorer() {
               viewBox={`${crop.x} ${crop.y} ${crop.width} ${crop.height}`}
               style={{ width: `${zoom * 100}%` }}
               onClick={clickMap}
+              onClickCapture={
+                correction
+                  ? (event) => {
+                      // A correction chooses a map point, even under another marker.
+                      event.stopPropagation();
+                      clickMap(event);
+                    }
+                  : undefined
+              }
               role="group"
               aria-label={
                 floorSheet
@@ -728,7 +885,9 @@ export function CampusExplorer() {
               {!artOnly && !floorSheet && (
                 <>
                   {sceneId === "campus" && breeze && (
-                    <CampusBreeze paused={Boolean(photoRoom || studentId)} />
+                    <CampusBreeze
+                      paused={Boolean(photoRoom || studentId || locationDialog)}
+                    />
                   )}
                   {showAreas &&
                     scene.walkable.map((r, i) => (
@@ -742,7 +901,7 @@ export function CampusExplorer() {
                         pointerEvents="none"
                       />
                     ))}
-                  {showRoute && route.length > 0 && (
+                  {!locationView && showRoute && route.length > 0 && (
                     <RouteOverlay points={[position, ...route]} />
                   )}
                   {sceneId === "campus" && (
@@ -776,6 +935,7 @@ export function CampusExplorer() {
                         role="button"
                         tabIndex={0}
                         aria-label={`Explore ${place.name}`}
+                        aria-disabled={locationView}
                         className={cn(
                           "campus-hotspot",
                           selected?.id === place.id &&
@@ -873,19 +1033,71 @@ export function CampusExplorer() {
                       </text>
                     </g>
                   ))}
-                  <Student
-                    position={position}
-                    direction={direction}
-                    moving={moving}
-                    avatar={profile.avatar}
-                    animate={mapVisible && !studentId && !photoRoom}
-                    onOpen={() => openStudent("self")}
-                  />
+                  {locationView && location.fix && location.alignment && (
+                    <g pointerEvents="none">
+                      <circle
+                        className="location-uncertainty"
+                        data-stale={location.status !== "live"}
+                        cx={location.fix.point.x}
+                        cy={location.fix.point.y}
+                        r={
+                          (location.fix.reading.accuracy +
+                            location.alignment.residualMeters) *
+                          location.alignment.metersToPixels
+                        }
+                      >
+                        <title>
+                          {location.status === "live"
+                            ? "Approximate GPS accuracy area"
+                            : "Last reliable position; current location uncertain or inactive"}
+                        </title>
+                      </circle>
+                      {location.status === "live" &&
+                        location.fix.heading !== null && (
+                          <path
+                            className="location-heading"
+                            d="M0 -24 L-6 -12 L6 -12 Z"
+                            transform={`translate(${location.fix.point.x},${location.fix.point.y}) rotate(${location.fix.heading})`}
+                          />
+                        )}
+                    </g>
+                  )}
+                  {(!locationView || location.fix) && (
+                    <Student
+                      position={locationView ? location.fix!.point : position}
+                      direction={
+                        locationView ? location.fix!.direction : direction
+                      }
+                      moving={
+                        locationView
+                          ? location.enabled &&
+                            location.status === "live" &&
+                            location.fix!.moving
+                          : moving
+                      }
+                      avatar={profile.avatar}
+                      name={identity.displayName || profile.name || "You"}
+                      color={identity.color}
+                      live={locationView}
+                      smooth={
+                        locationView &&
+                        location.status === "live" &&
+                        Boolean(location.fix?.smooth)
+                      }
+                      animate={
+                        mapVisible &&
+                        !studentId &&
+                        !photoRoom &&
+                        !locationDialog
+                      }
+                      onOpen={() => openStudent("self")}
+                    />
+                  )}
                 </>
               )}
             </svg>
           </div>
-          {!artOnly && !floorSheet && (
+          {!artOnly && !floorSheet && !locationView && (
             <div className="campus-mobile-controls">
               <span>HOLD A DIRECTION TO WALK</span>
               {directionPad}
@@ -896,6 +1108,7 @@ export function CampusExplorer() {
               <input
                 type="checkbox"
                 checked={artOnly}
+                disabled={locationView}
                 onChange={(e) => {
                   cancelMovement();
                   held.current.clear();
@@ -931,7 +1144,7 @@ export function CampusExplorer() {
                 <Footprints size={18} />
               </span>
               <p>{message}</p>
-              {(nearbyBuilding || nearStairs || nearExit) && (
+              {!locationView && (nearbyBuilding || nearStairs || nearExit) && (
                 <button className="campus-primary" onClick={interact}>
                   {nearbyBuilding
                     ? "Enter building"
@@ -1027,7 +1240,7 @@ export function CampusExplorer() {
                             selected?.id === place.id && "is-selected",
                           )}
                           onClick={() => choosePlace(place)}
-                          disabled={artOnly}
+                          disabled={artOnly || locationView}
                         >
                           <span className="campus-location-icon">
                             {place.id === "court" ? (
@@ -1062,7 +1275,7 @@ export function CampusExplorer() {
                     {selected.interior && (
                       <button
                         className="campus-primary"
-                        disabled={artOnly}
+                        disabled={artOnly || locationView}
                         onClick={() => {
                           cancelMovement();
                           walkTo(selected.arrival!, () =>
@@ -1086,7 +1299,7 @@ export function CampusExplorer() {
                 <select
                   id="campus-room"
                   value={selectedRoom?.id ?? ""}
-                  disabled={artOnly}
+                  disabled={artOnly || locationView}
                   onChange={(e) => {
                     const room = allRooms.find((r) => r.id === e.target.value);
                     if (room) chooseRoom(room);
@@ -1160,6 +1373,7 @@ export function CampusExplorer() {
             </label>
             <button
               className="campus-reset"
+              disabled={locationView}
               onClick={() => {
                 cancelMovement();
                 changeScene(sceneId);
@@ -1207,6 +1421,28 @@ export function CampusExplorer() {
             if (profileReturnFocus.current?.isConnected)
               profileReturnFocus.current.focus({ preventScroll: true });
             else viewport.current?.focus({ preventScroll: true });
+          }}
+        />
+      )}
+      {locationDialog === "identity" && (
+        <IdentityDialog
+          key={user?.id ?? "device"}
+          onClose={() => setLocationDialog(null)}
+        />
+      )}
+      {locationDialog === "calibration" && (
+        <CalibrationDialog
+          value={calibration}
+          onClose={() => setLocationDialog(null)}
+          onSave={(value) => {
+            location.reset();
+            setCalibration(value);
+            setLocationView(false);
+            setCorrection(false);
+            setLocationDialog(null);
+            setMessage(
+              "Map calibration saved on this device. Enable location sync when you are on campus.",
+            );
           }}
         />
       )}

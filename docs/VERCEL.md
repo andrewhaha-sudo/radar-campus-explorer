@@ -46,6 +46,9 @@ old `functions.api/index.mjs.excludeFiles` error does not apply to this version.
 - In the browser's Network panel, confirm the map images load and no `/api/` requests occur.
 - Open **Student profile**, save an identity and character, and try the photo editor.
   After the SQL setup, sign in and check a second account sees only shared fields.
+- Open **My live location** on the HTTPS website. GPS starts OFF and needs verified
+  map calibration before activation. Follow the [calibration and on-site phone
+  checks](LIVE-LOCATION.md); this feature needs no new Supabase migration or server key.
 
 Room photo uploads save in the visitor's browser and do not need server configuration.
 For photos everyone can view, deploy actual image files in `public/room-photos/` and

@@ -37,6 +37,12 @@ account can click that character to view the permitted card; it cannot edit it.
 Sharing and position updates refresh about every three seconds. A disconnected
 character expires after 30 seconds; background tabs stop publishing their position.
 
+Enabling **My live location** suppresses shared-character publishing for the entire
+page session, even after GPS is stopped or manually corrected. Measured physical
+coordinates never enter the presence table. See [live location](LIVE-LOCATION.md).
+Local nickname, role and uniform-color preferences are also separate from the
+shared account fields; changing them does not reveal them to other students.
+
 ## Photo and identity behavior
 
 - Boy/girl character selection, sex and profile photo are independent settings.

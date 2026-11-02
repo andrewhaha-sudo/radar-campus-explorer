@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import type { User } from "@supabase/supabase-js";
 import { emptyStudent, validateStudent } from "../../lib/student-profile";
@@ -12,6 +12,12 @@ import {
 } from "../../lib/student-cloud";
 
 import { StudentProfileContext } from "./student-context";
+import {
+  identityKey,
+  readIdentity,
+  validateIdentity,
+} from "../../lib/map-identity";
+import type { MapIdentity } from "../../lib/map-identity";
 
 export function StudentProfilesProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -26,6 +32,13 @@ export function StudentProfilesProvider({ children }: { children: ReactNode }) {
   const [saving, setSaving] = useState(false);
   const [revision, setRevision] = useState(0);
   const identity = user?.id ?? "device";
+  const [localIdentities, setLocalIdentities] = useState<
+    Record<string, MapIdentity>
+  >({});
+  const mapIdentity = useMemo(
+    () => localIdentities[identity] ?? readIdentity(identity),
+    [localIdentities, identity],
+  );
   const currentIdentity = useRef(identity);
   const current =
     loaded?.identity === identity && loaded?.revision === revision
@@ -126,6 +139,15 @@ export function StudentProfilesProvider({ children }: { children: ReactNode }) {
   return (
     <StudentProfileContext.Provider
       value={{
+        identity: mapIdentity,
+        saveIdentity: (value) => {
+          const valid = validateIdentity(value);
+          localStorage.setItem(identityKey(identity), JSON.stringify(valid));
+          setLocalIdentities((previous) => ({
+            ...previous,
+            [identity]: valid,
+          }));
+        },
         // Never briefly render one account's identity while another is loading.
         profile:
           profile.user_id === identity ? profile : emptyStudent(identity),

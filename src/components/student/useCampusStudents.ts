@@ -3,13 +3,16 @@ import { studentCloud, listCampusStudents } from "../../lib/student-cloud";
 import type { CampusStudent, Direction } from "../../lib/student-profile";
 import { useStudentProfile } from "./student-context";
 
-export function useCampusStudents(pose: {
-  scene: string;
-  x: number;
-  y: number;
-  direction: Direction;
-  moving: boolean;
-}) {
+export function useCampusStudents(
+  pose: {
+    scene: string;
+    x: number;
+    y: number;
+    direction: Direction;
+    moving: boolean;
+  },
+  publishAllowed = true,
+) {
   const { user, profile, loading } = useStudentProfile();
   const latest = useRef(pose);
   useEffect(() => {
@@ -30,7 +33,7 @@ export function useCampusStudents(pose: {
       if (busy || !active) return;
       busy = true;
       try {
-        if (document.hidden || !profile.sharing) {
+        if (document.hidden || !profile.sharing || !publishAllowed) {
           await client.from("explorer_presence").delete().eq("user_id", id);
         } else {
           const sent = await client
@@ -40,6 +43,11 @@ export function useCampusStudents(pose: {
             throw new Error(
               "Your character could not connect to other students.",
             );
+          // A request already in flight may finish after sharing is disabled.
+          if (!active) {
+            await client.from("explorer_presence").delete().eq("user_id", id);
+            return;
+          }
         }
         if (!document.hidden) {
           const peers = await listCampusStudents();
@@ -73,7 +81,7 @@ export function useCampusStudents(pose: {
         .eq("user_id", id)
         .then(() => {});
     };
-  }, [id, profile.sharing, loading]);
+  }, [id, profile.sharing, loading, publishAllowed]);
   return {
     students: id && !loading && result?.owner === id ? result.students : [],
     error: id && result?.owner === id ? result.error : "",
