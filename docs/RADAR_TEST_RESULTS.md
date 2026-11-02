@@ -49,3 +49,7 @@ Playwright, desktop and mobile, passed for a calibrated walk, a low-accuracy fix
 ## GPS-Case noise gate, same date
 
 `node --test tests/location-sync.test.mjs tests/campus-navigation.test.mjs` passed, including the 3 m noise gate. `npm run build` passed. Playwright desktop and mobile passed for calibration required with no movement, a calibrated walk to Building A, a coarse fix that stays put, and a 15 m demo step.
+
+## Tighter follow, same date
+
+The noise floor now scales with accuracy, from 1.2 m to 8 m. A 2.5 m step on a 5 m fix is accepted. Paths are shortened and open ground is crossed directly. The calibrated walk reached Building A in about 4 seconds. The same Playwright GPS checks passed on desktop and mobile.

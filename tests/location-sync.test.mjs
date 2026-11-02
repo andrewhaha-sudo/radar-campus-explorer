@@ -161,6 +161,11 @@ test("small GPS noise does not move the character and a real step does", () => {
   );
   assert.equal(step.accept, true);
   assert.equal(step.reason, "trusted");
+  const stride = gpsMoveGate(
+    { latitude: 14, longitude: 121 },
+    reading({ latitude: 14 + 2.5 / 111_320, longitude: 121, accuracy: 5 }),
+  );
+  assert.equal(stride.accept, true);
   const coarse = gpsMoveGate(
     { latitude: 14, longitude: 121 },
     reading({ latitude: 14.00005, longitude: 121, accuracy: 20 }),

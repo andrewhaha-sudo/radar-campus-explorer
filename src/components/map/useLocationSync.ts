@@ -195,8 +195,8 @@ export function useLocationSync(indoors: boolean, mapActive: boolean) {
       setStatus("connected");
       setMessage(
         calibrationRef.current.demo
-          ? "DEMO calibration saved. GPS Connected. Steps under 3 m are ignored while the fix is tight, and the character glides to a real step. North is toward the top of the map, about 8 pixels per meter. This is not a surveyed campus."
-          : "GPS Connected. Steps under 3 m are ignored while the fix is tight, and the character glides to a real step. The position stays on this device.",
+          ? "DEMO calibration saved. GPS Connected. The character takes the fix once the step clears the phone's noise, then cuts straight across open ground. North is toward the top of the map, about 8 pixels per meter. This is not a surveyed campus."
+          : "GPS Connected. The character takes the fix once the step clears the phone's noise, then cuts straight across open ground. The position stays on this device.",
       );
     },
     [rememberPlacement],
@@ -288,7 +288,7 @@ export function useLocationSync(indoors: boolean, mapActive: boolean) {
           if (!cancelled) applyReading(readingFromPosition(position));
         },
         () => {},
-        { enableHighAccuracy: false, maximumAge: 2000, timeout: 2500 },
+        { enableHighAccuracy: true, maximumAge: 0, timeout: 8000 },
       );
       lastAttemptRef.current = Date.now();
       heartbeat = window.setInterval(() => {

@@ -155,9 +155,8 @@ export function findPath(
         points.push(cursor);
       }
       points.push(from);
-      return points
-        .reverse()
-        .filter(
+      return shortenPath(
+        points.reverse().filter(
           (p, i, all) =>
             i === 0 ||
             i === all.length - 1 ||
@@ -165,7 +164,9 @@ export function findPath(
               (all[i - 1].x === p.x && p.x === all[i + 1].x) ||
               (all[i - 1].y === p.y && p.y === all[i + 1].y)
             ),
-        );
+        ),
+        areas,
+      );
     }
     closed.add(currentKey);
     for (const [dx, dy] of [
@@ -187,9 +188,23 @@ export function findPath(
   return null;
 }
 
-// Glide toward an accepted GPS point. GPS-Case eases the whole move instead
-// of snapping, and the stride stays brisk enough to cross the illustration.
-export const GPS_GLIDE_PX_PER_SEC = 240;
+function shortenPath(points: Point[], areas: Rect[]) {
+  if (points.length < 3) return points;
+  const kept = [points[0]];
+  let anchor = 0;
+  for (let index = 2; index < points.length; index += 1) {
+    if (!canTravel(points[anchor], points[index], areas)) {
+      kept.push(points[index - 1]);
+      anchor = index - 1;
+    }
+  }
+  kept.push(points[points.length - 1]);
+  return kept;
+}
+
+// Glide toward an accepted GPS point. Fast enough to cross the illustration,
+// slow enough that the character does not teleport.
+export const GPS_GLIDE_PX_PER_SEC = 640;
 
 export function gpsGlideStride(length: number, dt: number) {
   return Math.min(length, GPS_GLIDE_PX_PER_SEC * dt);

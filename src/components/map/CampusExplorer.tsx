@@ -526,6 +526,18 @@ export function CampusExplorer() {
           x: player.current.x + manual.x * stride,
           y: player.current.y + manual.y * stride,
         };
+      } else if (
+        goal &&
+        sceneId === "campus" &&
+        canTravel(player.current, goal, scene.walkable)
+      ) {
+        if (path.current.length) {
+          path.current = [];
+          routeSource.current = null;
+          setRoute([]);
+        }
+        next = advanceToward(player.current, goal, scene.walkable, dt);
+        gpsStepped = distance(player.current, next) > 0.4;
       } else if (goal && sceneId === "campus" && routeSource.current === "gps" && target) {
         const length = distance(player.current, target);
         const stride = gpsGlideStride(length, dt);

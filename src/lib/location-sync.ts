@@ -48,11 +48,13 @@ export const SHOW_FIX_MS = 10_000;
 /** Lodestar asks again when no fix arrives for 2 seconds. */
 export const HEARTBEAT_GAP_MS = 2_000;
 const DERIVED_SPEED_CAP_MPS = 5;
-/** GPS-Case trusts a fix at or under this accuracy, then still ignores sub-stride noise. */
+/** A tight phone ignores about a third of its accuracy, never less than 1.2 m or more than 8 m. */
 export const TRUST_ACCURACY_METERS = 8;
-export const TRUSTED_MIN_MOVE_METERS = 3;
-export const COARSE_MIN_MOVE_METERS = 10;
-export const ACCURACY_MOVE_MULTIPLIER = 1.5;
+
+export function noiseFloorMeters(accuracy: number) {
+  if (!Number.isFinite(accuracy) || accuracy < 0) return 1.2;
+  return Math.min(8, Math.max(1.2, accuracy * 0.35));
+}
 
 export interface GpsMoveGate {
   accept: boolean;
@@ -229,17 +231,13 @@ export function gpsMoveGate(
 ): GpsMoveGate {
   if (!previous) return { accept: true, meters: 0, reason: "first" };
   const meters = distanceMeters(previous, next);
-  if (next.accuracy <= TRUST_ACCURACY_METERS) {
-    if (meters >= TRUSTED_MIN_MOVE_METERS)
-      return { accept: true, meters, reason: "trusted" };
-    return { accept: false, meters, reason: "jitter" };
-  }
-  const gate = Math.max(
-    COARSE_MIN_MOVE_METERS,
-    next.accuracy * ACCURACY_MOVE_MULTIPLIER,
-  );
-  if (meters > gate) return { accept: true, meters, reason: "clear_step" };
-  return { accept: false, meters, reason: "jitter" };
+  const floor = noiseFloorMeters(next.accuracy);
+  if (meters < floor) return { accept: false, meters, reason: "jitter" };
+  return {
+    accept: true,
+    meters,
+    reason: next.accuracy <= TRUST_ACCURACY_METERS ? "trusted" : "clear_step",
+  };
 }
 
 export function followTarget(
