@@ -13,6 +13,8 @@ import {
 } from "../../lib/radar-records";
 import { safetyGuidance } from "../../lib/safety-guidance";
 import { useRadar } from "./radar-context";
+import { PeopleScreen, ReportsScreen, ResourcesScreen } from "./Operations";
+import { checkInWithCode } from "../../lib/radar-records";
 import "./radar.css";
 
 const screens = [
@@ -22,6 +24,9 @@ const screens = [
   ["alerts", "Alerts"],
   ["safety", "Safety"],
   ["sos", "SOS"],
+  ["people", "People"],
+  ["resources", "Resources"],
+  ["reports", "Reports"],
 ] as const;
 
 type Screen = (typeof screens)[number][0];
@@ -57,6 +62,9 @@ export function RadarShell() {
       {screen === "alerts" && <AlertsScreen />}
       {screen === "safety" && <SafetyScreen />}
       {screen === "sos" && <SosScreen />}
+      {screen === "people" && <PeopleScreen />}
+      {screen === "resources" && <ResourcesScreen />}
+      {screen === "reports" && <ReportsScreen />}
     </>
   );
 }
@@ -166,6 +174,32 @@ function HazardsScreen() {
   );
 }
 
+function RoomCodeCheck() {
+  const [code, setCode] = useState("");
+  const [result, setResult] = useState("");
+  return (
+    <form
+      className="radar-form"
+      onSubmit={(event) => {
+        event.preventDefault();
+        const roomId = checkInWithCode(code, allRooms);
+        setResult(
+          roomId
+            ? `Checked in at ${roomId} on this device.`
+            : "That room code is not on this map.",
+        );
+      }}
+    >
+      <label>
+        Check in with a room code
+        <input value={code} onChange={(event) => setCode(event.target.value)} placeholder="RADAR:B-101" />
+      </label>
+      <button className="campus-secondary" type="submit">Check in</button>
+      {result && <p role="status">{result}</p>}
+    </form>
+  );
+}
+
 function InspectScreen() {
   const { records, update } = useRadar();
   const [roomId, setRoomId] = useState(allRooms[0]?.id ?? "");
@@ -224,6 +258,8 @@ function InspectScreen() {
         </label>
         <button className="campus-primary" type="submit">Save inspection draft</button>
       </form>
+      <p className="campus-small">Room code: RADAR:{roomId}</p>
+      <RoomCodeCheck />
       {saved && (
         <p role="status">Saved {saved.updatedAt}. AI review: {saved.ai}.</p>
       )}

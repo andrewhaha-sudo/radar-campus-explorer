@@ -1,13 +1,20 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {
+  addEquipment,
+  addPerson,
   callTarget,
+  checkInWithCode,
   createAlert,
   createHazard,
   emptyRecords,
+  lowStock,
+  markAttendance,
+  recordsCsv,
   recordSos,
   reviewHazard,
   saveInspection,
+  searchRecords,
 } from "../src/lib/radar-records.ts";
 import { safetyGuidance } from "../src/lib/safety-guidance.ts";
 
@@ -55,6 +62,27 @@ test("inspection drafts do not invent an ai result", () => {
     notes: "Door visible",
   });
   assert.equal(saved.inspections[0].ai, "Not evaluated");
+});
+
+test("people, stock, search, csv, and room codes stay on device rules", () => {
+  let records = addPerson(emptyRecords(), {
+    name: "Practice Student",
+    role: "student",
+    section: "A",
+  });
+  records = markAttendance(records, records.people[0].id, "present");
+  records = addEquipment(records, {
+    name: "Practice extinguisher",
+    location: "Building B",
+    quantity: 0,
+    minimum: 1,
+    condition: "good",
+  });
+  assert.equal(lowStock(records).length, 1);
+  assert.equal(searchRecords(records, "practice").length, 2);
+  assert.match(recordsCsv(records), /attendance/);
+  assert.equal(checkInWithCode("RADAR:B-101", [{ id: "B-101" }]), "B-101");
+  assert.equal(checkInWithCode("NOPE", [{ id: "B-101" }]), null);
 });
 
 test("shaking never produces an evacuation route", () => {

@@ -15,6 +15,25 @@ test("hazard, safety, and sos records stay on this device", async ({ page }) => 
   await expect(page.getByText("No rescue was dispatched.")).toBeVisible();
 });
 
+test("people, resources, and provider status work on this device", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: "People", exact: true }).click();
+  await page.getByLabel("Practice name").fill("Practice Student");
+  await page.getByRole("button", { name: "Add person" }).click();
+  await expect(page.getByText("Practice Student")).toBeVisible();
+  await page.getByRole("button", { name: "present" }).click();
+  await expect(page.getByText("Today: present")).toBeVisible();
+  await page.getByRole("button", { name: "Resources", exact: true }).click();
+  await page.getByLabel("Equipment").fill("Practice extinguisher");
+  await page.getByLabel("Quantity").fill("0");
+  await page.getByLabel("Minimum").fill("1");
+  await page.getByRole("button", { name: "Add equipment" }).click();
+  await expect(page.getByText("Low stock: Practice extinguisher")).toBeVisible();
+  await page.getByRole("button", { name: "Reports", exact: true }).click();
+  await expect(page.getByText("PAGASA")).toBeVisible();
+  await expect(page.getByText("NOT CONFIGURED").first()).toBeVisible();
+});
+
 test("Google Map explains that the API key is not configured", async ({ page }) => {
   await page.goto("/");
   await page.getByRole("button", { name: "Google Map" }).click();
