@@ -45,3 +45,7 @@ All of those passed. The full browser folder was not re-run.
 `node --test tests/location-sync.test.mjs` passed, including fresh, holding, and hidden fix timing. `npx tsc -b` and `npm run build` passed.
 
 Playwright, desktop and mobile, passed for a calibrated walk, a low-accuracy fix that does not move the character, demo location save, and the radar shell.
+
+## GPS-Case noise gate, same date
+
+`node --test tests/location-sync.test.mjs tests/campus-navigation.test.mjs` passed, including the 3 m noise gate. `npm run build` passed. Playwright desktop and mobile passed for calibration required with no movement, a calibrated walk to Building A, a coarse fix that stays put, and a 15 m demo step.
