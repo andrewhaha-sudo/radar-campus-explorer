@@ -48,6 +48,17 @@ export const SHOW_FIX_MS = 10_000;
 /** Lodestar asks again when no fix arrives for 2 seconds. */
 export const HEARTBEAT_GAP_MS = 2_000;
 const DERIVED_SPEED_CAP_MPS = 5;
+/** GPS-Case trusts a fix at or under this accuracy, then still ignores sub-stride noise. */
+export const TRUST_ACCURACY_METERS = 8;
+export const TRUSTED_MIN_MOVE_METERS = 3;
+export const COARSE_MIN_MOVE_METERS = 10;
+export const ACCURACY_MOVE_MULTIPLIER = 1.5;
+
+export interface GpsMoveGate {
+  accept: boolean;
+  meters: number;
+  reason: "first" | "trusted" | "clear_step" | "jitter";
+}
 
 export interface FixAssessment {
   quality: "reliable" | "approximate" | "rejected";
@@ -212,21 +223,35 @@ export function predictReading(reading: GeoReading, now: number) {
   return { latitude, longitude };
 }
 
+export function gpsMoveGate(
+  previous: { latitude: number; longitude: number } | null,
+  next: GeoReading,
+): GpsMoveGate {
+  if (!previous) return { accept: true, meters: 0, reason: "first" };
+  const meters = distanceMeters(previous, next);
+  if (next.accuracy <= TRUST_ACCURACY_METERS) {
+    if (meters >= TRUSTED_MIN_MOVE_METERS)
+      return { accept: true, meters, reason: "trusted" };
+    return { accept: false, meters, reason: "jitter" };
+  }
+  const gate = Math.max(
+    COARSE_MIN_MOVE_METERS,
+    next.accuracy * ACCURACY_MOVE_MULTIPLIER,
+  );
+  if (meters > gate) return { accept: true, meters, reason: "clear_step" };
+  return { accept: false, meters, reason: "jitter" };
+}
+
 export function followTarget(
   reading: GeoReading,
   calibration: MapCalibration,
   now: number,
 ) {
   if (reading.accuracy > FOLLOW_ACCURACY_METERS) return null;
-  const clock = fixClock(reading.timestamp, now);
-  if (clock === "hidden") return null;
-  const predicted =
-    clock === "fresh"
-      ? predictReading(reading, now)
-      : { latitude: reading.latitude, longitude: reading.longitude };
+  if (fixClock(reading.timestamp, now) === "hidden") return null;
   const projected = geographicToPixel(
-    predicted.latitude,
-    predicted.longitude,
+    reading.latitude,
+    reading.longitude,
     calibration,
   );
   return projected.ok ? projected.point : null;

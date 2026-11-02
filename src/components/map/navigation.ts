@@ -187,8 +187,14 @@ export function findPath(
   return null;
 }
 
-// Move directly toward a GPS point and stop at the first wall. A long path
-// around the campus makes the character feel late and off the real direction.
+// Glide toward an accepted GPS point. GPS-Case eases the whole move instead
+// of snapping, and the stride stays brisk enough to cross the illustration.
+export const GPS_GLIDE_PX_PER_SEC = 240;
+
+export function gpsGlideStride(length: number, dt: number) {
+  return Math.min(length, GPS_GLIDE_PX_PER_SEC * dt);
+}
+
 export function advanceToward(
   from: Point,
   to: Point,
@@ -199,7 +205,7 @@ export function advanceToward(
   const dy = to.y - from.y;
   const length = Math.hypot(dx, dy);
   if (length < 2) return { x: to.x, y: to.y };
-  const stride = Math.min(length, Math.max(length / 0.12, 1100) * dt);
+  const stride = gpsGlideStride(length, dt);
   const at = (t: number): Point => ({
     x: from.x + dx * t,
     y: from.y + dy * t,

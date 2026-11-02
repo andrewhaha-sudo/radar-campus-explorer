@@ -41,7 +41,7 @@ import { useStudentProfile } from "../student/student-context";
 import { useCampusStudents } from "../student/useCampusStudents";
 import type { Character, Direction } from "../../lib/student-profile";
 import type { Place, Room, SceneId } from "./campus-data";
-import { advanceToward, canTravel, findPath, isWalkable } from "./navigation";
+import { advanceToward, canTravel, findPath, gpsGlideStride, isWalkable } from "./navigation";
 import type { Point } from "./navigation";
 import { CampusMiniMap } from "./CampusMiniMap";
 import { GoogleCampusMap } from "./GoogleCampusMap";
@@ -528,7 +528,7 @@ export function CampusExplorer() {
         };
       } else if (goal && sceneId === "campus" && routeSource.current === "gps" && target) {
         const length = distance(player.current, target);
-        const stride = Math.min(length, Math.max(length / 0.12, 1100) * dt);
+        const stride = gpsGlideStride(length, dt);
         gpsStepped = true;
         if (length <= stride) {
           next = target;

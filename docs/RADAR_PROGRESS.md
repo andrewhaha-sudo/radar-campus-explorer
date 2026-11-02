@@ -7,6 +7,7 @@ Updated: 2 November 2026.
 - Illustrated campus, collision, stairs, room list, stamps.
 - Outdoor GPS follow and calibration. Coarse fixes over 65 meters do not move the character.
 - Lodestar-style listen loop on this device: each newer fix is applied immediately, motion is estimated when the phone omits speed, a quiet phone is polled after 2 seconds, and the marker goes fresh, then holding, then hidden. The Lodestar spectator server was not added. GPS is still not sent to other students.
+- GPS-Case noise gate and glide. A tight fix must move at least 3 meters before the character follows it. A coarser fix must clear a larger step. Accepted moves glide across the artwork instead of snapping. Unity, the WebGL plugin, and the sample 3D scene were not added.
 - Google Map view gated on an API key.
 - Device hazard, inspection, alert, safety, SOS, people, resource, and report flows.
 - Hash routing for the section bar.

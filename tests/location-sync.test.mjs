@@ -8,6 +8,7 @@ import {
   movementMode,
   acceptNewerFix,
   fixClock,
+  gpsMoveGate,
   predictReading,
   readingWithMotion,
   shouldHeartbeat,
@@ -140,6 +141,32 @@ test("manual exploration stays distinct from location follow", () => {
     movementMode({ enabled: true, paused: false, status: "low_accuracy" }).id,
     "approximate",
   );
+});
+
+test("small GPS noise does not move the character and a real step does", () => {
+  assert.equal(gpsMoveGate(null, reading({ accuracy: 5 })).reason, "first");
+  const stood = gpsMoveGate(
+    { latitude: 14, longitude: 121 },
+    reading({ latitude: 14.00001, longitude: 121, accuracy: 5 }),
+  );
+  assert.equal(stood.accept, false);
+  assert.equal(stood.reason, "jitter");
+  const step = gpsMoveGate(
+    { latitude: 14, longitude: 121 },
+    reading({
+      latitude: 14,
+      longitude: 121 + 15 / (111_320 * Math.cos((14 * Math.PI) / 180)),
+      accuracy: 5,
+    }),
+  );
+  assert.equal(step.accept, true);
+  assert.equal(step.reason, "trusted");
+  const coarse = gpsMoveGate(
+    { latitude: 14, longitude: 121 },
+    reading({ latitude: 14.00005, longitude: 121, accuracy: 20 }),
+  );
+  assert.equal(coarse.accept, false);
+  assert.equal(coarse.reason, "jitter");
 });
 
 test("a quiet phone is fresh, then holding, then hidden", () => {

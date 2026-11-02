@@ -7,6 +7,7 @@ import {
   browserGeolocation,
   fixClock,
   FRESH_FIX_MS,
+  gpsMoveGate,
   GPS_STATUS_LABEL,
   headingDirection,
   locationIsSecure,
@@ -78,6 +79,7 @@ export function useLocationSync(indoors: boolean, mapActive: boolean) {
   const indoorsRef = useRef(indoors);
   const reliableRef = useRef<GeoReading | null>(null);
   const lastReadingRef = useRef<GeoReading | null>(null);
+  const acceptedRef = useRef<GeoReading | null>(null);
   const lastAttemptRef = useRef(0);
   const pollingRef = useRef(false);
   const watcherRef = useRef<LocationWatcher | null>(null);
@@ -164,6 +166,15 @@ export function useLocationSync(indoors: boolean, mapActive: boolean) {
         setMarker(null);
         return;
       }
+      const gate = gpsMoveGate(acceptedRef.current, reading);
+      if (!gate.accept) {
+        const demo = calibrationRef.current.demo ? "DEMO calibration saved. " : "";
+        setMessage(
+          `${demo}Held. The phone shifted ${gate.meters.toFixed(1)} m, inside the noise gate for a ${Math.round(reading.accuracy)} m fix. The character stayed put.`,
+        );
+        return;
+      }
+      acceptedRef.current = reading;
       live.current = { reading, calibration: calibrationRef.current };
       setDeviceFix({
         latitude: reading.latitude,
@@ -173,8 +184,7 @@ export function useLocationSync(indoors: boolean, mapActive: boolean) {
       setHeading(headingDirection(reading, calibrationRef.current));
       const radius = accuracyRadiusPixels(reading, calibrationRef.current);
       setMarker({ point: projected.point, radius });
-      const hold = reading.speed !== null && reading.speed > 0.5 ? 2 : 6;
-      rememberPlacement(projected.point, hold);
+      rememberPlacement(projected.point, 0);
       if (assessed.quality === "approximate") {
         setStatus("low_accuracy");
         setMessage(
@@ -185,8 +195,8 @@ export function useLocationSync(indoors: boolean, mapActive: boolean) {
       setStatus("connected");
       setMessage(
         calibrationRef.current.demo
-          ? "DEMO calibration saved. GPS Connected. Each new phone fix is applied immediately, and a quiet phone is asked again after 2 seconds. North is toward the top of the map, about 8 pixels per meter. This is not a surveyed campus."
-          : "GPS Connected. Each new phone fix is applied immediately, and a quiet phone is asked again after 2 seconds. The position stays on this device.",
+          ? "DEMO calibration saved. GPS Connected. Steps under 3 m are ignored while the fix is tight, and the character glides to a real step. North is toward the top of the map, about 8 pixels per meter. This is not a surveyed campus."
+          : "GPS Connected. Steps under 3 m are ignored while the fix is tight, and the character glides to a real step. The position stays on this device.",
       );
     },
     [rememberPlacement],
@@ -204,6 +214,7 @@ export function useLocationSync(indoors: boolean, mapActive: boolean) {
     setHeading(null);
     reliableRef.current = null;
     lastReadingRef.current = null;
+    acceptedRef.current = null;
     lastAttemptRef.current = 0;
     pollingRef.current = false;
     setSignal("hidden");
