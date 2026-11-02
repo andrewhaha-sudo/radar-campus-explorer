@@ -42,4 +42,6 @@ All of those passed. The full browser folder was not re-run.
 
 ## Lodestar listen loop, same date
 
-`node --test tests/location-sync.test.mjs` passed, including fresh, holding, and hidden fix timing. `npx tsc -b` passed. Playwright for the demo location save and the campus shell is recorded with the commit that adds the listen loop.
+`node --test tests/location-sync.test.mjs` passed, including fresh, holding, and hidden fix timing. `npx tsc -b` and `npm run build` passed.
+
+Playwright, desktop and mobile, passed for a calibrated walk, a low-accuracy fix that does not move the character, demo location save, and the radar shell.
