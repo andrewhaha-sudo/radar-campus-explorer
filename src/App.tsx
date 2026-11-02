@@ -1,4 +1,5 @@
 import { CampusExplorer } from "./components/map/CampusExplorer";
+import { StudentProfilesProvider } from "./components/student/StudentProfiles";
 
 export default function App() {
   return (
@@ -7,7 +8,9 @@ export default function App() {
         Skip to interactive map
       </a>
       <main>
-        <CampusExplorer />
+        <StudentProfilesProvider>
+          <CampusExplorer />
+        </StudentProfilesProvider>
       </main>
     </>
   );

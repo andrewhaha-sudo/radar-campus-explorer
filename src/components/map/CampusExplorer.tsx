@@ -18,6 +18,7 @@ import {
   Minus,
   Plus,
   RotateCcw,
+  IdCard,
 } from "lucide-react";
 import {
   allRooms,
@@ -29,8 +30,13 @@ import {
 import { RoomPhotoDialog } from "./RoomPhotoDialog";
 import { RouteOverlay } from "./RouteOverlay";
 import { CampusBreeze } from "./CampusBreeze";
+import { StudentSprite } from "../student/StudentSprite";
+import { StudentProfileModal } from "../student/StudentProfileModal";
+import { useStudentProfile } from "../student/student-context";
+import { useCampusStudents } from "../student/useCampusStudents";
+import type { Character, Direction } from "../../lib/student-profile";
 import type { Place, Room, SceneId } from "./campus-data";
-import { canTravel, findPath } from "./navigation";
+import { canTravel, findPath, isWalkable } from "./navigation";
 import type { Point } from "./navigation";
 import "./campus-explorer.css";
 import { cn } from "../../lib/cn";
@@ -51,47 +57,39 @@ function Student({
   position,
   direction,
   moving,
+  avatar,
+  animate,
+  onOpen,
 }: {
   position: Point;
-  direction: string;
+  direction: Direction;
   moving: boolean;
+  avatar: Character;
+  animate: boolean;
+  onOpen: () => void;
 }) {
   return (
     <g
       transform={`translate(${position.x},${position.y})`}
-      className={cn("campus-student", moving && "is-walking")}
+      className="campus-student"
+      data-animate={animate}
+      role="button"
+      tabIndex={0}
       aria-label="Your character"
-      pointerEvents="none"
+      onClick={(event) => {
+        event.stopPropagation();
+        onOpen();
+      }}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          event.stopPropagation();
+          onOpen();
+        }
+      }}
     >
-      <ellipse cx="0" cy="-1" rx="8" ry="3" fill="#14182d" opacity=".3" />
-      <g
-        className="campus-student-body"
-        shapeRendering="crispEdges"
-        stroke="#22213f"
-        strokeWidth="1.5"
-      >
-        <path d="M-6-8h5v7h-6v-3h1zm7 0h5v7H1z" fill="#263351" />
-        <path d="M-7-17H7v10H-7z" fill="#ffc548" />
-        <path d="M-10-16h3v8h-3zm17 0h3v8H7z" fill="#f6ba87" />
-        <path d="M-6-27H5v3h3v9H-7v-9h1z" fill="#f6ba87" />
-        <path d="M-7-27h13v3h3v4H-9v-4h2z" fill="#7956d7" />
-        <path d="M-6-25H5v2H-6z" fill="#b9a0ff" stroke="none" />
-        {direction === "up" ? (
-          <path d="M-5-16H5v9H-5z" fill="#5c66bd" />
-        ) : (
-          <path
-            d={
-              direction === "left"
-                ? "M-6-20h2v3h-2z"
-                : direction === "right"
-                  ? "M4-20h2v3H4z"
-                  : "M-4-20h2v3h-2zm6 0h2v3H2z"
-            }
-            fill="#22213f"
-            stroke="none"
-          />
-        )}
-      </g>
+      <title>Open your student profile</title>
+      <StudentSprite avatar={avatar} direction={direction} moving={moving} />
     </g>
   );
 }
@@ -133,7 +131,7 @@ function RoomDoor({
 export function CampusExplorer() {
   const [sceneId, setSceneId] = useState<SceneId>("campus");
   const [position, setPosition] = useState<Point>(scenes.campus.spawn);
-  const [direction, setDirection] = useState("down");
+  const [direction, setDirection] = useState<Direction>("down");
   const [moving, setMoving] = useState(false);
   const [selected, setSelected] = useState<Place | null>(null);
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
@@ -144,6 +142,9 @@ export function CampusExplorer() {
   const [showRoute, setShowRoute] = useState(true);
   const [breeze, setBreeze] = useState(true);
   const [photoRoom, setPhotoRoom] = useState<Room | null>(null);
+  const [studentId, setStudentId] = useState<string | null>(null);
+  const profileReturnFocus = useRef<HTMLElement | null>(null);
+  const [mapVisible, setMapVisible] = useState(true);
   const photoReturnFocus = useRef<HTMLElement | null>(null);
   const [zoom, setZoom] = useState(1);
   const [artOnly, setArtOnly] = useState(false);
@@ -160,6 +161,32 @@ export function CampusExplorer() {
   const viewport = useRef<HTMLDivElement>(null);
   const explorer = useRef<HTMLDivElement>(null);
   const scene = scenes[sceneId];
+  const { profile, user } = useStudentProfile();
+  const { students, error: studentsError } = useCampusStudents({
+    scene: sceneId,
+    ...position,
+    direction,
+    moving,
+  });
+  const nearbyStudents = students.filter(
+    (student) =>
+      student.scene === sceneId && isWalkable(student, scene.walkable),
+  );
+
+  useEffect(() => {
+    let intersecting = true;
+    const update = () => setMapVisible(intersecting && !document.hidden);
+    const observer = new IntersectionObserver(([entry]) => {
+      intersecting = entry.isIntersecting;
+      update();
+    });
+    if (viewport.current) observer.observe(viewport.current);
+    document.addEventListener("visibilitychange", update);
+    return () => {
+      observer.disconnect();
+      document.removeEventListener("visibilitychange", update);
+    };
+  }, []);
 
   const cancelMovement = useCallback(() => {
     path.current = [];
@@ -168,6 +195,13 @@ export function CampusExplorer() {
     setRoute([]);
     setMoving(false);
   }, []);
+
+  const openStudent = (id: string) => {
+    cancelMovement();
+    held.current.clear();
+    profileReturnFocus.current = document.activeElement as HTMLElement | null;
+    setStudentId(id);
+  };
 
   const changeScene = useCallback((id: SceneId, spawn?: Point) => {
     const point = spawn ?? scenes[id].spawn;
@@ -282,7 +316,7 @@ export function CampusExplorer() {
   }, [sceneId, scene, walkTo, changeScene]);
 
   useEffect(() => {
-    if (artOnly || floorSheet || photoRoom) return;
+    if (artOnly || floorSheet || photoRoom || studentId) return;
     let frame = 0,
       previous = 0;
     const animate = (time: number) => {
@@ -382,14 +416,19 @@ export function CampusExplorer() {
       window.removeEventListener("blur", release);
       document.removeEventListener("visibilitychange", release);
     };
-  }, [scene, sceneId, artOnly, floorSheet, zoom, photoRoom]);
+  }, [scene, sceneId, artOnly, floorSheet, zoom, photoRoom, studentId]);
 
   useEffect(() => {
     if (!expanded) return;
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     const close = (event: globalThis.KeyboardEvent) => {
-      if (event.key === "Escape" && !event.defaultPrevented && !photoRoom)
+      if (
+        event.key === "Escape" &&
+        !event.defaultPrevented &&
+        !photoRoom &&
+        !studentId
+      )
         setExpanded(false);
     };
     window.addEventListener("keydown", close);
@@ -397,7 +436,7 @@ export function CampusExplorer() {
       document.body.style.overflow = previousOverflow;
       window.removeEventListener("keydown", close);
     };
-  }, [expanded, photoRoom]);
+  }, [expanded, photoRoom, studentId]);
 
   const nearbyBuilding =
     sceneId === "campus"
@@ -430,6 +469,7 @@ export function CampusExplorer() {
       artOnly ||
       floorSheet ||
       photoRoom ||
+      studentId ||
       (event.target as HTMLElement).matches("input, select, textarea, button")
     )
       return;
@@ -444,14 +484,20 @@ export function CampusExplorer() {
     }
   };
   const clickMap = (event: React.MouseEvent<SVGSVGElement>) => {
-    if (artOnly || floorSheet || photoRoom) return;
+    if (artOnly || floorSheet || photoRoom || studentId) return;
     const matrix = svg.current?.getScreenCTM();
     if (!matrix) return;
     const point = new DOMPoint(event.clientX, event.clientY).matrixTransform(
       matrix.inverse(),
     );
     cancelMovement();
-    if (walkTo(point, () => setMessage("You reached this spot. Click another place or keep exploring.")))
+    if (
+      walkTo(point, () =>
+        setMessage(
+          "You reached this spot. Click another place or keep exploring.",
+        ),
+      )
+    )
       setMessage("Walking to this spot…");
     viewport.current?.focus({ preventScroll: true });
   };
@@ -543,17 +589,26 @@ export function CampusExplorer() {
             Your school map, brought to life. Pick a destination and explore.
           </p>
         </div>
-        <button
-          className="campus-secondary"
-          onClick={() => {
-            cancelMovement();
-            setFloorSheet(!floorSheet);
-            setZoom(1);
-          }}
-        >
-          <Layers size={16} />
-          {floorSheet ? "Back to explorer" : "Indoor floor plans"}
-        </button>
+        <div className="campus-profile-actions">
+          <button
+            className="campus-secondary"
+            onClick={() => openStudent("self")}
+          >
+            <IdCard size={16} />
+            Student profile
+          </button>
+          <button
+            className="campus-secondary"
+            onClick={() => {
+              cancelMovement();
+              setFloorSheet(!floorSheet);
+              setZoom(1);
+            }}
+          >
+            <Layers size={16} />
+            {floorSheet ? "Back to explorer" : "Indoor floor plans"}
+          </button>
+        </div>
       </header>
 
       <div className="campus-layout">
@@ -673,7 +728,7 @@ export function CampusExplorer() {
               {!artOnly && !floorSheet && (
                 <>
                   {sceneId === "campus" && breeze && (
-                    <CampusBreeze paused={Boolean(photoRoom)} />
+                    <CampusBreeze paused={Boolean(photoRoom || studentId)} />
                   )}
                   {showAreas &&
                     scene.walkable.map((r, i) => (
@@ -786,10 +841,45 @@ export function CampusExplorer() {
                       />
                     </g>
                   )}
+                  {nearbyStudents.map((student, index) => (
+                    <g
+                      key={student.user_id}
+                      className="campus-other-student"
+                      role="button"
+                      tabIndex={0}
+                      data-student-id={student.user_id}
+                      data-animate={mapVisible && !studentId && !photoRoom}
+                      transform={`translate(${student.x},${student.y})`}
+                      aria-label={`View ${student.name || `student ${index + 1}`} profile`}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        openStudent(student.user_id);
+                      }}
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter" || event.key === " ") {
+                          event.preventDefault();
+                          event.stopPropagation();
+                          openStudent(student.user_id);
+                        }
+                      }}
+                    >
+                      <StudentSprite
+                        avatar={student.avatar}
+                        direction={student.direction}
+                        moving={student.moving}
+                      />
+                      <text y="-38" className="campus-peer-label">
+                        {student.name ? student.name.slice(0, 20) : "Student"}
+                      </text>
+                    </g>
+                  ))}
                   <Student
                     position={position}
                     direction={direction}
                     moving={moving}
+                    avatar={profile.avatar}
+                    animate={mapVisible && !studentId && !photoRoom}
+                    onOpen={() => openStudent("self")}
                   />
                 </>
               )}
@@ -856,6 +946,21 @@ export function CampusExplorer() {
         </section>
 
         <aside className="campus-sidebar">
+          {user && (
+            <section className="campus-directory">
+              <span className="campus-eyebrow">STUDENTS HERE</span>
+              <p className="campus-small">
+                {nearbyStudents.length
+                  ? `${nearbyStudents.length} other student${nearbyStudents.length === 1 ? "" : "s"} in this area. Click a character to view their shared profile.`
+                  : "No other students are sharing a character in this area right now."}
+              </p>
+              {studentsError && (
+                <p className="student-error" role="status">
+                  {studentsError}
+                </p>
+              )}
+            </section>
+          )}
           <section className="campus-directory">
             <span className="campus-eyebrow">YOUR NEXT STOP</span>
             <h2>{indoor ? "Inside the school" : "Campus directory"}</h2>
@@ -1040,9 +1145,9 @@ export function CampusExplorer() {
             <span className="campus-eyebrow">A LITTLE EXPLORATION</span>
             <h2>Make your way around.</h2>
             <p>
-              Click a place or open grass to walk there. Use the arrow keys or <b>W A S D</b>{" "}
-              to take over. Turn route arrows on to see the direction of travel.
-              Click a room door to view its photo.
+              Click a place or open grass to walk there. Use the arrow keys or{" "}
+              <b>W A S D</b> to take over. Turn route arrows on to see the
+              direction of travel. Click a room door to view its photo.
             </p>
             {directionPad}
             <label className="campus-walking-toggle">
@@ -1089,6 +1194,18 @@ export function CampusExplorer() {
           onRestoreFocus={() => {
             if (photoReturnFocus.current?.isConnected)
               photoReturnFocus.current.focus({ preventScroll: true });
+            else viewport.current?.focus({ preventScroll: true });
+          }}
+        />
+      )}
+      {studentId && (
+        <StudentProfileModal
+          key={`${studentId}:${user?.id ?? "device"}`}
+          studentId={studentId}
+          onClose={() => setStudentId(null)}
+          onRestoreFocus={() => {
+            if (profileReturnFocus.current?.isConnected)
+              profileReturnFocus.current.focus({ preventScroll: true });
             else viewport.current?.focus({ preventScroll: true });
           }}
         />

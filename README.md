@@ -4,8 +4,11 @@ A standalone, interactive pixel-art school map. The home page opens directly to 
 campus. Walk between buildings, explore the supplied indoor hallways, choose a
 classroom, and travel between floors using the internal stairs.
 
-This version runs entirely in the browser. It has no RADAR dashboard, login,
-backend, database, Supabase configuration, or required API keys.
+The map opens directly, without the RADAR dashboard or a login wall. Map navigation,
+room photos and a device-only student profile work in the browser. Separate student
+accounts use Supabase for private profiles, photos and shared campus characters.
+The public connection settings for your separate project are included; apply the
+[student database setup](docs/STUDENT-PROFILES.md) before using online accounts.
 
 ## Run on your computer
 
@@ -38,6 +41,8 @@ again with `npm run dev`. There is no seed command or API server to start.
   image, then click the same room later to see it. **Walk to this room** starts a route.
 - Open **Indoor floor plans** to view the complete source sheet or an individual building.
 - Use zoom, expand, or **Original artwork only** to inspect the maps.
+- Open **Student profile** or click your own character to create a trainer card,
+  change your boy/girl character, and upload or take a profile photo.
 
 | Building | Floors | Rooms per floor | Total rooms |
 | --- | --- | --- | --- |
@@ -57,6 +62,25 @@ are walkable; solid buildings, pond water, fences and dense tree clusters block 
 The original artwork is preserved as extracted from the design PDF. Gameplay and
 selection indicators are separate overlays. These are illustration-based walking
 routes, not verified evacuation guidance. See [asset provenance](public/maps/README.md).
+
+## Student profiles and characters
+
+The trainer card has editable name, grade, section, teacher and sex. **Change Character**
+switches the walking sprite without changing identity fields or the profile photo.
+Both characters have idle and four-direction walking sprites.
+
+**Upload photo** supports JPG, PNG and WebP up to 15 MB. **Take photo** opens the
+camera after permission is granted. Crop, zoom and reposition the image, choose
+**Use cropped photo**, then **Save Changes**. Real photos use the same portrait
+frame as the default character. Remove a photo and save to restore the default portrait.
+
+Without sign-in, the profile is stored in this browser. Signed-in profiles save to
+the separate account; the device profile is never uploaded automatically. Photos
+and identity fields start private. Enable **Show my character to signed-in students**
+and choose which fields to share. Other signed-in students can click that character
+to see only the permitted fields and photo. Hidden photos use the character portrait.
+
+See [Student profiles: setup and privacy](docs/STUDENT-PROFILES.md).
 
 ## Room photos
 
@@ -84,14 +108,16 @@ Import **andrewhaha-sudo/radar-campus-explorer**, branch **main**, into a Vercel
 | Install command | `npm ci` |
 | Build command | `npm run build` |
 | Output directory | `dist` |
-| Environment variables | None required |
+| Environment variables | Public student project settings are included; optional overrides are documented below |
 
 Click **Deploy** and open the address Vercel assigns. To update an existing Vercel
-project, deploy the latest commit on `main`. Previous Supabase settings are no longer
-used. [Full deployment instructions](docs/VERCEL.md).
+project, deploy the latest commit on `main`. The former full RADAR server settings
+are not used. Student accounts use their own project and schema.
+[Full deployment instructions](docs/VERCEL.md).
 
 The generated `dist` directory also works on a static host at the site's root.
-The browser requests only the app bundle and local artwork; it does not call a school API.
+The map itself does not call a school API. Signed-in profiles and shared characters
+communicate with the configured Supabase project over authenticated requests.
 
 ## Checks
 
@@ -104,7 +130,9 @@ npm run test:e2e
 ```
 
 The browser tests serve the production build with a static file server and verify
-that the app works without accounts or an API. To use a Chromium binary already
+that the map works without signing in, and cover device profiles and mocked account
+flows. Database privacy tests run the actual migration and policies in PostgreSQL
+(PGlite). To use a Chromium binary already
 installed on your machine, set `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` when running
 `npm run test:e2e`. `npm run preview` previews the built app locally.
 
@@ -115,6 +143,9 @@ installed on your machine, set `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` when runnin
 - `src/components/map/campus-data.ts`: map bounds, walking corridors, rooms and entrances
 - `src/components/map/navigation.ts`: collision checks and A* pathfinding
 - `src/components/map/CampusBreeze.tsx`: tree and grass animation overlays
+- `src/components/student/`: trainer card, editor, character sprites, camera and cropper
+- `src/lib/student-project.json`: public connection settings for the separate accounts
+- `supabase/migrations/`: profile tables, ownership rules and private photo bucket
 - `src/components/map/campus-explorer.css`: interface styling
 - `public/maps/`: original embedded artwork
 
