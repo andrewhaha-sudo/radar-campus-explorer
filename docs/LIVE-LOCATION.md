@@ -32,6 +32,12 @@ until the user saves a verified calibration.
    points. On another device, use **Import calibration**, review, confirm and save.
    Calibration is local to each browser/origin, rather than silently shared online.
 
+References saved by the earlier GPS release are retained and prefilled when you
+open the calibration editor. Review and confirm them before enabling the new
+tracker. **Clear calibration** asks for confirmation and removes both saved formats.
+Existing local campus roles are retained; the older “Staff” role is displayed as
+“School Staff.” The two GPS implementations are consolidated into one active watch.
+
 The implementation converts coordinates into a local east/north plane in meters,
 then fits an affine transformation to image X/Y using all references. This accounts
 for rotation, scale and shear. Placement is limited to the convex boundary of the

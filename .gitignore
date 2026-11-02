@@ -10,3 +10,14 @@ test-results/
 .DS_Store
 .vscode/
 .idea/
+
+# Android build outputs & Gradle caches
+.gradle/
+build/
+app/build/
+*.apk
+*.aar
+*.keystore
+local.properties
+
+

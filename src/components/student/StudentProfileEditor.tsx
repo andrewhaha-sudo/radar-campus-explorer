@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { roles } from "../../lib/map-identity";
 import { grades, identityFields } from "../../lib/student-profile";
 import { CharacterSelection } from "./CharacterSelection";
 import { ProfilePhotoUploader } from "./ProfilePhotoUploader";
@@ -9,7 +10,8 @@ export function StudentProfileEditor({
 }: {
   onDone: (saved?: boolean) => void;
 }) {
-  const { profile, photo, user, saving, save } = useStudentProfile();
+  const { profile, photo, user, saving, save, identity, saveIdentity } =
+    useStudentProfile();
   const [draft, setDraft] = useState({
     ...profile,
     visibility: { ...profile.visibility },
@@ -18,6 +20,7 @@ export function StudentProfileEditor({
   const [photoChanged, setPhotoChanged] = useState(false);
   const [photoPending, setPhotoPending] = useState(false);
   const [chooseCharacter, setChooseCharacter] = useState(false);
+  const [role, setRole] = useState(identity.role);
   const [error, setError] = useState("");
   return (
     <form
@@ -28,6 +31,7 @@ export function StudentProfileEditor({
         if (photoPending) return;
         try {
           await save(draft, draftPhoto, photoChanged);
+          saveIdentity({ ...identity, role });
           onDone(true);
         } catch (cause) {
           setError(
@@ -88,6 +92,23 @@ export function StudentProfileEditor({
             placeholder="Teacher's name"
           />
         </label>
+        <label>
+          Role on this device
+          <select
+            aria-label="Role on this device"
+            value={role}
+            onChange={(event) => setRole(event.target.value as typeof role)}
+          >
+            {roles.map((item) => (
+              <option key={item}>{item}</option>
+            ))}
+          </select>
+        </label>
+        <p className="campus-small">
+          Student, Teacher, Staff or Visitor. This role stays in this browser.
+          It is not sent with the student account and other students cannot see
+          it.
+        </p>
         <label>
           Sex
           <select

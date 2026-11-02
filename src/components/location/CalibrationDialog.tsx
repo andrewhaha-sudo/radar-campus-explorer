@@ -1,7 +1,13 @@
 import { useRef, useState } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
+import * as AlertDialog from "@radix-ui/react-alert-dialog";
 import { X } from "lucide-react";
-import { calibrate, saveCalibration } from "../../lib/map-calibration";
+import {
+  calibrate,
+  saveCalibration,
+  readCalibration,
+  clearSavedCalibration,
+} from "../../lib/map-calibration";
 import type { Calibration } from "../../lib/map-calibration";
 import { cn } from "../../lib/cn";
 
@@ -19,7 +25,7 @@ const blank = (): Draft => ({
   x: "",
   y: "",
 });
-const toDraft = (value: Calibration) =>
+const toDraft = (value: Pick<Calibration, "points">) =>
   value.points.map((p) => ({
     label: p.label,
     latitude: String(p.latitude),
@@ -32,13 +38,19 @@ export function CalibrationDialog({
   value,
   onSave,
   onClose,
+  onClear,
 }: {
   value: Calibration | null;
   onSave: (value: Calibration) => void;
   onClose: () => void;
+  onClear: () => void;
 }) {
   const [points, setPoints] = useState<Draft[]>(() =>
-    value ? toDraft(value) : [blank(), blank(), blank()],
+    value
+      ? toDraft(value)
+      : readCalibration().points.length
+        ? toDraft(readCalibration())
+        : [blank(), blank(), blank()],
   );
   const [selected, setSelected] = useState(0);
   const [verified, setVerified] = useState(false);
@@ -271,6 +283,49 @@ export function CalibrationDialog({
               </fieldset>
             ))}
             <div className="student-actions">
+              <AlertDialog.Root>
+                <AlertDialog.Trigger asChild>
+                  <button type="button" className="campus-secondary">
+                    Clear calibration
+                  </button>
+                </AlertDialog.Trigger>
+                <AlertDialog.Portal>
+                  <AlertDialog.Overlay className="student-overlay" />
+                  <AlertDialog.Content className="student-modal location-modal">
+                    <AlertDialog.Title>
+                      Clear this device’s calibration?
+                    </AlertDialog.Title>
+                    <AlertDialog.Description>
+                      The saved map references will be removed. GPS placement
+                      will need calibration again.
+                    </AlertDialog.Description>
+                    <div className="student-actions">
+                      <AlertDialog.Cancel asChild>
+                        <button className="campus-secondary">
+                          Keep calibration
+                        </button>
+                      </AlertDialog.Cancel>
+                      <AlertDialog.Action asChild>
+                        <button
+                          className="campus-primary"
+                          onClick={() => {
+                            try {
+                              clearSavedCalibration();
+                              onClear();
+                            } catch {
+                              setError(
+                                "Calibration could not be cleared on this device.",
+                              );
+                            }
+                          }}
+                        >
+                          Clear saved references
+                        </button>
+                      </AlertDialog.Action>
+                    </div>
+                  </AlertDialog.Content>
+                </AlertDialog.Portal>
+              </AlertDialog.Root>
               <button
                 type="button"
                 className="campus-secondary"

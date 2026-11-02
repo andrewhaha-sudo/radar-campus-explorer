@@ -88,6 +88,9 @@ function Student({
       transform={`translate(${position.x},${position.y})`}
       className="campus-student"
       data-animate={animate}
+      data-player="you"
+      data-x={position.x}
+      data-y={position.y}
       data-location={live}
       data-smooth={smooth}
       style={
@@ -1434,6 +1437,13 @@ export function CampusExplorer() {
         <CalibrationDialog
           value={calibration}
           onClose={() => setLocationDialog(null)}
+          onClear={() => {
+            location.reset();
+            setCalibration(null);
+            setLocationView(false);
+            setCorrection(false);
+            setLocationDialog(null);
+          }}
           onSave={(value) => {
             location.reset();
             setCalibration(value);

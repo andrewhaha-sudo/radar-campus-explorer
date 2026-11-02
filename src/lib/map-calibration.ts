@@ -2,6 +2,10 @@ export interface MapPoint {
   x: number;
   y: number;
 }
+
+// Keep the previous calibration API readable for stored device references and
+// callers upgrading from the first GPS release. New tracking uses calibrate().
+export * from "./legacy-map-calibration.ts";
 export interface GeoPoint {
   latitude: number;
   longitude: number;
@@ -197,4 +201,8 @@ export function loadCalibration(): Calibration | null {
 export function saveCalibration(value: Calibration) {
   calibrate(value);
   localStorage.setItem(CALIBRATION_KEY, JSON.stringify(value));
+}
+export function clearSavedCalibration() {
+  localStorage.removeItem(CALIBRATION_KEY);
+  localStorage.removeItem("campus-explorer-map-calibration");
 }

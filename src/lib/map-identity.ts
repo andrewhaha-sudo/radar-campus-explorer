@@ -1,3 +1,4 @@
+import { readCampusRole } from "./campus-role.ts";
 export const roles = ["Student", "Teacher", "School Staff", "Visitor"] as const;
 export const uniformColors = {
   Green: "#39794a",
@@ -39,6 +40,10 @@ export function readIdentity(id: string): MapIdentity {
       JSON.parse(localStorage.getItem(identityKey(id)) || "null"),
     );
   } catch {
-    return { ...defaultIdentity };
+    const oldRole = readCampusRole(id);
+    return {
+      ...defaultIdentity,
+      role: oldRole === "Staff" ? "School Staff" : oldRole || "Student",
+    };
   }
 }
