@@ -119,6 +119,10 @@ The generated `dist` directory also works on a static host at the site's root.
 The map itself does not call a school API. Signed-in profiles and shared characters
 communicate with the configured Supabase project over authenticated requests.
 
+## Google Map
+
+Choose **Google Map** at the top of the page. The illustration campus stays available through **Campus map**. Interactive Google Maps loads only when `VITE_GOOGLE_MAPS_API_KEY` is set to a browser key. Without that key the view says the key is not configured and, after a device location exists, offers a link that opens Google Maps. The school’s coordinates are not included. Building pins appear only from a saved calibration, and a DEMO calibration is labeled on those pins.
+
 ## Live location
 
 GPS is off until you choose **Enable GPS** in **Live location**. For a quick

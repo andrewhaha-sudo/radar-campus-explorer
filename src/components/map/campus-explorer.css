@@ -755,3 +755,23 @@
   border-radius: 6px;
   background: #fff;
 }
+.campus-google-map {
+  min-height: 70vh;
+  background: #eef3ea;
+}
+.campus-google-map--notice {
+  display: grid;
+  align-content: center;
+  gap: 12px;
+  padding: 28px;
+}
+.campus-google-map--notice p,
+.campus-google-map .campus-small {
+  margin: 0;
+}
+.campus-google-map-canvas {
+  min-height: 70vh;
+}
+.campus-google-map code {
+  font-size: 12px;
+}

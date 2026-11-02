@@ -63,6 +63,10 @@ export function useLocationSync(indoors: boolean, mapActive: boolean) {
   const [marker, setMarker] = useState<GpsMarker | null>(null);
   const [tracking, setTracking] = useState(false);
   const [savingDemo, setSavingDemo] = useState(false);
+  const [deviceFix, setDeviceFix] = useState<{
+    latitude: number;
+    longitude: number;
+  } | null>(null);
   const calibrationRef = useRef(calibration);
   const indoorsRef = useRef(indoors);
   const reliableRef = useRef<GeoReading | null>(null);
@@ -119,6 +123,7 @@ export function useLocationSync(indoors: boolean, mapActive: boolean) {
           "Approximate location. GPS cannot choose a floor or a classroom, so the character was not moved indoors.",
         );
         live.current = null;
+        setDeviceFix(null);
         rememberPlacement(null);
         setMarker(null);
         return;
@@ -142,6 +147,10 @@ export function useLocationSync(indoors: boolean, mapActive: boolean) {
         return;
       }
       live.current = { reading, calibration: calibrationRef.current };
+      setDeviceFix({
+        latitude: reading.latitude,
+        longitude: reading.longitude,
+      });
       if (assessed.quality === "reliable") reliableRef.current = reading;
       setHeading(headingDirection(reading, calibrationRef.current));
       const radius = accuracyRadiusPixels(reading, calibrationRef.current);
@@ -178,6 +187,7 @@ export function useLocationSync(indoors: boolean, mapActive: boolean) {
     reliableRef.current = null;
     lastReadingRef.current = null;
     live.current = null;
+    setDeviceFix(null);
     setMessage(
       "GPS Disabled. Tracking stopped. Coordinates were not saved or sent.",
     );
@@ -400,5 +410,6 @@ export function useLocationSync(indoors: boolean, mapActive: boolean) {
     saveDemoAt,
     savingDemo,
     live,
+    deviceFix,
   };
 }

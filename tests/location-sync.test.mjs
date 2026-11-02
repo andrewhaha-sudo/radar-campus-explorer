@@ -13,10 +13,12 @@ import {
   demoCalibrationFromHere,
   fitAffine,
   geographicToPixel,
+  pixelToGeographic,
   projectAffine,
   readCalibration,
   writeCalibration,
 } from "../src/lib/map-calibration.ts";
+import { googleMapView } from "../src/lib/google-map.ts";
 import { readCampusRole, writeCampusRole } from "../src/lib/campus-role.ts";
 
 const surveyed = [
@@ -168,6 +170,26 @@ test("a location watcher cannot leave two watches running", () => {
   watcher.stop();
   assert.equal(watcher.active, false);
   assert.equal(watches.size, 0);
+});
+
+test("pixel coordinates convert back to the surveyed latitude and longitude", () => {
+  const calibration = { points: surveyed };
+  const geographic = pixelToGeographic({ x: 868, y: 411 }, calibration);
+  assert.equal(geographic.ok, true);
+  if (!geographic.ok) return;
+  assert.ok(Math.abs(geographic.latitude - 14) < 1e-6);
+  assert.ok(Math.abs(geographic.longitude - 121.01) < 1e-6);
+  assert.deepEqual(
+    googleMapView({ apiKey: "", latitude: 14, longitude: 121 }),
+    {
+      mode: "not_configured",
+      openUrl: "https://www.google.com/maps/search/?api=1&query=14,121",
+    },
+  );
+  assert.equal(
+    googleMapView({ apiKey: "browser-key", latitude: null, longitude: null }).mode,
+    "needs_location",
+  );
 });
 
 test("a demo calibration anchors the current fix and moves east across the map", () => {

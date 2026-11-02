@@ -39,6 +39,8 @@ import type { Character, Direction } from "../../lib/student-profile";
 import type { Place, Room, SceneId } from "./campus-data";
 import { advanceToward, canTravel, findPath, isWalkable } from "./navigation";
 import type { Point } from "./navigation";
+import { GoogleCampusMap } from "./GoogleCampusMap";
+import { googleMapsApiKey } from "../../lib/google-map";
 import { LocationSyncPanel } from "./LocationSyncPanel";
 import { useLocationSync } from "./useLocationSync";
 import { followTarget, movementMode } from "../../lib/location-sync";
@@ -228,6 +230,7 @@ export function CampusExplorer() {
   const scene = scenes[sceneId];
   const [gpsPausedByUser, setGpsPausedByUser] = useState(false);
   const [calibrationPick, setCalibrationPick] = useState<number | null>(null);
+  const [googleMapOpen, setGoogleMapOpen] = useState(false);
   const [pickedPixel, setPickedPixel] = useState<{
     index: number;
     x: number;
@@ -764,6 +767,14 @@ export function CampusExplorer() {
             {gps.savingDemo ? "Reading location…" : "Save my location"}
           </button>
           <button
+            type="button"
+            className="campus-secondary"
+            aria-pressed={googleMapOpen}
+            onClick={() => setGoogleMapOpen((open) => !open)}
+          >
+            {googleMapOpen ? "Campus map" : "Google Map"}
+          </button>
+          <button
             className="campus-secondary"
             onClick={() => openStudent("self")}
           >
@@ -835,6 +846,22 @@ export function CampusExplorer() {
               </button>
             </div>
           </div>
+          {googleMapOpen ? (
+            <GoogleCampusMap
+              apiKey={googleMapsApiKey()}
+              latitude={
+                gps.deviceFix?.latitude ??
+                gps.calibration.points[0]?.latitude ??
+                null
+              }
+              longitude={
+                gps.deviceFix?.longitude ??
+                gps.calibration.points[0]?.longitude ??
+                null
+              }
+              calibration={gps.calibration}
+            />
+          ) : (
           <div
             id="campus-map"
             data-zoomed={zoom > 1}
@@ -1087,7 +1114,8 @@ export function CampusExplorer() {
               )}
             </svg>
           </div>
-          {!artOnly && !floorSheet && (
+          )}
+          {!googleMapOpen && !artOnly && !floorSheet && (
             <div className="campus-mobile-controls">
               <span>HOLD A DIRECTION TO WALK</span>
               {directionPad}

@@ -172,6 +172,27 @@ export function geographicToPixel(
   return { ok: true, point };
 }
 
+export function pixelToGeographic(
+  point: Point,
+  calibration: MapCalibration,
+):
+  | { ok: true; latitude: number; longitude: number }
+  | { ok: false; reason: CalibrationIssue } {
+  const fitted = fitAffine(calibration.points);
+  if (!fitted.ok) return fitted;
+  const [a, b, c] = fitted.affine.x;
+  const [d, e, f] = fitted.affine.y;
+  const determinant = a * e - b * d;
+  if (Math.abs(determinant) < 1e-12) return { ok: false, reason: "collinear" };
+  const x = point.x - c;
+  const y = point.y - f;
+  const longitude = (e * x - b * y) / determinant;
+  const latitude = (a * y - d * x) / determinant;
+  if (!finite(latitude) || !finite(longitude))
+    return { ok: false, reason: "invalid_points" };
+  return { ok: true, latitude, longitude };
+}
+
 export function calibrationReady(calibration: MapCalibration) {
   return fitAffine(calibration.points).ok;
 }

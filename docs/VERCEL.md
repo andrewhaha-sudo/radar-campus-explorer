@@ -13,7 +13,8 @@ serverless function or private server key is required.
 3. Choose **main** as the production branch and give the project an available name.
 4. Set framework **Vite**, Node.js **24.x**, root directory **repository root**,
    install command **npm ci**, build command **npm run build**, output directory **dist**.
-5. The public student project settings are included. Apply the
+5. Optional: add `VITE_GOOGLE_MAPS_API_KEY` with a browser Maps JavaScript API key restricted to the site address. Leave it empty to deploy without Google Maps; the campus illustration still opens and the Google Map view explains that the key is not configured. Do not put a server secret in this variable.
+6. The public student project settings are included. Apply the
    [student profile SQL setup](STUDENT-PROFILES.md) in Supabase to enable accounts.
    Environment overrides are optional. The included `vercel.json` configures static hosting.
 6. Click **Deploy**, then open the address assigned by Vercel.

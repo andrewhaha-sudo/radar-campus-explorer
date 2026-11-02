@@ -1,5 +1,13 @@
 import { expect, test } from "@playwright/test";
 
+test("Google Map explains that the API key is not configured", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: "Google Map" }).click();
+  await expect(page.getByText("Google Maps API key is not configured")).toBeVisible();
+  await page.getByRole("button", { name: "Campus map" }).click();
+  await expect(page.locator("#campus-map")).toBeVisible();
+});
+
 test("selecting Building B lists only its illustrated rooms", async ({ page }) => {
   await page.goto("/");
   await page.getByRole("button", { name: "Explore Building B", exact: true }).click();
