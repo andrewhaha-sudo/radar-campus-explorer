@@ -2,14 +2,20 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { Point } from "./navigation";
 import {
   accuracyRadiusPixels,
+  acceptNewerFix,
   assessFix,
   browserGeolocation,
+  fixClock,
+  FRESH_FIX_MS,
   GPS_STATUS_LABEL,
   headingDirection,
   locationIsSecure,
   LocationWatcher,
   readingFromPosition,
+  readingWithMotion,
   RELIABLE_ACCURACY_METERS,
+  shouldHeartbeat,
+  type FixClock,
   type GeoReading,
   type GeolocationSource,
   type GpsStatus,
@@ -67,10 +73,13 @@ export function useLocationSync(indoors: boolean, mapActive: boolean) {
     latitude: number;
     longitude: number;
   } | null>(null);
+  const [signal, setSignal] = useState<FixClock>("hidden");
   const calibrationRef = useRef(calibration);
   const indoorsRef = useRef(indoors);
   const reliableRef = useRef<GeoReading | null>(null);
   const lastReadingRef = useRef<GeoReading | null>(null);
+  const lastAttemptRef = useRef(0);
+  const pollingRef = useRef(false);
   const watcherRef = useRef<LocationWatcher | null>(null);
   const live = useRef<{
     reading: GeoReading;
@@ -91,7 +100,16 @@ export function useLocationSync(indoors: boolean, mapActive: boolean) {
 
   const applyReading = useCallback(
     (reading: GeoReading) => {
-      lastReadingRef.current = reading;
+      lastAttemptRef.current = Date.now();
+      if (!acceptNewerFix(lastReadingRef.current, reading)) return;
+      const prior = lastReadingRef.current;
+      const enriched = readingWithMotion(
+        prior && Date.now() - prior.timestamp <= FRESH_FIX_MS ? prior : null,
+        reading,
+      );
+      lastReadingRef.current = enriched;
+      reading = enriched;
+      setSignal(fixClock(reading.timestamp, Date.now()));
       setAccuracy(reading.accuracy);
       setLastUpdate(reading.timestamp);
       const calibrated = calibrationReady(calibrationRef.current);
@@ -167,8 +185,8 @@ export function useLocationSync(indoors: boolean, mapActive: boolean) {
       setStatus("connected");
       setMessage(
         calibrationRef.current.demo
-          ? "DEMO calibration saved. GPS Connected. The marker keeps moving between phone updates. North is toward the top of the map, about 8 pixels per meter. This is not a surveyed campus."
-          : "GPS Connected. The character follows the latest outdoor fix on this device only.",
+          ? "DEMO calibration saved. GPS Connected. Each new phone fix is applied immediately, and a quiet phone is asked again after 2 seconds. North is toward the top of the map, about 8 pixels per meter. This is not a surveyed campus."
+          : "GPS Connected. Each new phone fix is applied immediately, and a quiet phone is asked again after 2 seconds. The position stays on this device.",
       );
     },
     [rememberPlacement],
@@ -186,6 +204,9 @@ export function useLocationSync(indoors: boolean, mapActive: boolean) {
     setHeading(null);
     reliableRef.current = null;
     lastReadingRef.current = null;
+    lastAttemptRef.current = 0;
+    pollingRef.current = false;
+    setSignal("hidden");
     live.current = null;
     setDeviceFix(null);
     setMessage(
@@ -218,6 +239,7 @@ export function useLocationSync(indoors: boolean, mapActive: boolean) {
       return;
     }
     let cancelled = false;
+    let heartbeat = 0;
     calibrationRef.current = calibration;
     indoorsRef.current = indoors;
     const watcher = new LocationWatcher(source);
@@ -257,6 +279,24 @@ export function useLocationSync(indoors: boolean, mapActive: boolean) {
         () => {},
         { enableHighAccuracy: false, maximumAge: 2000, timeout: 2500 },
       );
+      lastAttemptRef.current = Date.now();
+      heartbeat = window.setInterval(() => {
+        if (cancelled || !shouldHeartbeat(lastAttemptRef.current, Date.now(), pollingRef.current))
+          return;
+        if (!navigator.geolocation) return;
+        pollingRef.current = true;
+        lastAttemptRef.current = Date.now();
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            pollingRef.current = false;
+            if (!cancelled) applyReading(readingFromPosition(position));
+          },
+          () => {
+            pollingRef.current = false;
+          },
+          { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 },
+        );
+      }, 500);
       watcher.start(
         (position) => {
           if (!cancelled) applyReading(readingFromPosition(position));
@@ -286,11 +326,20 @@ export function useLocationSync(indoors: boolean, mapActive: boolean) {
     });
     return () => {
       cancelled = true;
+      window.clearInterval(heartbeat);
       watcher.stop();
       if (watcherRef.current === watcher) watcherRef.current = null;
       setTracking(false);
     };
   }, [applyReading, calibration, enabled, indoors, trackingActive]);
+
+  useEffect(() => {
+    if (!enabled || lastUpdate === null) return;
+    const id = window.setInterval(() => {
+      setSignal(fixClock(lastUpdate, Date.now()));
+    }, 1000);
+    return () => window.clearInterval(id);
+  }, [enabled, lastUpdate]);
 
   const enable = useCallback(() => {
     setEnabled(true);
@@ -401,7 +450,8 @@ export function useLocationSync(indoors: boolean, mapActive: boolean) {
     lastUpdate,
     placement,
     heading,
-    marker: status === "connected" ? marker : null,
+    marker: status === "connected" && signal !== "hidden" ? marker : null,
+    signal: enabled ? signal : "hidden",
     calibration,
     enable,
     disable,

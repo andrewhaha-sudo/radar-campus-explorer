@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { GpsStatus } from "../../lib/location-sync";
+import type { FixClock, GpsStatus } from "../../lib/location-sync";
 import {
   CAMPUS_PIXEL_HEIGHT,
   CAMPUS_PIXEL_WIDTH,
@@ -35,6 +35,7 @@ export function LocationSyncPanel({
   message,
   accuracy,
   lastUpdate,
+  signal,
   enabled,
   tracking,
   pausedByUser,
@@ -53,6 +54,7 @@ export function LocationSyncPanel({
   message: string;
   accuracy: number | null;
   lastUpdate: number | null;
+  signal: FixClock;
   enabled: boolean;
   tracking: boolean;
   pausedByUser: boolean;
@@ -123,6 +125,16 @@ export function LocationSyncPanel({
                   minute: "2-digit",
                   second: "2-digit",
                 })}
+          </dd>
+        </div>
+        <div>
+          <dt>Signal</dt>
+          <dd>
+            {signal === "fresh"
+              ? "Fresh"
+              : signal === "stale"
+                ? "Holding last fix"
+                : "Waiting"}
           </dd>
         </div>
       </dl>

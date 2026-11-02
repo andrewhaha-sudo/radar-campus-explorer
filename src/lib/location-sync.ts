@@ -42,6 +42,12 @@ export const FOLLOW_ACCURACY_METERS = 65;
 export const STALE_FIX_MS = 20_000;
 export const JUMP_METERS = 120;
 export const JUMP_WINDOW_MS = 3_000;
+/** Lodestar shows a live marker for 3s, then a stale marker until 10s. */
+export const FRESH_FIX_MS = 3_000;
+export const SHOW_FIX_MS = 10_000;
+/** Lodestar asks again when no fix arrives for 2 seconds. */
+export const HEARTBEAT_GAP_MS = 2_000;
+const DERIVED_SPEED_CAP_MPS = 5;
 
 export interface FixAssessment {
   quality: "reliable" | "approximate" | "rejected";
@@ -132,7 +138,57 @@ export function assessFix(
   return { quality: "reliable", reason: "ok" };
 }
 
-const PREDICT_MAX_MS = 1_200;
+const PREDICT_MAX_MS = 2_000;
+
+export type FixClock = "fresh" | "stale" | "hidden";
+
+export function fixClock(timestamp: number, now: number): FixClock {
+  const age = now - timestamp;
+  if (!Number.isFinite(age)) return "hidden";
+  if (age <= FRESH_FIX_MS) return "fresh";
+  if (age <= SHOW_FIX_MS) return "stale";
+  return "hidden";
+}
+
+export function shouldHeartbeat(
+  lastAttemptAt: number,
+  now: number,
+  inFlight: boolean,
+) {
+  return !inFlight && now - lastAttemptAt >= HEARTBEAT_GAP_MS;
+}
+
+export function acceptNewerFix(
+  previous: GeoReading | null,
+  next: GeoReading,
+) {
+  if (!previous) return true;
+  return next.timestamp >= previous.timestamp;
+}
+
+export function readingWithMotion(
+  previous: GeoReading | null,
+  next: GeoReading,
+): GeoReading {
+  if (!previous || next.timestamp <= previous.timestamp) return next;
+  const seconds = (next.timestamp - previous.timestamp) / 1000;
+  if (seconds <= 0 || seconds > FRESH_FIX_MS / 1000) return next;
+  const meters = distanceMeters(previous, next);
+  const derivedSpeed = meters / seconds;
+  const speed =
+    next.speed ??
+    (derivedSpeed <= DERIVED_SPEED_CAP_MPS ? derivedSpeed : null);
+  if (next.heading !== null || speed === null || speed < 0.4) {
+    return speed === next.speed ? next : { ...next, speed };
+  }
+  const north = (next.latitude - previous.latitude) * 111_320;
+  const east =
+    (next.longitude - previous.longitude) *
+    111_320 *
+    Math.cos((previous.latitude * Math.PI) / 180);
+  const heading = (Math.atan2(east, north) * 180) / Math.PI;
+  return { ...next, speed, heading: (heading + 360) % 360 };
+}
 
 export function predictReading(reading: GeoReading, now: number) {
   const age = Math.min(PREDICT_MAX_MS, Math.max(0, now - reading.timestamp));
@@ -162,7 +218,12 @@ export function followTarget(
   now: number,
 ) {
   if (reading.accuracy > FOLLOW_ACCURACY_METERS) return null;
-  const predicted = predictReading(reading, now);
+  const clock = fixClock(reading.timestamp, now);
+  if (clock === "hidden") return null;
+  const predicted =
+    clock === "fresh"
+      ? predictReading(reading, now)
+      : { latitude: reading.latitude, longitude: reading.longitude };
   const projected = geographicToPixel(
     predicted.latitude,
     predicted.longitude,

@@ -48,7 +48,7 @@ import { GoogleCampusMap } from "./GoogleCampusMap";
 import { googleMapsApiKey } from "../../lib/google-map";
 import { LocationSyncPanel } from "./LocationSyncPanel";
 import { useLocationSync } from "./useLocationSync";
-import { followTarget, movementMode } from "../../lib/location-sync";
+import { fixClock, followTarget, movementMode } from "../../lib/location-sync";
 import { useRadar } from "../radar/radar-context";
 import { collectStamp, hazardsForBuilding } from "../../lib/radar-records";
 import type { GpsStatus } from "../../lib/location-sync";
@@ -504,12 +504,17 @@ export function CampusExplorer() {
         !artOnly &&
         !floorSheet
       ) {
-        const predicted = followTarget(
-          liveFix.reading,
-          liveFix.calibration,
-          Date.now(),
-        );
-        if (predicted) gpsGoal.current = predicted;
+        const now = Date.now();
+        if (fixClock(liveFix.reading.timestamp, now) === "hidden") {
+          gpsGoal.current = null;
+        } else {
+          const predicted = followTarget(
+            liveFix.reading,
+            liveFix.calibration,
+            now,
+          );
+          if (predicted) gpsGoal.current = predicted;
+        }
       }
       const goal = gpsGoal.current;
       const target = path.current[0];
@@ -1215,14 +1220,18 @@ export function CampusExplorer() {
                     </g>
                   ))}
                   {gps.marker && sceneId === "campus" && (
-                    <g className="campus-gps-marker" pointerEvents="none">
+                    <g
+                      className="campus-gps-marker"
+                      data-gps-clock={gps.signal}
+                      pointerEvents="none"
+                    >
                       {gps.marker.radius && (
                         <circle
                           cx={gps.marker.point.x}
                           cy={gps.marker.point.y}
                           r={gps.marker.radius}
-                          fill="#2f9d6218"
-                          stroke="#1f7a49"
+                          fill={gps.signal === "stale" ? "#dfb55b33" : "#2f9d6218"}
+                          stroke={gps.signal === "stale" ? "#8a6a12" : "#1f7a49"}
                           strokeDasharray="4 3"
                         />
                       )}
@@ -1230,11 +1239,11 @@ export function CampusExplorer() {
                         x={gps.marker.point.x}
                         y={gps.marker.point.y - (gps.marker.radius ?? 12) - 6}
                         textAnchor="middle"
-                        fill="#1f7a49"
+                        fill={gps.signal === "stale" ? "#8a6a12" : "#1f7a49"}
                         fontSize="11"
                         fontWeight="700"
                       >
-                        GPS
+                        {gps.signal === "stale" ? "GPS hold" : "GPS"}
                       </text>
                     </g>
                   )}
@@ -1321,6 +1330,7 @@ export function CampusExplorer() {
             message={gps.message}
             accuracy={gps.accuracy}
             lastUpdate={gps.lastUpdate}
+            signal={gps.signal}
             enabled={gps.enabled}
             tracking={gps.tracking}
             pausedByUser={gpsPausedByUser}

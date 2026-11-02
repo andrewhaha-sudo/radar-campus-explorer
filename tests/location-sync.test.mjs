@@ -6,7 +6,11 @@ import {
   distanceMeters,
   LocationWatcher,
   movementMode,
+  acceptNewerFix,
+  fixClock,
   predictReading,
+  readingWithMotion,
+  shouldHeartbeat,
   shouldPublishPose,
 } from "../src/lib/location-sync.ts";
 import {
@@ -136,6 +140,22 @@ test("manual exploration stays distinct from location follow", () => {
     movementMode({ enabled: true, paused: false, status: "low_accuracy" }).id,
     "approximate",
   );
+});
+
+test("a quiet phone is fresh, then holding, then hidden", () => {
+  assert.equal(fixClock(1_000, 2_000), "fresh");
+  assert.equal(fixClock(1_000, 5_000), "stale");
+  assert.equal(fixClock(1_000, 12_000), "hidden");
+  assert.equal(shouldHeartbeat(1_000, 2_500, false), false);
+  assert.equal(shouldHeartbeat(1_000, 3_000, false), true);
+  assert.equal(shouldHeartbeat(1_000, 9_000, true), false);
+  assert.equal(acceptNewerFix(reading({ timestamp: 2_000 }), reading({ timestamp: 1_500 })), false);
+  const moved = readingWithMotion(
+    reading({ latitude: 14, longitude: 121, timestamp: 1_000, speed: null, heading: null }),
+    reading({ latitude: 14, longitude: 121.00002, timestamp: 2_000, speed: null, heading: null }),
+  );
+  assert.ok(moved.speed > 0.4 && moved.speed <= 5);
+  assert.ok(moved.heading > 45 && moved.heading < 135);
 });
 
 test("prediction carries a moving fix forward between phone updates", () => {
