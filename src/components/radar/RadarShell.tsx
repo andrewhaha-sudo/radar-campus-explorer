@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import * as Dialog from "@radix-ui/react-dialog";
+import { HelpCircle, Radar } from "lucide-react";
 import { CampusExplorer } from "../map/CampusExplorer";
 import { allRooms, places } from "../map/campus-data";
 import { illustrationBuilding } from "../map/campus-data";
@@ -32,6 +34,7 @@ const screenLabels: Record<(typeof radarScreens)[number], string> = {
 
 export function RadarShell() {
   const [screen, setScreen] = useState(() => parseRoute(window.location.hash));
+  const [guide, setGuide] = useState<"play" | "safety" | null>(null);
   const { records } = useRadar();
   useEffect(() => {
     const sync = () => setScreen(parseRoute(window.location.hash));
@@ -45,6 +48,23 @@ export function RadarShell() {
   };
   return (
     <>
+      <header className="radar-brandbar">
+        <div className="radar-brand">
+          <span className="radar-logo" aria-hidden="true">
+            <Radar size={22} strokeWidth={1.8} />
+          </span>
+          <span>
+            <strong>
+              RADAR<span>.</span>
+            </strong>
+            <small>KNOW YOUR CAMPUS. FIND YOUR WAY.</small>
+          </span>
+        </div>
+        <button type="button" className="radar-help" onClick={() => setGuide("play")}>
+          <HelpCircle size={16} />
+          How to play
+        </button>
+      </header>
       <nav className="radar-nav" aria-label="RADAR sections">
         {radarScreens.map((id) => (
           <button
@@ -59,7 +79,65 @@ export function RadarShell() {
               : ""}
           </button>
         ))}
+        <button type="button" onClick={() => setGuide("safety")}>
+          Safety guide
+        </button>
       </nav>
+      <Dialog.Root open={guide !== null} onOpenChange={(open) => !open && setGuide(null)}>
+        <Dialog.Portal>
+          <Dialog.Overlay className="radar-guide-modal" />
+          <Dialog.Content className="radar-guide-card radar-guide">
+            <Dialog.Title>
+              {guide === "safety"
+                ? "Explore with awareness."
+                : "Your campus adventure starts here."}
+            </Dialog.Title>
+            <Dialog.Description>
+              {guide === "safety"
+                ? "Demonstration information, not an official emergency plan."
+                : "The illustrated campus, your character, and the records already on this device."}
+            </Dialog.Description>
+            {guide === "safety" ? (
+              <>
+                <p>
+                  Colored areas appear only where this device has a saved DEMO
+                  hazard report. They are not a school risk assessment.
+                </p>
+                <p>
+                  The assembly preview walks toward the Covered Court on the
+                  artwork. It is not a verified evacuation route. During marked
+                  shaking, the app does not start that walk.
+                </p>
+                <p>
+                  In a real emergency, follow school personnel and the official
+                  plan. SOS on this app is recorded on the device and is not a
+                  dispatch.
+                </p>
+              </>
+            ) : (
+              <>
+                <p>
+                  Walk by clicking open ground, or use the arrow keys and W A S
+                  D. Press E near a door, stair, or exit.
+                </p>
+                <p>
+                  Choose a place to collect its stamp and walk there. Save my
+                  location stores a DEMO map calibration from this phone. GPS
+                  stays off until you turn it on, and that position is not sent
+                  to other students.
+                </p>
+                <p>
+                  Indoor floor plans use the supplied artwork. A GPS reading
+                  does not change your floor or room.
+                </p>
+              </>
+            )}
+            <Dialog.Close className="campus-primary" type="button">
+              Close
+            </Dialog.Close>
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog.Root>
       {records.drill && (
         <p className="radar-banner radar-banner--drill" role="status">
           SIMULATION. Drill mode is on. These records are practice on this device.

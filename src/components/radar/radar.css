@@ -1,27 +1,87 @@
+.radar-brandbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 72px;
+  padding: 10px 20px;
+  background: #fcfcf6;
+  border-bottom: 1px solid #e0e3d5;
+}
+.radar-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #314c3b;
+}
+.radar-logo {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  color: #fff6da;
+  background: #367353;
+  border: 3px solid #315d47;
+  border-radius: 11px;
+  box-shadow:
+    inset 0 0 0 2px #74a178,
+    0 2px 0 #cbd5b8;
+}
+.radar-brand strong {
+  display: block;
+  font-size: 22px;
+  letter-spacing: 0.16em;
+  line-height: 1;
+}
+.radar-brand strong span {
+  color: #d5a857;
+}
+.radar-brand small {
+  display: block;
+  margin-top: 4px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: #81867b;
+}
 .radar-nav {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  padding: 12px 16px 0;
-  background:
-    radial-gradient(circle at 12px 12px, #efe6ff 0 6px, transparent 7px),
-    #f7f6fa;
+  gap: 6px;
+  justify-content: flex-end;
+  padding: 10px 16px 0;
+  background: #f4f5ed;
 }
-.radar-nav button {
-  border: 1px solid #d3c8e1;
-  background: #fff;
-  color: #3a3450;
-  border-radius: 999px;
-  padding: 8px 12px;
+.radar-nav button,
+.radar-help {
+  border: 1px solid #dfe3d4;
+  background: #fafaf2;
+  color: #4d6248;
+  border-radius: 8px;
+  padding: 8px 10px;
   font: inherit;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
   cursor: pointer;
 }
 .radar-nav button[aria-current="page"] {
-  background: #7352ac;
+  background: #357a58;
   color: #fff;
-  border-color: #654394;
+  border-color: #286547;
+}
+.radar-help {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+.radar-guide {
+  max-width: 460px;
+}
+.radar-guide p {
+  margin: 0 0 12px;
+  font-size: 14px;
+  line-height: 1.55;
 }
 .radar-banner {
   margin: 12px 16px 0;

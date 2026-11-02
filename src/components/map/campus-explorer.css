@@ -1,9 +1,9 @@
 .campus-explorer {
   color-scheme: light;
-  --campus-ink: #25243d;
-  --campus-purple: #7352b5;
-  --campus-line: #e1dfe8;
-  background: #f7f6fa;
+  --campus-ink: #314c3b;
+  --campus-purple: #357a58;
+  --campus-line: #d8decb;
+  background: #f4f5ed;
   color: var(--campus-ink);
   padding: 28px clamp(16px, 3vw, 40px) 20px;
   font-family: var(--app-font-sans);
@@ -40,7 +40,7 @@
 }
 .campus-heading h1 {
   font-size: clamp(22px, 2.3vw, 32px);
-  color: #25243d;
+  color: #344d3b;
   margin: 8px 0;
   letter-spacing: -0.05em;
   font-weight: 750;
@@ -237,6 +237,15 @@
   overflow-y: auto;
   scrollbar-color: #dcd6e7 transparent;
 }
+.campus-location-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.campus-location-row .campus-location {
+  flex: 1;
+  min-width: 0;
+}
 .campus-location {
   display: flex;
   align-items: center;
@@ -330,12 +339,12 @@
 }
 .campus-primary {
   color: #fff;
-  background: #7352ac;
-  border: 1px solid #654394;
-  box-shadow: 0 2px 0 #55367f;
+  background: #357a58;
+  border: 1px solid #286547;
+  box-shadow: 0 2px 0 #1e4e34;
 }
 .campus-primary:hover {
-  background: #634297;
+  background: #286547;
 }
 .campus-primary kbd {
   font-size: 10px;
@@ -805,9 +814,9 @@
 }
 .campus-stamp.is-found {
   border-style: solid;
-  border-color: #7352ac;
-  background: #f4edff;
-  color: #4d3478;
+  border-color: #357a58;
+  background: #eef6ea;
+  color: #24543a;
 }
 @media (prefers-reduced-motion: no-preference) {
   .campus-stamp.is-found {
@@ -823,7 +832,154 @@
   margin: 0 auto 12px;
   padding: 8px 12px;
   border-radius: 8px;
-  background: #efe6ff;
-  color: #4d3478;
+  background: #eef3e3;
+  color: #24543a;
   font-weight: 800;
+}
+.radar-directory-tabs {
+  display: flex;
+  gap: 12px;
+  margin: 0 0 8px;
+  border-bottom: 1px solid #e7e9df;
+}
+.radar-directory-tabs button {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 8px 2px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #7d8775;
+  border-bottom: 2px solid transparent;
+}
+.radar-directory-tabs button[aria-pressed="true"] {
+  color: #39704d;
+  border-color: #638959;
+}
+.radar-room-list {
+  display: grid;
+  gap: 4px;
+  max-height: 280px;
+  overflow: auto;
+}
+.radar-hazard-card,
+.radar-assembly {
+  background: #fcfcf5;
+  border: 1px solid #dfe2d3;
+  border-radius: 12px;
+}
+.radar-hazard-card {
+  padding: 14px;
+}
+.radar-hazard-card h2,
+.radar-where {
+  margin: 0 0 8px;
+  font-size: 15px;
+}
+.radar-legend {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin: 10px 0;
+  font-size: 11px;
+  color: #5f6b58;
+}
+.radar-legend span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.radar-legend i {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  display: block;
+}
+.radar-demo-notice {
+  display: flex;
+  gap: 8px;
+  background: #f6f0de;
+  border: 1px solid #ebe2c8;
+  color: #6d5a32;
+  border-radius: 7px;
+  padding: 8px;
+  font-size: 11px;
+  line-height: 1.45;
+}
+.radar-assembly {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  text-align: left;
+  background: #4d7955;
+  color: #fafbe9;
+  border-color: #396645;
+  padding: 12px;
+  cursor: pointer;
+}
+.radar-assembly:hover {
+  background: #3b6845;
+}
+.radar-assembly small {
+  display: block;
+  color: #cadcca;
+  font-size: 10px;
+}
+.radar-assembly:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+.radar-minimap {
+  position: absolute;
+  z-index: 2;
+  width: 146px;
+  right: 12px;
+  bottom: 12px;
+  padding: 8px;
+  background: #f9f9e9ed;
+  border: 1px solid #a6b595;
+  border-radius: 9px;
+  box-shadow: 0 3px 0 #50684533;
+  pointer-events: none;
+}
+.radar-minimap-label {
+  display: flex;
+  justify-content: space-between;
+  gap: 6px;
+  margin-bottom: 6px;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: #3e8064;
+}
+.radar-minimap svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 4px;
+}
+.radar-guide-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: #314c3b55;
+}
+.radar-guide-card {
+  position: fixed;
+  z-index: 41;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(460px, calc(100% - 32px));
+  background: #fafbf2;
+  color: #314c3b;
+  border: 1px solid #dbe0cd;
+  border-radius: 16px;
+  padding: 20px;
+}
+@media (max-width: 720px) {
+  .radar-minimap {
+    display: none;
+  }
 }

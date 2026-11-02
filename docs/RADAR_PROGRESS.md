@@ -10,6 +10,7 @@ Updated: 2 November 2026.
 - Device hazard, inspection, alert, safety, SOS, people, resource, and report flows.
 - Hash routing for the section bar.
 - Building panel lists that building’s non-rejected hazard reports.
+- RADAR shell from the radar-2 reference: cream and green header, Where to? places and classrooms, minimap of this artwork, device-only hazard legend, and a Covered Court walk labeled as an unverified preview. The Phaser tile map and its example hazard zones were not copied.
 
 ## Active module
 
@@ -40,4 +41,4 @@ None recorded in this session’s targeted run. See `docs/RADAR_TEST_RESULTS.md`
 
 ## Next task
 
-Add a verified-hazard record only after school locations exist. Until then, do not promote a DEMO report to verified.
+Add a verified-hazard record only after school locations exist. Until then, do not promote a DEMO report to verified. The radar-2 shell is visual chrome on the existing explorer; it does not add official alerts, a verified evacuation graph, or live hazard geometry.

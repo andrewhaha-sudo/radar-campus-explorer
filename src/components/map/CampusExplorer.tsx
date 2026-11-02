@@ -10,7 +10,11 @@ import {
   Image as PhotoIcon,
   Check,
   ChevronLeft,
+  ChevronRight,
+  Compass,
   Crosshair,
+  DoorOpen,
+  Flag,
   Footprints,
   Layers,
   MapPin,
@@ -39,6 +43,7 @@ import type { Character, Direction } from "../../lib/student-profile";
 import type { Place, Room, SceneId } from "./campus-data";
 import { advanceToward, canTravel, findPath, isWalkable } from "./navigation";
 import type { Point } from "./navigation";
+import { CampusMiniMap } from "./CampusMiniMap";
 import { GoogleCampusMap } from "./GoogleCampusMap";
 import { googleMapsApiKey } from "../../lib/google-map";
 import { LocationSyncPanel } from "./LocationSyncPanel";
@@ -253,6 +258,9 @@ export function CampusExplorer() {
   const [floorSheet, setFloorSheet] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [query, setQuery] = useState("");
+  const [directoryTab, setDirectoryTab] = useState<"places" | "rooms">("places");
+  const [hazardOverlay, setHazardOverlay] = useState(true);
+  const [roomBuilding, setRoomBuilding] = useState<string | null>(null);
   const player = useRef(position);
   const path = useRef<Point[]>([]);
   const arrival = useRef<(() => void) | null>(null);
@@ -719,6 +727,14 @@ export function CampusExplorer() {
       ? !room.scene.startsWith("six")
       : scenes[room.scene].buildingId === scene.buildingId,
   );
+  const matchingRooms = displayedRooms.filter((room) => {
+    const buildingId = scenes[room.scene].buildingId;
+    const buildingName = places.find((place) => place.id === buildingId)?.name ?? "";
+    const matchesQuery = `${room.name} ${room.id} ${buildingName}`
+      .toLowerCase()
+      .includes(query.toLowerCase());
+    return matchesQuery && (!roomBuilding || buildingId === roomBuilding);
+  });
   const visiblePlaces = places.filter((p) =>
     `${p.name} ${p.kind}`.toLowerCase().includes(query.toLowerCase()),
   );
@@ -795,12 +811,12 @@ export function CampusExplorer() {
       <header className="campus-heading">
         <div>
           <span className="campus-eyebrow">
-            <span /> EXPLORE YOUR CAMPUS
+            <span /> YOUR CAMPUS, CONNECTED
           </span>
           <h1>Campus Explorer</h1>
           <p>
-            Pick a place and collect its stamp. {records.stamps.length} of{" "}
-            {places.length} found.
+            A little adventure. A better way around. {records.stamps.length} of{" "}
+            {places.length} stamps found.
           </p>
         </div>
         <div className="campus-profile-actions">
@@ -880,7 +896,7 @@ export function CampusExplorer() {
           )}
           <div className="campus-map-toolbar">
             <span>
-              <MapPin size={15} />
+              <Compass size={15} />
               <strong>
                 {floorSheet ? "Original school floor plans" : scene.name}
               </strong>
@@ -1052,6 +1068,48 @@ export function CampusExplorer() {
                       </text>
                     </g>
                   )}
+                  {hazardOverlay &&
+                    sceneId === "campus" &&
+                    places.map((place) => {
+                      const hazards = hazardsForBuilding(records, place.id);
+                      if (!hazards.length) return null;
+                      const blocked = hazards.some(
+                        (hazard) => hazard.category === "blocked_pathway",
+                      );
+                      const severity = hazards.some(
+                        (hazard) => hazard.severity === "high",
+                      )
+                        ? "high"
+                        : hazards.some(
+                              (hazard) => hazard.severity === "moderate",
+                            )
+                          ? "moderate"
+                          : "low";
+                      const fill = blocked
+                        ? "#897381"
+                        : severity === "high"
+                          ? "#ce7964"
+                          : severity === "moderate"
+                            ? "#dfb55b"
+                            : "#7b9f6d";
+                      return (
+                        <rect
+                          key={`demo-hazard-${place.id}`}
+                          {...place.bounds}
+                          fill={fill}
+                          fillOpacity="0.38"
+                          stroke={fill}
+                          strokeWidth="3"
+                          pointerEvents="none"
+                          data-demo-hazard={place.id}
+                        >
+                          <title>
+                            DEMO report on this device. Not a school-verified
+                            hazard.
+                          </title>
+                        </rect>
+                      );
+                    })}
                   {sceneId === "campus" &&
                     places.map((place) => (
                       <g
@@ -1191,6 +1249,9 @@ export function CampusExplorer() {
                 </>
               )}
             </svg>
+            {sceneId === "campus" && !floorSheet && !artOnly && (
+              <CampusMiniMap position={position} />
+            )}
           </div>
           )}
           {!googleMapOpen && !artOnly && !floorSheet && (
@@ -1294,7 +1355,12 @@ export function CampusExplorer() {
           )}
           <section className="campus-directory">
             <span className="campus-eyebrow">YOUR NEXT STOP</span>
-            <h2>{indoor ? "Inside the school" : "Campus directory"}</h2>
+            <h2 className="radar-where">
+              {indoor ? "Inside the school" : "Where to?"}
+            </h2>
+            {!indoor && (
+              <p className="campus-small">Your next stop is a click away.</p>
+            )}
             {floorSheet ? (
               <>
                 <p className="campus-small">
@@ -1344,15 +1410,35 @@ export function CampusExplorer() {
                   <>
                     <input
                       className="campus-search"
-                      placeholder="Find a place…"
-                      aria-label="Find a place in the illustrated campus"
+                      placeholder="Search rooms or buildings…"
+                      aria-label="Search rooms or buildings"
                       value={query}
                       onChange={(e) => setQuery(e.target.value)}
                     />
+                    <div className="radar-directory-tabs">
+                      <button
+                        type="button"
+                        aria-pressed={directoryTab === "places"}
+                        onClick={() => {
+                          setDirectoryTab("places");
+                          setRoomBuilding(null);
+                        }}
+                      >
+                        Places
+                      </button>
+                      <button
+                        type="button"
+                        aria-pressed={directoryTab === "rooms"}
+                        onClick={() => setDirectoryTab("rooms")}
+                      >
+                        <DoorOpen size={13} /> Classrooms
+                      </button>
+                    </div>
+                    {directoryTab === "places" ? (
                     <div className="campus-locations">
                       {visiblePlaces.map((place) => (
+                        <div key={place.id} className="campus-location-row">
                         <button
-                          key={place.id}
                           className={cn(
                             "campus-location",
                             selected?.id === place.id && "is-selected",
@@ -1362,7 +1448,7 @@ export function CampusExplorer() {
                         >
                           <span className="campus-location-icon">
                             {place.id === "court" ? (
-                              <Crosshair size={18} />
+                              <Flag size={18} />
                             ) : (
                               <Building2 size={18} />
                             )}
@@ -1377,6 +1463,20 @@ export function CampusExplorer() {
                             <ArrowUpRight size={15} />
                           )}
                         </button>
+                        {illustrationBuilding(place.id).length > 0 && (
+                          <button
+                            type="button"
+                            className="campus-secondary"
+                            aria-label={`View ${place.name} rooms`}
+                            onClick={() => {
+                              setRoomBuilding(place.id);
+                              setDirectoryTab("rooms");
+                            }}
+                          >
+                            <ChevronRight size={14} />
+                          </button>
+                        )}
+                        </div>
                       ))}
                       {!visiblePlaces.length && (
                         <p className="campus-small">
@@ -1384,9 +1484,48 @@ export function CampusExplorer() {
                         </p>
                       )}
                     </div>
+                    ) : (
+                      <div className="radar-room-list">
+                        {roomBuilding && (
+                          <button
+                            type="button"
+                            className="campus-secondary"
+                            onClick={() => setRoomBuilding(null)}
+                          >
+                            Show all rooms
+                          </button>
+                        )}
+                        {matchingRooms.map((room) => (
+                          <button
+                            key={room.id}
+                            type="button"
+                            className={cn(
+                              "campus-location",
+                              selectedRoom?.id === room.id && "is-selected",
+                            )}
+                            disabled={artOnly}
+                            onClick={() => chooseRoom(room)}
+                          >
+                            <span className="campus-location-icon">
+                              <DoorOpen size={16} />
+                            </span>
+                            <span>
+                              <strong>{room.name}</strong>
+                              <small>
+                                Floor {room.scene.endsWith("2") ? 2 : 1}
+                              </small>
+                            </span>
+                            <ChevronRight size={14} />
+                          </button>
+                        ))}
+                        {!matchingRooms.length && (
+                          <p className="campus-small">No matching rooms found.</p>
+                        )}
+                      </div>
+                    )}
                   </>
                 )}
-                {selected && sceneId === "campus" && (
+                {selected && sceneId === "campus" && directoryTab === "places" && (
                   <div className="campus-place-details">
                     <strong>{selected.name}</strong>
                     <p>{selected.description}</p>
@@ -1477,6 +1616,51 @@ export function CampusExplorer() {
               </>
             )}
           </section>
+          <section className="radar-hazard-card">
+            <div className="campus-location-actions">
+              <h2>Hazard overlay</h2>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={hazardOverlay}
+                  onChange={(event) => setHazardOverlay(event.target.checked)}
+                />{" "}
+                Show on map
+              </label>
+            </div>
+            <div className="radar-legend">
+              <span><i style={{ background: "#7b9f6d" }} /> Low report</span>
+              <span><i style={{ background: "#dfb55b" }} /> Moderate report</span>
+              <span><i style={{ background: "#ce7964" }} /> High report</span>
+              <span><i style={{ background: "#897381" }} /> Blocked pathway</span>
+            </div>
+            <p className="radar-demo-notice">
+              DEMONSTRATION DATA. Colors mark hazard reports saved on this
+              device ({records.hazards.filter((hazard) => hazard.status !== "rejected").length}{" "}
+              active). They are not school-verified risks, and buildings with
+              no report stay clear.
+            </p>
+          </section>
+          <button
+            type="button"
+            className="radar-assembly"
+            disabled={artOnly || records.shaking || sceneId !== "campus" || floorSheet}
+            onClick={() => {
+              const court = places.find((place) => place.id === "court");
+              if (court) choosePlace(court);
+            }}
+          >
+            <Flag size={18} />
+            <span>
+              <strong>Find an assembly point</strong>
+              <small>
+                {records.shaking
+                  ? "Shaking is marked. No route is started."
+                  : "Preview a walk to the Covered Court. Not a verified evacuation route."}
+              </small>
+            </span>
+            <ArrowUpRight size={16} />
+          </button>
           <section className="campus-controls">
             <span className="campus-eyebrow">A LITTLE EXPLORATION</span>
             <h2>Make your way around.</h2>

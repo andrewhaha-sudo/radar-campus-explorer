@@ -135,3 +135,31 @@ test("keyboard and direction buttons move the character and cancel automatic wal
     ),
   ).toBe(true);
 });
+
+test("radar shell sits on the illustrated campus", async ({ page }, testInfo) => {
+  await page.goto("/");
+  await expect(page.getByText("RADAR.")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Campus Explorer", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Where to?", exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Find an assembly point" })).toBeVisible();
+  await expect(page.getByText("DEMONSTRATION DATA")).toBeVisible();
+  await expect(page.getByText("Not a verified evacuation route")).toBeVisible();
+  if (testInfo.project.name === "desktop") {
+    await expect(
+      page.getByRole("img", { name: /Minimap showing your current position/ }),
+    ).toBeVisible();
+    await page.screenshot({
+      path: "/opt/cursor/artifacts/radar-shell-desktop.png",
+      fullPage: true,
+    });
+  }
+  await page.getByRole("button", { name: "How to play", exact: true }).click();
+  const guide = page.getByRole("dialog");
+  await expect(guide).toContainText("not sent to other students");
+  await guide.getByRole("button", { name: "Close", exact: true }).click();
+  await page.getByRole("button", { name: "Classrooms", exact: true }).click();
+  await expect(page.getByRole("button", { name: /Room B-101/ }).first()).toBeVisible();
+  await page.getByRole("button", { name: "Places", exact: true }).click();
+  await page.getByRole("button", { name: "Find an assembly point" }).click();
+  await expect(page.locator("#campus-map polyline")).toHaveCount(1);
+});

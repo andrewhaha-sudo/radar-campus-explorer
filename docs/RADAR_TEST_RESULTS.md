@@ -25,3 +25,17 @@ Passed. 4 tests, desktop and mobile. `#safety` remains after reload. Building B 
 ## Not run this session
 
 The full Playwright file and `npm test` of every unit file. Earlier sessions ran those suites when those areas changed. This session did not re-run them after the hash and hazard-panel edits.
+
+## Radar-2 shell, same date
+
+`npx tsc -b` passed. `node --test` on radar records, routes, location sync, and campus navigation passed: 28 tests, 0 failed.
+
+`npm run build` passed.
+
+Playwright, desktop and mobile:
+
+- campus “opens directly” and “keyboard and direction”
+- campus “radar shell sits on the illustrated campus” (header, Where to?, classrooms, How to play, assembly polyline)
+- location “section address”, “Google Map”, “selecting Building B”, and “saving the current location”
+
+All of those passed. The full browser folder was not re-run.
