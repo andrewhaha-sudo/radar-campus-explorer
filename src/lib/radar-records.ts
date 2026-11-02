@@ -112,6 +112,7 @@ export interface RadarRecords {
   visitors: VisitorEntry[];
   readAlertIds: string[];
   workspaceName: string;
+  stamps: string[];
 }
 
 interface KeyValueStore {
@@ -139,6 +140,7 @@ export function emptyRecords(): RadarRecords {
     visitors: [],
     readAlertIds: [],
     workspaceName: "This device",
+    stamps: [],
   };
 }
 
@@ -227,6 +229,11 @@ export function recordSos(
     status: "recorded_on_device",
   };
   return { ...records, sos: [entry, ...records.sos] };
+}
+
+export function collectStamp(records: RadarRecords, placeId: string): RadarRecords {
+  if (!placeId || records.stamps.includes(placeId)) return records;
+  return { ...records, stamps: [...records.stamps, placeId] };
 }
 
 export function addPerson(
@@ -441,6 +448,7 @@ export function loadRecords(store?: KeyValueStore | null): RadarRecords {
       tasks: Array.isArray(parsed.tasks) ? parsed.tasks : [],
       visitors: Array.isArray(parsed.visitors) ? parsed.visitors : [],
       readAlertIds: Array.isArray(parsed.readAlertIds) ? parsed.readAlertIds : [],
+      stamps: Array.isArray(parsed.stamps) ? parsed.stamps : [],
       workspaceName:
         typeof parsed.workspaceName === "string" && parsed.workspaceName.trim()
           ? parsed.workspaceName.trim()

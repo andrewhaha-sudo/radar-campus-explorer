@@ -45,6 +45,7 @@ import { LocationSyncPanel } from "./LocationSyncPanel";
 import { useLocationSync } from "./useLocationSync";
 import { followTarget, movementMode } from "../../lib/location-sync";
 import { useRadar } from "../radar/radar-context";
+import { collectStamp } from "../../lib/radar-records";
 import type { GpsStatus } from "../../lib/location-sync";
 import "./campus-explorer.css";
 import { cn } from "../../lib/cn";
@@ -246,7 +247,9 @@ export function CampusExplorer() {
   const gpsGoal = useRef<Point | null>(null);
   const gpsPaused = useRef(false);
   const { profile, user } = useStudentProfile();
-  const { records } = useRadar();
+  const { records, update } = useRadar();
+  const [freshStamp, setFreshStamp] = useState("");
+  const stampTimer = useRef(0);
   const { students, error: studentsError } = useCampusStudents(
     {
       scene: sceneId,
@@ -342,6 +345,12 @@ export function CampusExplorer() {
       return;
     }
     setMessage(`Walking to ${place.name}…`);
+    if (!records.shaking && !records.stamps.includes(place.id)) {
+      update((current) => collectStamp(current, place.id));
+      setFreshStamp(place.name);
+      window.clearTimeout(stampTimer.current);
+      stampTimer.current = window.setTimeout(() => setFreshStamp(""), 2200);
+    }
     walkTo(place.arrival, () =>
       setMessage(
         place.interior
@@ -758,7 +767,8 @@ export function CampusExplorer() {
           </span>
           <h1>Campus Explorer</h1>
           <p>
-            Your school map, brought to life. Pick a destination and explore.
+            Pick a place and collect its stamp. {records.stamps.length} of{" "}
+            {places.length} found.
           </p>
         </div>
         <div className="campus-profile-actions">
@@ -802,6 +812,29 @@ export function CampusExplorer() {
           </button>
         </div>
       </header>
+      <div className="campus-stamps" aria-label="Place stamps">
+        {places.map((place) => {
+          const found = records.stamps.includes(place.id);
+          return (
+            <button
+              key={place.id}
+              type="button"
+              className={cn("campus-stamp", found && "is-found")}
+              data-stamp={place.id}
+              data-stamped={found ? "true" : "false"}
+              aria-pressed={found}
+              onClick={() => choosePlace(place)}
+            >
+              {found ? "✦" : "·"} {place.name}
+            </button>
+          );
+        })}
+      </div>
+      {freshStamp && !records.shaking && (
+        <p className="campus-stamp-toast" role="status">
+          Stamp collected: {freshStamp}
+        </p>
+      )}
 
       <div className="campus-layout">
         <section

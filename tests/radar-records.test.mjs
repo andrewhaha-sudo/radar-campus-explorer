@@ -5,6 +5,7 @@ import {
   addPerson,
   callTarget,
   checkInWithCode,
+  collectStamp,
   createAlert,
   createHazard,
   emptyRecords,
@@ -62,6 +63,13 @@ test("inspection drafts do not invent an ai result", () => {
     notes: "Door visible",
   });
   assert.equal(saved.inspections[0].ai, "Not evaluated");
+});
+
+test("a place stamp is collected once", () => {
+  const once = collectStamp(emptyRecords(), "b");
+  const twice = collectStamp(once, "b");
+  assert.deepEqual(once.stamps, ["b"]);
+  assert.equal(twice, once);
 });
 
 test("people, stock, search, csv, and room codes stay on device rules", () => {

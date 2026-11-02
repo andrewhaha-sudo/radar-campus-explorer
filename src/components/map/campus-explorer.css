@@ -775,3 +775,47 @@
 .campus-google-map code {
   font-size: 12px;
 }
+.campus-stamps {
+  max-width: 1450px;
+  margin: -8px auto 16px;
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 0 2px 8px;
+}
+.campus-stamp {
+  flex: 0 0 auto;
+  border: 1px dashed #c9bdd8;
+  background: #fff;
+  color: #6d657c;
+  border-radius: 999px;
+  padding: 6px 10px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.campus-stamp.is-found {
+  border-style: solid;
+  border-color: #7352ac;
+  background: #f4edff;
+  color: #4d3478;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .campus-stamp.is-found {
+    animation: campus-stamp-pop 0.35s ease;
+  }
+}
+@keyframes campus-stamp-pop {
+  from { transform: scale(0.92); }
+  to { transform: scale(1); }
+}
+.campus-stamp-toast {
+  max-width: 1450px;
+  margin: 0 auto 12px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: #efe6ff;
+  color: #4d3478;
+  font-weight: 800;
+}

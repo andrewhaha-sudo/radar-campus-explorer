@@ -45,6 +45,8 @@ test("Google Map explains that the API key is not configured", async ({ page }) 
 test("selecting Building B lists only its illustrated rooms", async ({ page }) => {
   await page.goto("/");
   await page.getByRole("button", { name: "Explore Building B", exact: true }).click();
+  await expect(page.locator("[data-stamp='b']")).toHaveAttribute("data-stamped", "true");
+  await expect(page.getByText("Stamp collected: Building B")).toBeVisible();
   await expect(page.getByText("Illustration room labels from this map.")).toBeVisible();
   await expect(page.getByRole("button", { name: "Room B-101" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Room B-201" })).toBeVisible();
