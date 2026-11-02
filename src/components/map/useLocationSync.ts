@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { isWalkable, type Point } from "./navigation";
-import { scenes } from "./campus-data";
+import type { Point } from "./navigation";
 import {
   accuracyRadiusPixels,
   assessFix,
@@ -69,13 +68,17 @@ export function useLocationSync(indoors: boolean, mapActive: boolean) {
   const reliableRef = useRef<GeoReading | null>(null);
   const lastReadingRef = useRef<GeoReading | null>(null);
   const watcherRef = useRef<LocationWatcher | null>(null);
+  const live = useRef<{
+    reading: GeoReading;
+    calibration: MapCalibration;
+  } | null>(null);
 
-  const rememberPlacement = useCallback((point: Point | null) => {
+  const rememberPlacement = useCallback((point: Point | null, hold = 4) => {
     setPlacement((current) => {
       if (!point) return null;
       if (
         current &&
-        Math.hypot(current.x - point.x, current.y - point.y) < 4
+        Math.hypot(current.x - point.x, current.y - point.y) < hold
       )
         return current;
       return point;
@@ -106,7 +109,7 @@ export function useLocationSync(indoors: boolean, mapActive: boolean) {
             ? "A physically implausible GPS jump was ignored. The character stayed at its last position."
             : assessed.reason === "stale"
               ? "The location fix is stale. The character stayed at its last position."
-              : "This location fix could not be used. The character stayed in place.",
+              : "Approximate location. This fix is too coarse to move the character.",
         );
         return;
       }
@@ -115,15 +118,8 @@ export function useLocationSync(indoors: boolean, mapActive: boolean) {
         setMessage(
           "Approximate location. GPS cannot choose a floor or a classroom, so the character was not moved indoors.",
         );
+        live.current = null;
         rememberPlacement(null);
-        setMarker(null);
-        return;
-      }
-      if (assessed.quality === "approximate") {
-        setStatus("low_accuracy");
-        setMessage(
-          "Approximate location. This fix is not accurate enough to move the character.",
-        );
         setMarker(null);
         return;
       }
@@ -141,28 +137,30 @@ export function useLocationSync(indoors: boolean, mapActive: boolean) {
             ? "The GPS fix is outside the illustrated campus. The character was not moved."
             : `${GPS_STATUS_LABEL.calibration_required}. The character was not moved.`,
         );
+        live.current = null;
         setMarker(null);
         return;
       }
-      if (!isWalkable(projected.point, scenes.campus.walkable)) {
-        setStatus("low_accuracy");
-        setMessage(
-          "The GPS fix lands on a blocked part of the illustrated map. The character stayed in place.",
-        );
-        setMarker(null);
-        return;
-      }
-      reliableRef.current = reading;
-      setStatus("connected");
-      setMessage(
-        calibrationRef.current.demo
-          ? "DEMO calibration saved. GPS Connected. The character moves straight to the latest fix. North is toward the top of the map, about 8 pixels per meter. This is not a surveyed campus."
-          : "GPS Connected. The character follows reliable outdoor fixes on this device only.",
-      );
+      live.current = { reading, calibration: calibrationRef.current };
+      if (assessed.quality === "reliable") reliableRef.current = reading;
       setHeading(headingDirection(reading, calibrationRef.current));
       const radius = accuracyRadiusPixels(reading, calibrationRef.current);
       setMarker({ point: projected.point, radius });
-      rememberPlacement(projected.point);
+      const hold = reading.speed !== null && reading.speed > 0.5 ? 2 : 6;
+      rememberPlacement(projected.point, hold);
+      if (assessed.quality === "approximate") {
+        setStatus("low_accuracy");
+        setMessage(
+          "Approximate location. The character follows this outdoor fix, and the circle is the uncertainty. GPS is not a classroom position.",
+        );
+        return;
+      }
+      setStatus("connected");
+      setMessage(
+        calibrationRef.current.demo
+          ? "DEMO calibration saved. GPS Connected. The marker keeps moving between phone updates. North is toward the top of the map, about 8 pixels per meter. This is not a surveyed campus."
+          : "GPS Connected. The character follows the latest outdoor fix on this device only.",
+      );
     },
     [rememberPlacement],
   );
@@ -179,6 +177,7 @@ export function useLocationSync(indoors: boolean, mapActive: boolean) {
     setHeading(null);
     reliableRef.current = null;
     lastReadingRef.current = null;
+    live.current = null;
     setMessage(
       "GPS Disabled. Tracking stopped. Coordinates were not saved or sent.",
     );
@@ -240,6 +239,13 @@ export function useLocationSync(indoors: boolean, mapActive: boolean) {
               ? "Locating. Waiting for a GPS fix."
               : "Requesting Permission. Allow location access if the browser asks."
           : `${GPS_STATUS_LABEL.calibration_required}. Permission may be requested, but the character will not move.`,
+      );
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          if (!cancelled) applyReading(readingFromPosition(position));
+        },
+        () => {},
+        { enableHighAccuracy: false, maximumAge: 2000, timeout: 2500 },
       );
       watcher.start(
         (position) => {
@@ -393,5 +399,6 @@ export function useLocationSync(indoors: boolean, mapActive: boolean) {
     clearCalibration,
     saveDemoAt,
     savingDemo,
+    live,
   };
 }

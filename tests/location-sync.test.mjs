@@ -5,6 +5,7 @@ import {
   directionFromHeading,
   distanceMeters,
   LocationWatcher,
+  predictReading,
   shouldPublishPose,
 } from "../src/lib/location-sync.ts";
 import {
@@ -115,6 +116,17 @@ test("heading follows the calibrated map axes instead of raw screen direction", 
     directionFromHeading(180, { north: { x: 0, y: -10 }, east: { x: 10, y: 0 } }),
     "down",
   );
+});
+
+test("prediction carries a moving fix forward between phone updates", () => {
+  const start = reading({ speed: 2, heading: 0, timestamp: 1_000 });
+  const next = predictReading(start, 2_000);
+  assert.ok(next.latitude > start.latitude);
+  assert.ok(Math.abs(next.longitude - start.longitude) < 1e-8);
+  const still = predictReading(reading({ speed: null, heading: null }), 2_000);
+  assert.equal(still.latitude, 14);
+  assert.equal(still.longitude, 121);
+  assert.equal(assessFix(reading({ accuracy: 90 }), null, 1_000).quality, "rejected");
 });
 
 test("a location watcher cannot leave two watches running", () => {

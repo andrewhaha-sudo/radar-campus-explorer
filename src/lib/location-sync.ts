@@ -1,5 +1,6 @@
 import type { Direction } from "./student-profile.ts";
 import {
+  geographicToPixel,
   metersPerPixel,
   pixelAxes,
   type MapCalibration,
@@ -37,6 +38,7 @@ export const GPS_STATUS_LABEL: Record<GpsStatus, string> = {
 };
 
 export const RELIABLE_ACCURACY_METERS = 25;
+export const FOLLOW_ACCURACY_METERS = 65;
 export const STALE_FIX_MS = 20_000;
 export const JUMP_METERS = 120;
 export const JUMP_WINDOW_MS = 3_000;
@@ -123,9 +125,50 @@ export function assessFix(
     distanceMeters(previousReliable, reading) > JUMP_METERS
   )
     return { quality: "rejected", reason: "implausible_jump" };
+  if (reading.accuracy > FOLLOW_ACCURACY_METERS)
+    return { quality: "rejected", reason: "low_accuracy" };
   if (reading.accuracy > RELIABLE_ACCURACY_METERS)
     return { quality: "approximate", reason: "low_accuracy" };
   return { quality: "reliable", reason: "ok" };
+}
+
+const PREDICT_MAX_MS = 1_200;
+
+export function predictReading(reading: GeoReading, now: number) {
+  const age = Math.min(PREDICT_MAX_MS, Math.max(0, now - reading.timestamp));
+  const speed = reading.speed;
+  const heading = reading.heading;
+  if (
+    speed === null ||
+    heading === null ||
+    speed < 0.4 ||
+    age === 0
+  )
+    return { latitude: reading.latitude, longitude: reading.longitude };
+  const distance = speed * (age / 1000);
+  const radians = (heading * Math.PI) / 180;
+  const latitude =
+    reading.latitude + (distance * Math.cos(radians)) / 111_320;
+  const longitude =
+    reading.longitude +
+    (distance * Math.sin(radians)) /
+      (111_320 * Math.cos((reading.latitude * Math.PI) / 180));
+  return { latitude, longitude };
+}
+
+export function followTarget(
+  reading: GeoReading,
+  calibration: MapCalibration,
+  now: number,
+) {
+  if (reading.accuracy > FOLLOW_ACCURACY_METERS) return null;
+  const predicted = predictReading(reading, now);
+  const projected = geographicToPixel(
+    predicted.latitude,
+    predicted.longitude,
+    calibration,
+  );
+  return projected.ok ? projected.point : null;
 }
 
 export function directionFromHeading(
@@ -212,7 +255,7 @@ export class LocationWatcher {
     this.id = this.source.watchPosition(success, error, {
       enableHighAccuracy: true,
       maximumAge: 0,
-      timeout: 10000,
+      timeout: 8000,
     });
   }
 

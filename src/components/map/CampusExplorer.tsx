@@ -40,6 +40,7 @@ import { advanceToward, canTravel, findPath, isWalkable } from "./navigation";
 import type { Point } from "./navigation";
 import { LocationSyncPanel } from "./LocationSyncPanel";
 import { useLocationSync } from "./useLocationSync";
+import { followTarget } from "../../lib/location-sync";
 import "./campus-explorer.css";
 import { cn } from "../../lib/cn";
 
@@ -180,6 +181,7 @@ export function CampusExplorer() {
   );
   const gpsHeading = useRef(gps.heading);
   const gpsGoal = useRef<Point | null>(null);
+  const gpsPaused = useRef(false);
   const { profile, user } = useStudentProfile();
   const { students, error: studentsError } = useCampusStudents(
     {
@@ -344,6 +346,7 @@ export function CampusExplorer() {
 
   useEffect(() => {
     gpsHeading.current = gps.heading;
+    gpsPaused.current = gpsPausedByUser;
     const point =
       !gps.placement ||
       gpsPausedByUser ||
@@ -380,6 +383,21 @@ export function CampusExplorer() {
       previous = time;
       const key = [...held.current].at(-1);
       const manual = key ? movementKeys[key] : null;
+      const liveFix = gps.live.current;
+      if (
+        liveFix &&
+        !gpsPaused.current &&
+        sceneId === "campus" &&
+        !artOnly &&
+        !floorSheet
+      ) {
+        const predicted = followTarget(
+          liveFix.reading,
+          liveFix.calibration,
+          Date.now(),
+        );
+        if (predicted) gpsGoal.current = predicted;
+      }
       const goal = gpsGoal.current;
       const target = path.current[0];
       let next: Point | null = null;
@@ -392,7 +410,7 @@ export function CampusExplorer() {
         };
       } else if (goal && sceneId === "campus" && routeSource.current === "gps" && target) {
         const length = distance(player.current, target);
-        const stride = Math.min(length, Math.max(length / 0.2, 700) * dt);
+        const stride = Math.min(length, Math.max(length / 0.12, 1100) * dt);
         gpsStepped = true;
         if (length <= stride) {
           next = target;

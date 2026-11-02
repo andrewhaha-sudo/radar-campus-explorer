@@ -199,7 +199,7 @@ export function advanceToward(
   const dy = to.y - from.y;
   const length = Math.hypot(dx, dy);
   if (length < 2) return { x: to.x, y: to.y };
-  const stride = Math.min(length, Math.max(length / 0.2, 700) * dt);
+  const stride = Math.min(length, Math.max(length / 0.12, 1100) * dt);
   const at = (t: number): Point => ({
     x: from.x + dx * t,
     y: from.y + dy * t,
