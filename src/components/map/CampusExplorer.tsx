@@ -1336,6 +1336,22 @@ export function CampusExplorer() {
         </section>
 
         <aside className="campus-sidebar">
+          <section className="radar-watch">
+            <h2>Device watch</h2>
+            <p>
+              Weather, PAGASA, and PHIVOLCS are not configured. These lines are not live official alerts.
+            </p>
+            <ul>
+              <li>Weather feed: not configured</li>
+              <li>PAGASA: not configured</li>
+              <li>PHIVOLCS: not configured</li>
+              <li>
+                {records.shaking
+                  ? "Shaking is marked on this device."
+                  : "No shaking mark on this device."}
+              </li>
+            </ul>
+          </section>
           <LocationSyncPanel
             status={gps.status}
             statusLabel={gps.statusLabel}

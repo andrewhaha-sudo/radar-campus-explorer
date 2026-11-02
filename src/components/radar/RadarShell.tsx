@@ -1,6 +1,19 @@
 import { useEffect, useState } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
-import { HelpCircle, Radar } from "lucide-react";
+import {
+  Bell,
+  ClipboardCheck,
+  FileBarChart,
+  HelpCircle,
+  Map,
+  Radar,
+  Shield,
+  Siren,
+  TriangleAlert,
+  Users,
+  Warehouse,
+} from "lucide-react";
+import { useStudentProfile } from "../student/student-context";
 import { CampusExplorer } from "../map/CampusExplorer";
 import { allRooms, places } from "../map/campus-data";
 import { illustrationBuilding } from "../map/campus-data";
@@ -32,10 +45,50 @@ const screenLabels: Record<(typeof radarScreens)[number], string> = {
   reports: "Reports",
 };
 
+const screenIcons = {
+  campus: Map,
+  hazards: TriangleAlert,
+  inspect: ClipboardCheck,
+  alerts: Bell,
+  safety: Shield,
+  sos: Siren,
+  people: Users,
+  resources: Warehouse,
+  reports: FileBarChart,
+} as const;
+
+function ManilaClock() {
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const id = window.setInterval(() => setNow(new Date()), 30_000);
+    return () => window.clearInterval(id);
+  }, []);
+  const label = new Intl.DateTimeFormat("en-PH", {
+    timeZone: "Asia/Manila",
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(now);
+  return <time dateTime={now.toISOString()}>{label}</time>;
+}
+
 export function RadarShell() {
   const [screen, setScreen] = useState(() => parseRoute(window.location.hash));
   const [guide, setGuide] = useState<"play" | "safety" | null>(null);
   const { records } = useRadar();
+  const { profile } = useStudentProfile();
+  const studentLabel = profile.name.trim()
+    ? `${profile.name}${profile.grade ? ` · ${profile.grade}` : ""}`
+    : "Student";
+  const deviceStatus = records.shaking
+    ? "Shaking marked"
+    : records.alerts.length > 0
+      ? "Device alert"
+      : records.sos.length > 0
+        ? "SOS on device"
+        : "No device alert";
   useEffect(() => {
     const sync = () => setScreen(parseRoute(window.location.hash));
     window.addEventListener("hashchange", sync);
@@ -47,8 +100,8 @@ export function RadarShell() {
     else window.location.hash = next;
   };
   return (
-    <>
-      <header className="radar-brandbar">
+    <div className="radar-app">
+      <header className="radar-top">
         <div className="radar-brand">
           <span className="radar-logo" aria-hidden="true">
             <Radar size={22} strokeWidth={1.8} />
@@ -57,32 +110,52 @@ export function RadarShell() {
             <strong>
               RADAR<span>.</span>
             </strong>
-            <small>KNOW YOUR CAMPUS. FIND YOUR WAY.</small>
+            <small>CAMPUS AWARENESS</small>
           </span>
         </div>
+        <span className="radar-chip">{records.workspaceName}</span>
+        <span
+          className={
+            deviceStatus === "No device alert" ? "radar-chip radar-chip--ok" : "radar-chip radar-chip--warn"
+          }
+        >
+          {deviceStatus}
+        </span>
+        <span className="radar-chip">
+          <ManilaClock />
+        </span>
+        <span className="radar-chip radar-chip--student">{studentLabel}</span>
         <button type="button" className="radar-help" onClick={() => setGuide("play")}>
           <HelpCircle size={16} />
           How to play
         </button>
       </header>
-      <nav className="radar-nav" aria-label="RADAR sections">
-        {radarScreens.map((id) => (
-          <button
-            key={id}
-            type="button"
-            aria-current={screen === id ? "page" : undefined}
-            onClick={() => open(id)}
-          >
-            {screenLabels[id]}
-            {id === "alerts" && records.alerts.length > 0
-              ? ` (${records.alerts.length})`
-              : ""}
+      <div className="radar-body">
+        <nav className="radar-rail" aria-label="RADAR sections">
+          {radarScreens.map((id) => {
+            const Icon = screenIcons[id];
+            return (
+              <button
+                key={id}
+                type="button"
+                className={id === "sos" ? "radar-rail-sos" : undefined}
+                aria-current={screen === id ? "page" : undefined}
+                onClick={() => open(id)}
+              >
+                <Icon size={16} aria-hidden="true" />
+                {screenLabels[id]}
+                {id === "alerts" && records.alerts.length > 0
+                  ? ` (${records.alerts.length})`
+                  : ""}
+              </button>
+            );
+          })}
+          <button type="button" onClick={() => setGuide("safety")}>
+            <Shield size={16} aria-hidden="true" />
+            Safety guide
           </button>
-        ))}
-        <button type="button" onClick={() => setGuide("safety")}>
-          Safety guide
-        </button>
-      </nav>
+        </nav>
+        <div className="radar-stage">
       <Dialog.Root open={guide !== null} onOpenChange={(open) => !open && setGuide(null)}>
         <Dialog.Portal>
           <Dialog.Overlay className="radar-guide-modal" />
@@ -152,7 +225,17 @@ export function RadarShell() {
       {screen === "people" && <PeopleScreen />}
       {screen === "resources" && <ResourcesScreen />}
       {screen === "reports" && <ReportsScreen />}
-    </>
+        </div>
+      </div>
+      <footer className="radar-dock">
+        <p>
+          <strong>On this device.</strong> Walk the map, check a room, and save a report here. This desk does not dispatch help.
+        </p>
+        <p>
+          <strong>Open section.</strong> {screenLabels[screen]}
+        </p>
+      </footer>
+    </div>
   );
 }
 

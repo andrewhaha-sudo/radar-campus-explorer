@@ -1,79 +1,243 @@
-.radar-brandbar {
+.radar-app {
+  min-height: 100dvh;
+  padding: 12px;
+  color: #f7fbff;
+  background:
+    radial-gradient(circle at 12% -10%, #5aa0ff 0%, transparent 32%),
+    radial-gradient(circle at 92% 0%, #7a4bff 0%, transparent 28%),
+    linear-gradient(180deg, #17286f 0%, #24398f 46%, #1a2f78 100%);
+}
+.radar-top,
+.radar-dock,
+.radar-rail,
+.radar-watch,
+.radar-app .campus-directory,
+.radar-app .campus-controls,
+.radar-app .campus-location-sync,
+.radar-app .radar-hazard-card,
+.radar-app .campus-map-panel,
+.radar-app .radar-screen {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.2), transparent 28%),
+    linear-gradient(180deg, #2d4db8 0%, #1d348c 100%);
+  border: 1px solid #9ec4ff;
+  border-radius: 18px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    inset 0 -8px 14px rgba(8, 20, 70, 0.28),
+    0 8px 0 #13245f,
+    0 14px 24px rgba(8, 16, 48, 0.35);
+}
+.radar-top {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  min-height: 72px;
-  padding: 10px 20px;
-  background: #fcfcf6;
-  border-bottom: 1px solid #e0e3d5;
+  gap: 8px;
+  padding: 10px 12px;
 }
 .radar-brand {
   display: flex;
   align-items: center;
-  gap: 12px;
-  color: #314c3b;
+  gap: 10px;
+  margin-right: auto;
 }
 .radar-logo {
-  width: 42px;
-  height: 42px;
+  width: 46px;
+  height: 46px;
   display: grid;
   place-items: center;
   color: #fff6da;
-  background: #367353;
-  border: 3px solid #315d47;
-  border-radius: 11px;
+  background: radial-gradient(circle at 30% 30%, #7dffb2, #1f8a52 55%, #0e5a34);
+  border: 3px solid #d7fff0;
+  border-radius: 14px;
   box-shadow:
-    inset 0 0 0 2px #74a178,
-    0 2px 0 #cbd5b8;
+    inset 0 2px 0 rgba(255, 255, 255, 0.55),
+    0 4px 0 #0c4a2c;
 }
 .radar-brand strong {
   display: block;
   font-size: 22px;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.14em;
   line-height: 1;
 }
 .radar-brand strong span {
-  color: #d5a857;
+  color: #ffd56a;
 }
 .radar-brand small {
   display: block;
   margin-top: 4px;
   font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  color: #81867b;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  color: #d5e4ff;
 }
-.radar-nav {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  justify-content: flex-end;
-  padding: 10px 16px 0;
-  background: #f4f5ed;
-}
-.radar-nav button,
-.radar-help {
-  border: 1px solid #dfe3d4;
-  background: #fafaf2;
-  color: #4d6248;
-  border-radius: 8px;
-  padding: 8px 10px;
-  font: inherit;
-  font-size: 12px;
-  font-weight: 700;
-  cursor: pointer;
-}
-.radar-nav button[aria-current="page"] {
-  background: #357a58;
-  color: #fff;
-  border-color: #286547;
-}
-.radar-help {
+.radar-chip,
+.radar-help,
+.radar-rail button {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  white-space: nowrap;
+  border: 1px solid #d7e8ff;
+  border-radius: 999px;
+  padding: 8px 12px;
+  color: #173067;
+  background: linear-gradient(180deg, #ffffff 0%, #d7e7ff 100%);
+  box-shadow:
+    inset 0 1px 0 #fff,
+    0 3px 0 #7ea2df;
+  font-size: 12px;
+  font-weight: 800;
+}
+.radar-chip--ok {
+  color: #08321c;
+  background: linear-gradient(180deg, #e9ffe8 0%, #7ddea0 100%);
+  box-shadow:
+    inset 0 1px 0 #fff,
+    0 3px 0 #2f8a52;
+}
+.radar-chip--warn {
+  color: #4a2a00;
+  background: linear-gradient(180deg, #fff4d2 0%, #ffc14d 100%);
+  box-shadow:
+    inset 0 1px 0 #fff,
+    0 3px 0 #c47a12;
+}
+.radar-help {
+  cursor: pointer;
+}
+.radar-body {
+  display: grid;
+  grid-template-columns: 168px minmax(0, 1fr);
+  gap: 12px;
+  margin-top: 12px;
+  align-items: start;
+}
+.radar-rail {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px;
+}
+.radar-rail button {
+  width: 100%;
+  justify-content: flex-start;
+  border-radius: 14px;
+  text-align: left;
+  cursor: pointer;
+}
+.radar-rail button[aria-current="page"] {
+  color: #fff;
+  background: linear-gradient(180deg, #69a2ff 0%, #2f63e6 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    0 3px 0 #17398f;
+}
+.radar-rail-sos {
+  color: #fff !important;
+  background: linear-gradient(180deg, #ff8d8d 0%, #d5253a 100%) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    0 3px 0 #8d1020 !important;
+}
+.radar-stage {
+  min-width: 0;
+}
+.radar-dock {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 12px;
+  padding: 12px 16px;
+  color: #e7f0ff;
+  font-size: 13px;
+}
+.radar-dock p {
+  margin: 0;
+}
+.radar-watch {
+  padding: 14px;
+  color: #f4f8ff;
+}
+.radar-watch h2 {
+  margin: 0 0 6px;
+  font-size: 15px;
+}
+.radar-watch p,
+.radar-watch li {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.45;
+}
+.radar-watch ul {
+  margin: 8px 0 0;
+  padding-left: 16px;
+}
+.radar-app .campus-explorer {
+  min-height: 0;
+  padding: 0;
+  background: transparent;
+  color: #eef4ff;
+}
+.radar-app .campus-heading h1,
+.radar-app .campus-heading p,
+.radar-app .campus-eyebrow,
+.radar-app .radar-screen,
+.radar-app .radar-screen h1,
+.radar-app .campus-small,
+.radar-app .campus-sidebar h2 {
+  color: #f4f8ff;
+}
+.radar-app .campus-map-panel {
+  overflow: hidden;
+  border-width: 3px;
+}
+.radar-app .campus-map-toolbar,
+.radar-app .campus-status,
+.radar-app .campus-map-bottom {
+  background: linear-gradient(180deg, rgba(18, 40, 110, 0.2), rgba(10, 24, 70, 0.35));
+  color: #e7f0ff;
+}
+.radar-app .campus-directory,
+.radar-app .campus-controls,
+.radar-app .campus-location-sync,
+.radar-app .radar-hazard-card {
+  color: #f4f8ff;
+  padding: 14px;
+}
+.radar-app .campus-location,
+.radar-app .campus-search,
+.radar-app .campus-explorer select {
+  background: linear-gradient(180deg, #f7fbff, #d5e4ff);
+  color: #173067;
+}
+.radar-app .radar-screen {
+  margin-top: 0;
+  color: #f7fbff;
+}
+.radar-app .radar-form input,
+.radar-app .radar-form select,
+.radar-app .radar-form textarea,
+.radar-app .radar-list li,
+.radar-app .radar-guidance {
+  background: linear-gradient(180deg, #f7fbff, #d9e7ff);
+  color: #173067;
+}
+@media (max-width: 900px) {
+  .radar-body {
+    grid-template-columns: 1fr;
+  }
+  .radar-rail {
+    flex-direction: row;
+    overflow-x: auto;
+    order: 2;
+  }
+  .radar-rail button {
+    width: auto;
+    flex: 0 0 auto;
+  }
+  .radar-dock {
+    flex-direction: column;
+  }
 }
 .radar-guide {
   max-width: 460px;
