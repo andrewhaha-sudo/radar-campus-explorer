@@ -121,12 +121,16 @@ communicate with the configured Supabase project over authenticated requests.
 
 ## Live location
 
-GPS is off until you choose **Enable GPS** in **Live location**. The character
-follows the device only on the outdoor map, and only after this browser has three
-surveyed calibration points. The project does not include the school’s latitude
-and longitude. Open **Calibrate this device**, enter each surveyed latitude and
-longitude, and either type the matching outdoor map pixel or choose **Pick on
-map** and click open grass. Save the calibration on this device.
+GPS is off until you choose **Enable GPS** in **Live location**. For a quick
+try, stand on the outdoor map and choose **Save my current location for demo**.
+That stores this phone’s current GPS at the character’s current spot. It is a
+DEMO: north is toward the top of the map and about 8 pixels equal 1 meter. It
+is not a surveyed school map. Then walk a few steps outdoors.
+
+For a real calibration, the project does not include the school’s latitude and
+longitude. Open **Calibrate this device**, enter three surveyed outdoor points,
+and either type the matching map pixel or choose **Pick on map** and click open
+grass. Save the calibration on this device.
 
 Until that calibration exists, the status stays **Map Calibration Required** and
 the character does not move. Weak, stale, or implausible fixes stay approximate

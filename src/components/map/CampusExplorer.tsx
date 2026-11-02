@@ -176,7 +176,7 @@ export function CampusExplorer() {
   const routeSource = useRef<"user" | "gps" | null>(null);
   const gps = useLocationSync(
     sceneId !== "campus",
-    mapVisible && !artOnly && !floorSheet && !photoRoom && !studentId,
+    !artOnly && !floorSheet && !photoRoom && !studentId,
   );
   const gpsHeading = useRef(gps.heading);
   const { profile, user } = useStudentProfile();
@@ -1054,6 +1054,12 @@ export function CampusExplorer() {
             calibration={gps.calibration}
             onSaveCalibration={gps.saveCalibration}
             onClearCalibration={gps.clearCalibration}
+            onSaveDemo={() => {
+              setGpsPausedByUser(false);
+              gps.saveDemoAt({ x: player.current.x, y: player.current.y });
+            }}
+            savingDemo={gps.savingDemo}
+            indoors={sceneId !== "campus"}
             picking={calibrationPick}
             onPick={setCalibrationPick}
             pickedPixel={pickedPixel}

@@ -12,6 +12,7 @@ export interface CalibrationPoint {
 
 export interface MapCalibration {
   points: CalibrationPoint[];
+  demo?: boolean;
 }
 
 export interface Affine {
@@ -29,6 +30,8 @@ const STORAGE_KEY = "campus-explorer-map-calibration";
 
 export const CAMPUS_PIXEL_WIDTH = scenes.campus.imageWidth;
 export const CAMPUS_PIXEL_HEIGHT = scenes.campus.imageHeight;
+export const DEMO_PIXELS_PER_METER = 8;
+const METERS_PER_DEGREE_LAT = 111_320;
 
 export const emptyCalibration = (): MapCalibration => ({ points: [] });
 
@@ -202,6 +205,83 @@ export function metersPerPixel(
   return meters / northPixels;
 }
 
+export function demoCalibrationFromHere(
+  latitude: number,
+  longitude: number,
+  anchor: Point,
+): { ok: true; calibration: MapCalibration } | { ok: false; reason: string } {
+  if (
+    !finite(latitude) ||
+    latitude < -90 ||
+    latitude > 90 ||
+    !finite(longitude) ||
+    longitude < -180 ||
+    longitude > 180
+  )
+    return { ok: false, reason: "The current location could not be read." };
+  if (
+    !finite(anchor.x) ||
+    !finite(anchor.y) ||
+    anchor.x < 0 ||
+    anchor.y < 0 ||
+    anchor.x > CAMPUS_PIXEL_WIDTH ||
+    anchor.y > CAMPUS_PIXEL_HEIGHT
+  )
+    return {
+      ok: false,
+      reason: "Stand on the outdoor campus before saving a demo location.",
+    };
+  for (const meters of [25, 20, 15, 10, 8]) {
+    const pixels = meters * DEMO_PIXELS_PER_METER;
+    const xSign =
+      anchor.x + pixels <= CAMPUS_PIXEL_WIDTH
+        ? 1
+        : anchor.x - pixels >= 0
+          ? -1
+          : 0;
+    const ySign =
+      anchor.y - pixels >= 0 ? -1 : anchor.y + pixels <= CAMPUS_PIXEL_HEIGHT ? 1 : 0;
+    if (!xSign || !ySign) continue;
+    const lonDelta =
+      (meters / (METERS_PER_DEGREE_LAT * Math.cos((latitude * Math.PI) / 180))) *
+      xSign;
+    const latDelta = (meters / METERS_PER_DEGREE_LAT) * (ySign < 0 ? 1 : -1);
+    const points: CalibrationPoint[] = [
+      {
+        id: "demo-here",
+        label: "DEMO current location",
+        latitude,
+        longitude,
+        x: anchor.x,
+        y: anchor.y,
+      },
+      {
+        id: "demo-across",
+        label: xSign > 0 ? "DEMO east" : "DEMO west",
+        latitude,
+        longitude: longitude + lonDelta,
+        x: anchor.x + xSign * pixels,
+        y: anchor.y,
+      },
+      {
+        id: "demo-along",
+        label: ySign < 0 ? "DEMO north" : "DEMO south",
+        latitude: latitude + latDelta,
+        longitude,
+        x: anchor.x,
+        y: anchor.y + ySign * pixels,
+      },
+    ];
+    if (calibrationReady({ points }))
+      return { ok: true, calibration: { points, demo: true } };
+  }
+  return {
+    ok: false,
+    reason:
+      "The character is too close to the edge of the map. Walk toward the middle of the outdoor campus and try again.",
+  };
+}
+
 export function readCalibration(store?: KeyValueStore | null): MapCalibration {
   const storage = store === undefined ? browserStore() : store;
   if (!storage) return emptyCalibration();
@@ -220,7 +300,8 @@ export function readCalibration(store?: KeyValueStore | null): MapCalibration {
         finite(point.x) &&
         finite(point.y),
     );
-    return calibrationReady({ points }) ? { points } : emptyCalibration();
+    const calibration = { points, demo: parsed.demo === true };
+    return calibrationReady(calibration) ? calibration : emptyCalibration();
   } catch {
     return emptyCalibration();
   }

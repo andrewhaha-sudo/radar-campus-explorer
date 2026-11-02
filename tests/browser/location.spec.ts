@@ -111,6 +111,37 @@ test("a low-accuracy fix does not move the character", async ({ page, context })
   await expect(player).toHaveAttribute("data-y", "785");
 });
 
+test("saving the current location creates a demo calibration the character can follow", async ({
+  page,
+  context,
+}) => {
+  test.setTimeout(90_000);
+  await context.grantPermissions(["geolocation"]);
+  await context.setGeolocation({ latitude: 14, longitude: 121, accuracy: 5 });
+  await page.goto("/");
+  await page.getByRole("button", { name: "Save my current location for demo" }).click();
+  await expect(page.getByText("DEMO calibration saved").first()).toBeVisible({
+    timeout: 20_000,
+  });
+  await expect(page.locator("[data-gps-status]")).toHaveAttribute(
+    "data-gps-status",
+    "connected",
+    { timeout: 20_000 },
+  );
+  const player = page.locator("[data-player='you']");
+  await expect(player).toHaveAttribute("data-x", "387");
+  await context.setGeolocation({
+    latitude: 14,
+    longitude: 121 + 15 / (111_320 * Math.cos((14 * Math.PI) / 180)),
+    accuracy: 5,
+  });
+  await expect
+    .poll(async () => Number(await player.getAttribute("data-x")), {
+      timeout: 30_000,
+    })
+    .toBeGreaterThan(470);
+});
+
 test("the device role is editable and stays separate from the walking character", async ({
   page,
 }) => {

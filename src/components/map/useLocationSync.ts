@@ -10,12 +10,14 @@ import {
   locationIsSecure,
   LocationWatcher,
   readingFromPosition,
+  RELIABLE_ACCURACY_METERS,
   type GeoReading,
   type GeolocationSource,
   type GpsStatus,
 } from "../../lib/location-sync";
 import {
   calibrationReady,
+  demoCalibrationFromHere,
   geographicToPixel,
   readCalibration,
   writeCalibration,
@@ -38,6 +40,15 @@ function permissionState() {
 }
 
 export function useLocationSync(indoors: boolean, mapActive: boolean) {
+  const [pageVisible, setPageVisible] = useState(
+    () => typeof document === "undefined" || !document.hidden,
+  );
+  useEffect(() => {
+    const update = () => setPageVisible(!document.hidden);
+    document.addEventListener("visibilitychange", update);
+    return () => document.removeEventListener("visibilitychange", update);
+  }, []);
+  const trackingActive = mapActive && pageVisible;
   const [enabled, setEnabled] = useState(false);
   const [calibration, setCalibration] = useState<MapCalibration>(() =>
     readCalibration(),
@@ -52,6 +63,7 @@ export function useLocationSync(indoors: boolean, mapActive: boolean) {
   const [heading, setHeading] = useState<ReturnType<typeof headingDirection>>(null);
   const [marker, setMarker] = useState<GpsMarker | null>(null);
   const [tracking, setTracking] = useState(false);
+  const [savingDemo, setSavingDemo] = useState(false);
   const calibrationRef = useRef(calibration);
   const indoorsRef = useRef(indoors);
   const reliableRef = useRef<GeoReading | null>(null);
@@ -143,7 +155,9 @@ export function useLocationSync(indoors: boolean, mapActive: boolean) {
       reliableRef.current = reading;
       setStatus("connected");
       setMessage(
-        "GPS Connected. The character follows reliable outdoor fixes on this device only.",
+        calibrationRef.current.demo
+          ? "DEMO calibration saved. GPS Connected. Walk outdoors to see the character follow. North is toward the top of the map, about 8 pixels per meter. This is not a surveyed campus."
+          : "GPS Connected. The character follows reliable outdoor fixes on this device only.",
       );
       setHeading(headingDirection(reading, calibrationRef.current));
       const radius = accuracyRadiusPixels(reading, calibrationRef.current);
@@ -171,7 +185,7 @@ export function useLocationSync(indoors: boolean, mapActive: boolean) {
   }, []);
 
   useEffect(() => {
-    if (!enabled || !mapActive) {
+    if (!enabled || !trackingActive) {
       if (watcherRef.current) {
         watcherRef.current.stop();
         watcherRef.current = null;
@@ -210,6 +224,7 @@ export function useLocationSync(indoors: boolean, mapActive: boolean) {
         return;
       }
       const calibrated = calibrationReady(calibrationRef.current);
+      const demo = calibrationRef.current.demo === true;
       setStatus(
         calibrated
           ? permission === "granted"
@@ -219,9 +234,11 @@ export function useLocationSync(indoors: boolean, mapActive: boolean) {
       );
       setMessage(
         calibrated
-          ? permission === "granted"
-            ? "Locating. Waiting for a GPS fix."
-            : "Requesting Permission. Allow location access if the browser asks."
+          ? demo
+            ? "DEMO calibration saved. Locating the next outdoor fix."
+            : permission === "granted"
+              ? "Locating. Waiting for a GPS fix."
+              : "Requesting Permission. Allow location access if the browser asks."
           : `${GPS_STATUS_LABEL.calibration_required}. Permission may be requested, but the character will not move.`,
       );
       watcher.start(
@@ -257,7 +274,7 @@ export function useLocationSync(indoors: boolean, mapActive: boolean) {
       if (watcherRef.current === watcher) watcherRef.current = null;
       setTracking(false);
     };
-  }, [applyReading, calibration, enabled, indoors, mapActive]);
+  }, [applyReading, calibration, enabled, indoors, trackingActive]);
 
   const enable = useCallback(() => {
     setEnabled(true);
@@ -278,6 +295,70 @@ export function useLocationSync(indoors: boolean, mapActive: boolean) {
     return null;
   }, []);
 
+  const saveDemoAt = useCallback(
+    (anchor: Point) => {
+      if (indoors) {
+        setMessage(
+          "Return to the outdoor campus. A demo location cannot choose a floor or classroom.",
+        );
+        return;
+      }
+      if (!locationIsSecure() || !navigator.geolocation) {
+        setStatus("unavailable");
+        setMessage(
+          "GPS Signal Unavailable. This browser cannot read the current location, so nothing was saved.",
+        );
+        return;
+      }
+      setSavingDemo(true);
+      setStatus("locating");
+      setMessage("Reading this device's current location for a DEMO calibration…");
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const reading = readingFromPosition(position);
+          const built = demoCalibrationFromHere(
+            reading.latitude,
+            reading.longitude,
+            anchor,
+          );
+          setSavingDemo(false);
+          if (!built.ok) {
+            setStatus("calibration_required");
+            setMessage(built.reason);
+            return;
+          }
+          writeCalibration(built.calibration);
+          setCalibration(built.calibration);
+          reliableRef.current = reading;
+          lastReadingRef.current = reading;
+          setAccuracy(reading.accuracy);
+          setLastUpdate(reading.timestamp);
+          setEnabled(true);
+          const coarse = reading.accuracy > RELIABLE_ACCURACY_METERS;
+          setMessage(
+            coarse
+              ? `DEMO calibration saved, but this fix is only approximate (${Math.round(reading.accuracy)} m). Walk outside until the accuracy is tighter. North is toward the top of the map, about 8 pixels per meter. This is not a surveyed campus.`
+              : "DEMO calibration saved at your current location. Walk a few steps outdoors. North is toward the top of the map, about 8 pixels per meter. This is not a surveyed campus.",
+          );
+        },
+        (error) => {
+          setSavingDemo(false);
+          if (error.code === 1) {
+            setStatus("permission_denied");
+            setMessage(
+              "Permission Denied. Allow location access, then save your current location again.",
+            );
+            return;
+          }
+          setStatus("unavailable");
+          setMessage("GPS Signal Unavailable. The demo location was not saved.");
+        },
+        { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 },
+      );
+    },
+    [indoors],
+  );
+
   const clearCalibration = useCallback(() => {
     writeCalibration({ points: [] });
     setCalibration({ points: [] });
@@ -297,8 +378,8 @@ export function useLocationSync(indoors: boolean, mapActive: boolean) {
     status,
     statusLabel: GPS_STATUS_LABEL[status],
     message:
-      enabled && !mapActive
-        ? "Location sync is paused while the map is hidden. Tracking resumes when you return."
+      enabled && !pageVisible
+        ? "Location sync is paused while this tab is in the background. Tracking resumes when you return."
         : message,
     accuracy,
     lastUpdate,
@@ -310,5 +391,7 @@ export function useLocationSync(indoors: boolean, mapActive: boolean) {
     disable,
     saveCalibration,
     clearCalibration,
+    saveDemoAt,
+    savingDemo,
   };
 }

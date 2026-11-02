@@ -8,6 +8,7 @@ import {
   shouldPublishPose,
 } from "../src/lib/location-sync.ts";
 import {
+  demoCalibrationFromHere,
   fitAffine,
   geographicToPixel,
   projectAffine,
@@ -137,6 +138,25 @@ test("a location watcher cannot leave two watches running", () => {
   watcher.stop();
   assert.equal(watcher.active, false);
   assert.equal(watches.size, 0);
+});
+
+test("a demo calibration anchors the current fix and moves east across the map", () => {
+  const built = demoCalibrationFromHere(14, 121, { x: 387, y: 785 });
+  assert.equal(built.ok, true);
+  if (!built.ok) return;
+  assert.equal(built.calibration.demo, true);
+  const here = geographicToPixel(14, 121, built.calibration);
+  assert.equal(here.ok, true);
+  if (!here.ok) return;
+  assert.ok(Math.abs(here.point.x - 387) < 0.05);
+  assert.ok(Math.abs(here.point.y - 785) < 0.05);
+  const fifteenMetersEast =
+    121 + 15 / (111_320 * Math.cos((14 * Math.PI) / 180));
+  const moved = geographicToPixel(14, fifteenMetersEast, built.calibration);
+  assert.equal(moved.ok, true);
+  if (!moved.ok) return;
+  assert.ok(Math.abs(moved.point.x - (387 + 120)) < 1);
+  assert.ok(Math.abs(moved.point.y - 785) < 1);
 });
 
 test("gps poses are not published and calibration stays on the supplied store", () => {
