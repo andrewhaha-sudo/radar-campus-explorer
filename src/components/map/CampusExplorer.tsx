@@ -44,6 +44,7 @@ import { googleMapsApiKey } from "../../lib/google-map";
 import { LocationSyncPanel } from "./LocationSyncPanel";
 import { useLocationSync } from "./useLocationSync";
 import { followTarget, movementMode } from "../../lib/location-sync";
+import { useRadar } from "../radar/radar-context";
 import type { GpsStatus } from "../../lib/location-sync";
 import "./campus-explorer.css";
 import { cn } from "../../lib/cn";
@@ -245,6 +246,7 @@ export function CampusExplorer() {
   const gpsGoal = useRef<Point | null>(null);
   const gpsPaused = useRef(false);
   const { profile, user } = useStudentProfile();
+  const { records } = useRadar();
   const { students, error: studentsError } = useCampusStudents(
     {
       scene: sceneId,
@@ -743,6 +745,12 @@ export function CampusExplorer() {
       className={cn("campus-explorer", expanded && "campus-explorer--expanded")}
       onKeyDown={keyDown}
     >
+      {records.shaking && (
+        <p className="campus-safety-banner" role="status">
+          Drop, Cover, and Hold On. Shaking is marked. No evacuation route is
+          being started.
+        </p>
+      )}
       <header className="campus-heading">
         <div>
           <span className="campus-eyebrow">
@@ -800,6 +808,11 @@ export function CampusExplorer() {
           className="campus-map-panel"
           aria-label="Interactive school artwork"
         >
+          {records.demoRain && (
+            <div className="campus-demo-rain" aria-hidden="true">
+              <span>DEMO rain — not a weather report</span>
+            </div>
+          )}
           <div className="campus-map-toolbar">
             <span>
               <MapPin size={15} />

@@ -1,5 +1,20 @@
 import { expect, test } from "@playwright/test";
 
+test("hazard, safety, and sos records stay on this device", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: "Hazards", exact: true }).click();
+  await page.getByLabel("What did you observe?").fill("Practice blocked passage");
+  await page.getByRole("button", { name: "Save DEMO report" }).click();
+  await expect(page.getByText("REPORTED")).toBeVisible();
+  await page.getByRole("button", { name: "Safety", exact: true }).click();
+  await expect(page.getByText("ROUTE UNVERIFIED — FOLLOW TRAINED PERSONNEL")).toBeVisible();
+  await page.getByLabel("Mark earthquake shaking").check();
+  await expect(page.getByRole("heading", { name: "Drop, Cover, and Hold On" })).toBeVisible();
+  await page.getByRole("button", { name: "SOS", exact: true }).click();
+  await page.getByRole("button", { name: "Record SOS on this device" }).click();
+  await expect(page.getByText("No rescue was dispatched.")).toBeVisible();
+});
+
 test("Google Map explains that the API key is not configured", async ({ page }) => {
   await page.goto("/");
   await page.getByRole("button", { name: "Google Map" }).click();

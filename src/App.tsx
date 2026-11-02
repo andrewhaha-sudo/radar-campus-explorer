@@ -1,4 +1,5 @@
-import { CampusExplorer } from "./components/map/CampusExplorer";
+import { RadarProvider } from "./components/radar/RadarProvider";
+import { RadarShell } from "./components/radar/RadarShell";
 import { StudentProfilesProvider } from "./components/student/StudentProfiles";
 
 export default function App() {
@@ -9,7 +10,9 @@ export default function App() {
       </a>
       <main>
         <StudentProfilesProvider>
-          <CampusExplorer />
+          <RadarProvider>
+            <RadarShell />
+          </RadarProvider>
         </StudentProfilesProvider>
       </main>
     </>
