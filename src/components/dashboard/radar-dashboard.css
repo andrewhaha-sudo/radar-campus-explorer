@@ -1,0 +1,1610 @@
+.campus-explorer.radar-dashboard {
+  --radar-navy: #101d54;
+  --radar-blue: #173a83;
+  --radar-cyan: #62ecff;
+  --radar-purple: #b479ff;
+  --radar-white: #f5f7ff;
+  padding: 0;
+  background: #0c3983;
+  color: var(--radar-white);
+  font-family: "Arial Narrow", "Trebuchet MS", Arial, sans-serif;
+}
+.radar-stage {
+  min-height: 780px;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  padding: 8px 12px 0;
+  position: relative;
+  isolation: isolate;
+  background: linear-gradient(#0854a9, #326e9a 45%, #387b4c);
+  overflow: hidden;
+}
+.radar-header {
+  display: grid;
+  grid-template-columns: 1.25fr 1.5fr 1.05fr 0.9fr 58px 1.05fr;
+  gap: 16px;
+  align-items: start;
+  height: 86px;
+  flex: 0 0 86px;
+  position: relative;
+  z-index: 10;
+}
+.radar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-align: left;
+  color: white;
+  margin: 0;
+}
+.radar-brand h1 {
+  font-size: clamp(34px, 3.7vw, 64px);
+  line-height: 0.9;
+  margin: 0 0 6px;
+  font-style: italic;
+  font-weight: 1000;
+  -webkit-text-stroke: 2px #12275b;
+  paint-order: stroke fill;
+  text-shadow:
+    3px 3px 0 #102355,
+    -2px -2px 0 white,
+    2px -2px 0 white,
+    -2px 2px 0 white;
+}
+.radar-brand small {
+  display: block;
+  font-size: clamp(10px, 0.94vw, 15px);
+  line-height: 1.12;
+  font-weight: 700;
+  text-shadow: 2px 2px #102355;
+}
+.radar-emblem {
+  width: 78px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border: 5px solid #0c1e4d;
+  outline: 3px solid white;
+  position: relative;
+  background: linear-gradient(
+    #ff294a 0%,
+    #ff7482 40%,
+    #df1f46 47%,
+    #101b4b 47%,
+    #101b4b 55%,
+    #f4f6ff 55%,
+    #d8dbff 86%,
+    #7574ca 100%
+  );
+  box-shadow:
+    0 0 0 7px #213588,
+    inset 4px 0 0 #ffffff90,
+    0 7px 0 #101b4b;
+}
+.radar-emblem::before {
+  content: "";
+  position: absolute;
+  top: 12%;
+  left: 18%;
+  width: 22%;
+  height: 11%;
+  border-radius: 50%;
+  background: #fff9;
+  transform: rotate(-35deg);
+}
+.radar-emblem i {
+  width: 35%;
+  aspect-ratio: 1;
+  border: 4px solid #101b4b;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: inset 0 0 0 4px #cbd5ff;
+}
+.game-frame {
+  background: linear-gradient(160deg, #304ba9, #16265d 50%, #17286d);
+  border: 3px solid #8eeaff;
+  border-radius: 13px;
+  box-shadow:
+    inset 0 0 0 2px #f7f7ff,
+    inset 0 -6px 10px #241476,
+    0 0 0 2px #172046,
+    0 0 0 4px #7762e3,
+    0 4px 0 4px #111e50;
+}
+.radar-school {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  height: 54px;
+  padding: 6px 10px;
+  border-color: #bd98ff;
+  margin-top: 6px;
+}
+.radar-school > svg:first-child {
+  color: #ffdd71;
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+}
+.radar-school select {
+  appearance: none;
+  color: white;
+  background: transparent;
+  border: none;
+  padding: 0;
+  font-size: clamp(12px, 1.08vw, 18px);
+  font-weight: 700;
+  outline-offset: 5px;
+  width: 100%;
+}
+.radar-school option {
+  color: #16204c;
+  background: white;
+}
+.radar-school > svg:last-child {
+  width: 20px;
+  flex-shrink: 0;
+}
+.radar-safety {
+  height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  margin-top: 6px;
+  text-align: left;
+  font-weight: 800;
+  font-size: clamp(11px, 1.15vw, 18px);
+  background: linear-gradient(#14778e, #064a67);
+}
+.radar-safety > svg {
+  width: 30px;
+  height: 30px;
+  fill: #30a286;
+  stroke: #fff;
+}
+.radar-safety small {
+  display: block;
+  font-size: 10px;
+  font-weight: 500;
+}
+.radar-clock {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  height: 54px;
+  margin-top: 6px;
+  font-size: clamp(10px, 0.95vw, 16px);
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.radar-clock svg {
+  width: 30px;
+  height: 30px;
+}
+.radar-clock strong {
+  display: block;
+  font-size: clamp(14px, 1.35vw, 22px);
+}
+.radar-bell {
+  margin-top: 6px;
+  height: 54px;
+  position: relative;
+  border-radius: 11px;
+}
+.radar-badge {
+  position: absolute;
+  top: -9px;
+  right: -8px;
+  border: 2px solid white;
+  border-radius: 50%;
+  color: white;
+  background: #ef284b;
+  font-size: 16px;
+  font-weight: 800;
+  min-width: 25px;
+  height: 25px;
+  text-align: center;
+  box-shadow: 0 0 0 2px #681542;
+  line-height: 21px;
+}
+.radar-student-menu {
+  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  height: 54px;
+  border-color: #a792f6;
+  padding-right: 4px;
+}
+.radar-student-menu > button {
+  display: flex;
+  align-items: center;
+  text-align: left;
+  gap: 9px;
+  min-width: 0;
+  flex: 1;
+  font-size: clamp(12px, 1.15vw, 18px);
+  font-weight: 700;
+}
+.radar-student-menu > button > span:last-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.radar-student-menu small {
+  display: block;
+  font-size: 0.78em;
+}
+.radar-avatar {
+  width: 53px;
+  height: 53px;
+  border: 3px solid #9af1ff;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #68bce0;
+  display: block;
+  flex: 0 0 auto;
+}
+.radar-avatar svg {
+  width: 100%;
+  height: 100%;
+  transform: scale(1.5) translateY(12%);
+}
+.radar-student-menu .radar-menu-trigger {
+  flex: 0 0 24px;
+}
+.radar-dropdown {
+  z-index: 130;
+  min-width: 220px;
+  background: #142458;
+  border: 2px solid #7ee7ff;
+  border-radius: 10px;
+  padding: 7px;
+  box-shadow: 0 0 0 3px #775add;
+  color: white;
+  font:
+    700 14px Arial,
+    sans-serif;
+}
+.radar-dropdown [role="menuitem"] {
+  padding: 11px;
+  border-radius: 5px;
+  cursor: pointer;
+  outline: none;
+}
+.radar-dropdown [data-highlighted] {
+  background: #304b9d;
+}
+.radar-header-error {
+  position: absolute;
+  top: 58px;
+  right: 0;
+  background: #7c204b;
+  padding: 8px;
+}
+.campus-layout.radar-game-grid {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  max-width: none;
+  display: grid;
+  grid-template-columns: minmax(185px, 17.4fr) minmax(0, 59fr) minmax(
+      230px,
+      21fr
+    );
+  gap: 17px;
+  align-items: stretch;
+  grid-template-rows: minmax(0, 1fr);
+}
+.radar-left-column {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-width: 0;
+  padding-top: 30px;
+}
+.neon-frame {
+  border: 3px solid #d2eaff;
+  border-radius: 24px;
+  background: linear-gradient(150deg, #213a7e, #102357 62%, #19235c);
+  box-shadow:
+    inset 0 0 0 3px #4272d8,
+    inset 0 0 14px #65deff99,
+    0 0 0 3px #1b2953,
+    0 0 0 6px #b46dff,
+    0 0 0 9px #2a1c58,
+    0 0 12px 8px #7099ed;
+}
+.radar-left-nav {
+  padding: 17px 12px 0;
+  border-color: #e2ccff;
+  border-radius: 32px;
+  overflow: visible;
+}
+.radar-nav-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.game-nav-button {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 50px;
+  padding: 8px 12px;
+  color: #fff;
+  border: 2px solid #81caff;
+  border-radius: 12px;
+  background: linear-gradient(155deg, #285ca6, #101f51 60%, #172c63);
+  box-shadow:
+    inset 0 2px 0 #e1f6ff99,
+    inset 0 -3px 0 #071336,
+    0 0 0 2px #172049,
+    0 3px 0 2px #070e2d;
+  font-size: clamp(14px, 1.18vw, 20px);
+  font-weight: 800;
+  line-height: 1.1;
+  text-shadow: 1px 2px 0 #10194f;
+  transition:
+    transform 120ms ease-out,
+    filter 120ms ease-out;
+}
+.game-nav-button:hover:not(:disabled) {
+  filter: brightness(1.18);
+  transform: translateY(-1px);
+}
+.game-nav-button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+.game-nav-button.is-active {
+  color: #171827;
+  border-color: #fff5a5;
+  background: linear-gradient(#ffe96a, #ffc900 70%, #ffd849);
+  text-shadow: 1px 1px #fff2ba;
+  box-shadow:
+    inset 0 0 0 2px #ffae13,
+    0 0 0 3px #dc8a04,
+    0 0 0 5px #17204c,
+    0 4px 0 4px #251744;
+}
+.game-nav-button.is-emergency {
+  background: linear-gradient(#ff6e85, #f3174e 65%, #d90f48);
+  border-color: #ffe4f0;
+  border-radius: 22px;
+}
+.game-nav-button:disabled {
+  opacity: 0.55;
+}
+.game-icon {
+  width: 37px;
+  height: 37px;
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 auto;
+  filter: drop-shadow(2px 2px 0 #00163a);
+}
+.game-icon svg {
+  width: 100%;
+  height: 100%;
+  color: #b7f5ff;
+  fill: #138fd2;
+  stroke-width: 2;
+}
+.game-icon-gold svg {
+  fill: #ffd442;
+  color: #fff6bf;
+}
+.game-icon-green svg {
+  fill: #44e744;
+  color: #bcff94;
+}
+.game-icon-silver svg {
+  fill: #d5e5ff;
+  color: white;
+}
+.radar-nav-landscape {
+  height: 45px;
+  margin: 20px -8px 0;
+  background: url("/maps/campus.jpg") center 83% / 150% auto;
+  border-radius: 0 0 24px 24px;
+  text-align: center;
+  border-top: 2px solid #89d6ff;
+}
+.radar-nav-landscape .radar-emblem {
+  width: 48px;
+  transform: translateY(14px);
+  border-width: 3px;
+  outline-width: 2px;
+}
+.radar-right-column {
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding-top: 9px;
+}
+.radar-panel {
+  line-height: 1.25;
+  padding: 8px 10px 10px;
+  border-radius: 20px;
+}
+.radar-panel h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: clamp(16px, 1.45vw, 23px);
+  margin: 0 0 6px;
+  text-shadow: 1px 2px #151637;
+}
+.radar-panel h2 > svg {
+  width: 23px;
+  height: 23px;
+  color: #a0f3b7;
+}
+.radar-panel h2 button {
+  margin-left: auto;
+  display: grid;
+  place-items: center;
+}
+.radar-panel h2 button svg {
+  width: 18px;
+  height: 18px;
+}
+.radar-weather {
+  display: grid;
+  grid-template-columns: 0.9fr 1.3fr;
+  gap: 4px 8px;
+  align-items: center;
+  padding: 4px 3px 10px;
+}
+.radar-weather-icon {
+  width: 82px;
+  height: 64px;
+  margin: auto;
+  color: #c6faff;
+  fill: #75bee8;
+  filter: drop-shadow(2px 4px #14234e);
+}
+.radar-weather h3 {
+  margin: 0;
+  font-size: clamp(16px, 1.55vw, 25px);
+}
+.radar-feed-label {
+  font-size: 9px;
+  color: #b9dcff;
+}
+.radar-weather > strong {
+  text-align: center;
+  font-size: 27px;
+}
+.radar-weather > div:last-child {
+  display: grid;
+  gap: 4px;
+  font-size: clamp(11px, 0.99vw, 16px);
+}
+.radar-weather > div:last-child svg {
+  width: 17px;
+  height: 17px;
+  margin-right: 5px;
+}
+.radar-disaster-watch {
+  border: 2px solid #9c8cff;
+  box-shadow:
+    0 0 0 2px #142b69,
+    inset 0 0 8px #8564dc;
+  border-radius: 15px;
+  background: #101d50;
+  padding: 8px 10px;
+}
+.radar-disaster-watch h3 {
+  margin: 0 0 7px;
+  font-size: clamp(11px, 1.15vw, 18px);
+}
+.radar-disaster-watch h3 small {
+  font-size: 0.8em;
+  font-weight: 500;
+}
+.radar-disaster-watch > div {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-size: clamp(11px, 1.02vw, 17px);
+  margin-top: 3px;
+}
+.radar-disaster-watch > div svg {
+  width: 19px;
+  height: 19px;
+  color: #9dbcf4;
+  flex-shrink: 0;
+}
+.radar-disaster-watch b {
+  font-weight: 500;
+  color: #b9c7e5;
+}
+.radar-minimap-body {
+  display: flex;
+  gap: 10px;
+}
+.radar-minimap-body > svg {
+  width: calc(100% - 40px);
+  height: clamp(100px, 16vh, 165px);
+  image-rendering: pixelated;
+  object-fit: cover;
+  border: 2px solid #060d2c;
+  border-radius: 12px;
+  background: #8ccd65;
+}
+.radar-minimap-tools {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  justify-content: space-between;
+}
+.radar-minimap-tools button {
+  width: 35px;
+  height: 35px;
+  background: linear-gradient(#3d5699, #1a285e);
+  border: 2px solid white;
+  border-radius: 7px;
+  box-shadow: 0 0 0 2px #102250;
+  display: grid;
+  place-items: center;
+}
+.radar-minimap-tools svg {
+  width: 26px;
+  height: 26px;
+}
+.radar-quick-actions {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 7px;
+}
+.radar-quick-actions button {
+  border: 2px solid white;
+  border-radius: 13px;
+  color: #081b40;
+  padding: 7px 1px;
+  background: linear-gradient(#9af8ff, #14c1fc);
+  box-shadow:
+    inset 0 0 0 2px #62efff,
+    0 0 0 2px #151244,
+    0 4px 0 #151244;
+  font-size: clamp(10px, 0.9vw, 14px);
+  line-height: 1.05;
+  font-weight: 800;
+}
+.radar-quick-actions svg {
+  display: block;
+  width: 31px;
+  height: 31px;
+  margin: 0 auto 4px;
+}
+.radar-quick-actions .quick-report {
+  background: linear-gradient(#fff57b, #ffc519);
+  box-shadow:
+    inset 0 0 0 2px #fff1a0,
+    0 0 0 2px #151244,
+    0 4px 0 #151244;
+}
+.radar-quick-actions .quick-emergency {
+  background: linear-gradient(#ff9f9f, #f3214e);
+  color: white;
+  box-shadow:
+    inset 0 0 0 2px #ffa8c3,
+    0 0 0 2px #151244,
+    0 4px 0 #151244;
+}
+.radar-quick-actions .quick-message {
+  background: linear-gradient(#ffd4ff, #c56afb);
+  box-shadow:
+    inset 0 0 0 2px #f6c1ff,
+    0 0 0 2px #151244,
+    0 4px 0 #151244;
+}
+.radar-dashboard .campus-map-panel {
+  margin-bottom: 64px;
+  position: relative;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  border: 4px solid #f0cfff;
+  border-radius: 16px;
+  background: #18244e;
+  box-shadow:
+    0 0 0 3px #1a1342,
+    0 0 0 7px #ac61ef,
+    inset 0 0 0 3px #5abef9;
+  overflow: visible;
+}
+.radar-map-heading {
+  height: 79px;
+  flex: 0 0 79px;
+  position: relative;
+  background: linear-gradient(#3064d5, #244d9c);
+  border-bottom: 4px solid #21154f;
+  border-radius: 11px 11px 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 15px;
+}
+.radar-element-icons {
+  display: flex;
+  gap: 15px;
+  color: #ffdb27;
+}
+.radar-element-icons svg {
+  width: 24px;
+  height: 30px;
+  fill: currentColor;
+  filter: drop-shadow(2px 2px #102447);
+}
+.radar-element-icons svg:first-child {
+  color: #6ded3b;
+}
+.radar-element-icons svg:nth-child(2) {
+  color: #38d7ff;
+}
+.radar-element-icons svg:last-child {
+  color: #ff6838;
+}
+.radar-map-title {
+  position: absolute;
+  z-index: 4;
+  left: 27%;
+  right: 27%;
+  top: -10px;
+  text-align: center;
+  border: 4px solid #252045;
+  outline: 4px solid #d192ff;
+  border-radius: 16px;
+  background: linear-gradient(#fffefa, #fff3d7);
+  color: #111b3e;
+  box-shadow:
+    0 0 0 7px #6b429f,
+    0 0 0 9px #191c48;
+  line-height: 0.98;
+  padding: 7px 3px 9px;
+  font-style: italic;
+  font-family: Impact, "Arial Narrow", sans-serif;
+}
+.radar-map-title strong {
+  display: block;
+  font-size: clamp(17px, 1.85vw, 31px);
+  font-weight: 900;
+}
+.radar-map-title em {
+  color: #9e1726;
+}
+.radar-map-title b {
+  display: block;
+  color: #765014;
+  font-size: clamp(20px, 2.3vw, 38px);
+}
+.radar-map-title > span {
+  position: absolute;
+  top: calc(100% + 3px);
+  left: -1%;
+  width: 102%;
+  background: #5d368e;
+  border: 2px solid #fffbff;
+  box-shadow: 0 0 0 2px #232047;
+  padding: 4px 1px;
+  font:
+    700 clamp(7px, 0.8vw, 13px) Arial,
+    sans-serif;
+  color: #fff;
+  border-radius: 8px;
+  white-space: nowrap;
+}
+.radar-floor-button {
+  display: flex;
+  gap: 15px;
+  color: #66f2e4;
+  padding: 6px;
+}
+.radar-floor-button svg {
+  width: 29px;
+  height: 29px;
+  fill: #1fc1ca;
+}
+.radar-floor-button:disabled {
+  opacity: 0.5;
+}
+.radar-dashboard .campus-map-toolbar {
+  position: absolute;
+  top: 79px;
+  left: 0;
+  right: 0;
+  padding: 4px 9px;
+  font-size: 10px;
+  color: #fff;
+  background: #14264bbb;
+  z-index: 3;
+  height: 28px;
+}
+.radar-dashboard .campus-map-toolbar button {
+  width: 22px;
+  height: 22px;
+  background: #223c74;
+  color: white;
+  border-color: #81c9f5;
+}
+.radar-dashboard .campus-map-toolbar output {
+  color: white;
+}
+.radar-dashboard .campus-viewport {
+  flex: 1;
+  min-height: 0;
+  max-height: none;
+  background: #7cbe65;
+  width: 100%;
+  border-left: 3px solid #333366;
+  border-right: 3px solid #333366;
+}
+.radar-dashboard .campus-viewport--indoor {
+  background: #18365f;
+}
+.radar-map-legend {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex: 0 0 35px;
+  padding: 3px 10px;
+  margin: 0 5px 5px;
+  border: 2px solid #c9afff;
+  border-radius: 9px;
+  background: #fffcf0;
+  color: #17162b;
+  font-size: 9px;
+  line-height: 1;
+}
+.radar-map-legend > strong {
+  color: white;
+  background: #52318d;
+  padding: 8px;
+  font-size: 15px;
+  border-radius: 5px;
+}
+.radar-map-legend > span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.radar-map-legend i {
+  display: block;
+  width: 30px;
+  height: 20px;
+  border: 2px solid #25653c;
+  background: #65c83f;
+}
+.radar-map-legend .legend-road {
+  background: #c5c5e2;
+  border-color: #64578b;
+}
+.radar-map-legend .legend-route {
+  width: 24px;
+  height: 3px;
+  border: none;
+  background: #ffe02e;
+  box-shadow: 0 1px #855a23;
+}
+.radar-map-legend svg {
+  color: #257bb7;
+  width: 25px;
+  height: 25px;
+}
+.radar-current-mission {
+  line-height: 1.15;
+  position: absolute;
+  z-index: 4;
+  right: -4px;
+  bottom: -54px;
+  width: min(330px, 48%);
+  padding: 12px 10px 6px;
+  color: #15254f;
+  background: linear-gradient(#fffdfa, #c6d6f3);
+  border-color: #78d1ff;
+  text-align: left;
+  border-radius: 14px;
+}
+.radar-current-mission > span {
+  position: absolute;
+  top: -10px;
+  left: 12px;
+  background: #ffdc20;
+  color: #182341;
+  border: 2px solid #fffb9f;
+  outline: 2px solid #64531c;
+  border-radius: 14px;
+  padding: 1px 12px;
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  font-size: 15px;
+  font-weight: 800;
+}
+.radar-current-mission > span svg {
+  width: 16px;
+  height: 16px;
+}
+.radar-current-mission > div {
+  display: flex;
+  gap: 7px;
+  align-items: center;
+}
+.radar-current-mission > div > svg {
+  color: #2185cf;
+  width: 27px;
+  height: 27px;
+  flex-shrink: 0;
+}
+.radar-current-mission > div > svg:last-child {
+  color: #bd9100;
+}
+.radar-current-mission p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.15;
+}
+.radar-current-mission small {
+  display: block;
+  font-size: 11px;
+}
+.radar-assistant {
+  display: flex;
+  align-items: flex-end;
+  position: relative;
+  margin: 18px -9px -5px;
+  z-index: 5;
+  min-height: 130px;
+}
+.radar-mascot {
+  width: 135px;
+  flex: 0 0 135px;
+  height: 162px;
+  image-rendering: pixelated;
+  filter: drop-shadow(2px 3px 0 white);
+}
+.radar-speech {
+  position: relative;
+  background: linear-gradient(white, #dce9ff);
+  border: 3px solid #172350;
+  border-radius: 22px;
+  color: #14204d;
+  padding: 17px 10px 10px;
+  width: 240px;
+  min-width: 170px;
+  margin-left: -20px;
+  margin-bottom: 24px;
+  text-align: left;
+  font-size: 12px;
+  line-height: 1.2;
+  box-shadow: 0 0 0 2px white;
+}
+.radar-speech strong {
+  position: absolute;
+  top: -16px;
+  left: 8px;
+  padding: 4px 10px;
+  border: 2px solid white;
+  background: #ffe02b;
+  color: #151a32;
+  border-radius: 17px;
+  font-size: 14px;
+  white-space: nowrap;
+}
+.radar-speech > svg {
+  width: 15px;
+  height: 15px;
+  float: right;
+}
+.radar-bottom-nav {
+  height: 116px;
+  flex: 0 0 116px;
+  display: flex;
+  justify-content: center;
+  align-items: end;
+  gap: 15px;
+  padding: 20px 12% 15px;
+  position: relative;
+  z-index: 5;
+  background: linear-gradient(
+    transparent 20%,
+    #683cb0 30%,
+    #2a1f66 80%,
+    #8956e3 92%,
+    #5c58b4 97%
+  );
+  border-bottom: 5px solid #9f7dfa;
+}
+.radar-bottom-item {
+  flex: 1;
+  min-width: 0;
+  max-width: 119px;
+  display: flex;
+  position: relative;
+}
+.radar-bottom-item .game-nav-button {
+  width: 100%;
+  height: 78px;
+  padding: 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  justify-content: center;
+  font-size: clamp(12px, 1.2vw, 19px);
+  border-radius: 17px;
+}
+.radar-bottom-item .game-icon {
+  width: 36px;
+  height: 36px;
+}
+.radar-bottom-item:nth-child(5) {
+  margin-left: 112px;
+}
+.radar-center-emblem {
+  position: absolute;
+  right: calc(100% + 17px);
+  bottom: -1px;
+}
+.radar-center-emblem .radar-emblem {
+  width: 96px;
+  border-width: 6px;
+  box-shadow:
+    0 0 0 7px #6592ea,
+    0 0 0 10px #b1faff,
+    0 0 18px 10px #6d72ff,
+    inset 4px 0 0 #ffffff80;
+}
+.radar-control-deck {
+  padding: 35px 24px;
+  background: #0b214bec;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(240px, 0.7fr);
+  gap: 24px;
+}
+.radar-control-deck > .live-location-panel {
+  grid-column: 1 / -1;
+  width: 100%;
+  margin: 0;
+}
+.radar-control-deck .campus-sidebar {
+  grid-column: 2;
+  grid-row: 2;
+}
+.radar-manual-controls {
+  grid-column: 1;
+  grid-row: 2;
+}
+.radar-dashboard .campus-directory,
+.radar-dashboard .campus-controls,
+.radar-dashboard .live-location-panel {
+  background: #142a5c;
+  color: white;
+  border-color: #718ed4;
+  border-radius: 15px;
+  box-shadow: inset 0 0 0 2px #243a77;
+}
+.radar-dashboard .campus-directory h2,
+.radar-dashboard .campus-controls h2,
+.radar-dashboard .campus-small,
+.radar-dashboard .campus-eyebrow,
+.radar-dashboard .campus-note,
+.radar-dashboard .campus-controls p,
+.radar-dashboard .location-help {
+  color: #d2dfff;
+}
+.radar-dashboard .campus-location {
+  color: white;
+}
+.radar-dashboard .campus-location small {
+  color: #afc2ec;
+}
+.radar-dashboard .campus-location:hover,
+.radar-dashboard .campus-location.is-selected {
+  background: #263e7a;
+}
+.radar-dashboard .campus-place-details {
+  background: #243870;
+  border-color: #7d92bf;
+}
+.radar-dashboard .campus-place-details p {
+  color: white;
+}
+.radar-dashboard .campus-status {
+  background: #1c3169;
+  border: 1px solid #86a5ee;
+  border-radius: 12px;
+}
+.radar-dashboard .campus-status p {
+  color: white;
+}
+.radar-dashboard .campus-map-bottom {
+  color: white;
+  background: #182d60;
+  border-radius: 10px;
+  margin: 0 0 15px;
+}
+.radar-dashboard .campus-map-bottom label {
+  color: white;
+}
+.radar-dashboard .campus-secondary {
+  color: #172850;
+  background: #e5f0ff;
+  border-color: #85c9ff;
+}
+.radar-dashboard .campus-primary {
+  background: #345bb1;
+  color: white;
+  border-color: #84caff;
+}
+.radar-dashboard .campus-footer {
+  color: #bed8ff;
+  margin: 0;
+  padding: 20px 25px;
+}
+.radar-dashboard .campus-footer i {
+  color: #ffe74b;
+}
+.radar-dialog {
+  position: fixed;
+  z-index: 120;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(600px, calc(100vw - 32px));
+  max-height: calc(100dvh - 48px);
+  overflow: auto;
+  color: white;
+  padding: 22px;
+  font-family: "Trebuchet MS", Arial, sans-serif;
+  outline: none;
+}
+.radar-dialog > header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.radar-dialog header h2 {
+  margin: 0;
+  font-size: 24px;
+}
+.radar-dialog header button {
+  margin-left: auto;
+  color: white;
+}
+.radar-dialog p {
+  font-size: 14px;
+  line-height: 1.55;
+}
+.radar-dialog-kicker {
+  color: #a4e8ff;
+  font-weight: 700;
+  margin: 0 0 10px;
+}
+.radar-muted {
+  color: #bdc9e6;
+}
+.radar-dialog-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.radar-dialog .game-nav-button {
+  font-size: 14px;
+}
+.radar-dialog .game-nav-button svg {
+  width: 20px;
+  height: 20px;
+}
+.radar-building-preview {
+  margin: 14px 0;
+  padding: 10px;
+  border: 2px solid #81b5e4;
+  border-radius: 12px;
+  background: #76b968;
+}
+.radar-building-preview svg {
+  display: block;
+  width: 100%;
+  height: 145px;
+  image-rendering: pixelated;
+}
+.radar-notification {
+  background: #1d3469;
+  border: 1px solid #788cc3;
+  border-radius: 12px;
+  padding: 15px;
+  margin-top: 20px;
+}
+.radar-notification a {
+  display: block;
+  margin: 12px 0 0;
+  color: #91e6ff;
+}
+.radar-room-picker {
+  display: grid;
+  gap: 15px;
+  margin-top: 20px;
+}
+.radar-room-picker label {
+  display: grid;
+  gap: 8px;
+}
+.radar-room-picker select {
+  background: #fff;
+  color: #192750;
+  padding: 10px;
+  border-radius: 8px;
+}
+.radar-student-list {
+  display: grid;
+  gap: 14px;
+}
+@media (min-width: 1800px) {
+  .radar-stage {
+    max-width: 1900px;
+    margin: auto;
+  }
+}
+@media (max-width: 1150px) and (min-width: 801px) {
+  .radar-header {
+    grid-template-columns: 1.3fr 1.7fr 1.1fr 50px 1.1fr;
+    gap: 12px;
+  }
+  .radar-clock {
+    display: none;
+  }
+  .radar-brand .radar-emblem {
+    width: 55px;
+  }
+  .radar-left-column {
+    padding-top: 20px;
+  }
+  .game-nav-button {
+    gap: 7px;
+    padding: 8px 6px;
+    min-height: 45px;
+  }
+  .game-icon {
+    width: 28px;
+    height: 28px;
+  }
+  .radar-mascot {
+    width: 85px;
+    flex-basis: 85px;
+  }
+  .radar-speech {
+    min-width: 140px;
+    font-size: 10px;
+  }
+  .radar-bottom-nav {
+    padding-left: 8%;
+    padding-right: 8%;
+    gap: 10px;
+  }
+  .radar-bottom-item:nth-child(5) {
+    margin-left: 80px;
+  }
+  .radar-center-emblem .radar-emblem {
+    width: 65px;
+  }
+  .radar-map-title {
+    left: 23%;
+    right: 23%;
+  }
+  .radar-element-icons {
+    gap: 8px;
+  }
+  .radar-element-icons svg {
+    width: 15px;
+  }
+  .radar-floor-button {
+    gap: 4px;
+  }
+  .radar-floor-button svg {
+    width: 21px;
+  }
+  .campus-layout.radar-game-grid {
+    grid-template-columns: 180px minmax(0, 1fr) 230px;
+    gap: 14px;
+  }
+  .radar-quick-actions {
+    gap: 5px;
+  }
+  .radar-quick-actions svg {
+    width: 25px;
+  }
+  .radar-quick-actions button {
+    font-size: 10px;
+  }
+}
+@media (max-width: 800px) {
+  .radar-stage {
+    height: auto;
+    min-height: 100dvh;
+    padding: 8px 10px 0;
+    overflow: visible;
+  }
+  .radar-header {
+    height: auto;
+    flex-basis: auto;
+    grid-template-columns: 1fr 44px 1fr;
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+  .radar-brand {
+    grid-column: 1 / 3;
+    grid-row: 1;
+  }
+  .radar-brand h1 {
+    font-size: 39px;
+  }
+  .radar-brand .radar-emblem {
+    width: 52px;
+  }
+  .radar-brand small {
+    font-size: 9px;
+  }
+  .radar-school {
+    grid-column: 1 / 3;
+    grid-row: 2;
+    height: 43px;
+    margin: 0;
+  }
+  .radar-school select {
+    font-size: 11px;
+  }
+  .radar-school > svg:first-child {
+    width: 20px;
+  }
+  .radar-safety {
+    grid-column: 3;
+    grid-row: 2;
+    height: 43px;
+    margin: 0;
+    font-size: 10px;
+    gap: 4px;
+  }
+  .radar-safety > svg {
+    width: 20px;
+  }
+  .radar-safety small {
+    font-size: 8px;
+  }
+  .radar-student-menu {
+    grid-column: 3;
+    grid-row: 1;
+    height: 47px;
+    margin: 5px 0 0;
+  }
+  .radar-student-menu > button {
+    font-size: 11px;
+    gap: 3px;
+  }
+  .radar-avatar {
+    width: 37px;
+    height: 37px;
+  }
+  .radar-student-menu small {
+    font-size: 8px;
+  }
+  .radar-clock,
+  .radar-bell {
+    display: none;
+  }
+  .campus-layout.radar-game-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 19px;
+  }
+  .radar-left-column {
+    padding: 0;
+  }
+  .radar-left-nav {
+    padding: 5px;
+    border-width: 2px;
+    border-radius: 14px;
+    box-shadow:
+      0 0 0 2px #7748bd,
+      0 0 0 4px #1c245a;
+  }
+  .radar-nav-buttons {
+    display: flex;
+    flex-direction: row;
+    gap: 7px;
+    overflow-x: auto;
+    padding: 3px;
+    scrollbar-width: thin;
+  }
+  .radar-nav-buttons .game-nav-button {
+    min-width: 115px;
+    min-height: 37px;
+    padding: 6px;
+    font-size: 11px;
+    gap: 5px;
+    border-radius: 8px;
+  }
+  .radar-nav-buttons .game-icon {
+    width: 23px;
+    height: 23px;
+  }
+  .radar-nav-buttons .radar-badge {
+    min-width: 17px;
+    height: 17px;
+    font-size: 10px;
+    top: -4px;
+    right: -3px;
+    line-height: 13px;
+  }
+  .radar-nav-landscape,
+  .radar-assistant {
+    display: none;
+  }
+  .radar-dashboard .campus-map-panel {
+    height: 520px;
+    min-height: 490px;
+    border-width: 3px;
+    margin: 0 3px;
+  }
+  .radar-map-heading {
+    height: 56px;
+    flex-basis: 56px;
+    padding: 4px 8px;
+  }
+  .radar-map-title {
+    left: 20%;
+    right: 20%;
+    border-width: 2px;
+    outline-width: 2px;
+    padding: 4px 0;
+    box-shadow: 0 0 0 5px #624a9e;
+  }
+  .radar-map-title strong {
+    font-size: 15px;
+  }
+  .radar-map-title b {
+    font-size: 22px;
+  }
+  .radar-map-title > span {
+    font-size: 6px;
+  }
+  .radar-element-icons {
+    gap: 4px;
+  }
+  .radar-element-icons svg {
+    width: 12px;
+    height: 19px;
+  }
+  .radar-element-icons svg:nth-last-child(-n + 2) {
+    display: none;
+  }
+  .radar-floor-button {
+    gap: 4px;
+    padding: 0;
+  }
+  .radar-floor-button svg {
+    width: 20px;
+  }
+  .radar-dashboard .campus-map-toolbar {
+    top: 56px;
+  }
+  .radar-map-legend {
+    gap: 5px;
+    padding: 3px;
+    font-size: 7px;
+    flex-basis: 28px;
+    margin-bottom: 52px;
+  }
+  .radar-map-legend > strong {
+    font-size: 10px;
+    padding: 5px;
+  }
+  .radar-map-legend i {
+    width: 17px;
+    height: 13px;
+  }
+  .radar-map-legend svg {
+    width: 18px;
+  }
+  .radar-current-mission {
+    line-height: 1.15;
+    bottom: 7px;
+    right: 7px;
+    width: 64%;
+    padding: 9px 6px 4px;
+  }
+  .radar-current-mission > span {
+    font-size: 11px;
+    top: -13px;
+  }
+  .radar-current-mission p {
+    font-size: 10px;
+  }
+  .radar-current-mission small {
+    font-size: 8px;
+  }
+  .radar-current-mission > div > svg {
+    width: 19px;
+    height: 19px;
+  }
+  .radar-right-column {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin: 12px 4px 0;
+    padding: 0;
+  }
+  .radar-right-column .radar-panel:first-child {
+    grid-column: 1 / -1;
+  }
+  .radar-panel {
+    border-radius: 15px;
+    box-shadow:
+      inset 0 0 0 2px #4272d8,
+      0 0 0 2px #6e66c6,
+      0 0 0 4px #142451;
+    padding: 7px;
+  }
+  .radar-panel h2 {
+    font-size: 14px;
+    gap: 4px;
+  }
+  .radar-panel h2 > svg {
+    width: 17px;
+  }
+  .radar-weather {
+    grid-template-columns: 60px 1fr 50px 1fr;
+    padding: 0 0 6px;
+    gap: 3px;
+  }
+  .radar-weather-icon {
+    width: 50px;
+    height: 44px;
+  }
+  .radar-weather h3 {
+    font-size: 13px;
+  }
+  .radar-feed-label {
+    font-size: 7px;
+  }
+  .radar-weather > strong {
+    font-size: 18px;
+  }
+  .radar-weather > div:last-child {
+    font-size: 9px;
+  }
+  .radar-weather > div:last-child svg {
+    width: 12px;
+    height: 12px;
+  }
+  .radar-disaster-watch {
+    padding: 6px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .radar-disaster-watch h3 {
+    grid-column: 1 / -1;
+    font-size: 12px;
+  }
+  .radar-disaster-watch > div {
+    font-size: 10px;
+    gap: 3px;
+  }
+  .radar-disaster-watch > div svg {
+    width: 14px;
+  }
+  .radar-minimap-body {
+    gap: 6px;
+  }
+  .radar-minimap-body > svg {
+    height: 115px;
+    width: calc(100% - 28px);
+  }
+  .radar-minimap-tools button {
+    width: 24px;
+    height: 26px;
+  }
+  .radar-minimap-tools svg {
+    width: 19px;
+  }
+  .radar-quick-actions {
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+  .radar-quick-actions button {
+    display: flex;
+    align-items: center;
+    font-size: 8px;
+    gap: 2px;
+    padding: 5px 2px;
+    border-radius: 7px;
+  }
+  .radar-quick-actions svg {
+    width: 21px;
+    height: 21px;
+    margin: 0;
+    flex-shrink: 0;
+  }
+  .radar-bottom-nav {
+    height: auto;
+    flex-basis: auto;
+    padding: 20px 0 10px;
+    gap: 6px;
+    margin: 10px -10px 0;
+    flex-wrap: wrap;
+  }
+  .radar-bottom-item {
+    min-width: calc(25% - 10px);
+    max-width: none;
+    flex: 0 0 calc(25% - 10px);
+  }
+  .radar-bottom-item .game-nav-button {
+    height: 61px;
+    font-size: 11px;
+    border-radius: 10px;
+    gap: 1px;
+  }
+  .radar-bottom-item .game-icon {
+    width: 26px;
+    height: 26px;
+  }
+  .radar-bottom-item:nth-child(5) {
+    margin-left: 0;
+  }
+  .radar-center-emblem {
+    display: none;
+  }
+  .radar-control-deck {
+    padding: 20px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  .radar-dashboard .campus-mobile-controls {
+    margin: 0;
+    background: #152e62;
+    color: white;
+    border-top-color: #87a7ed;
+    padding: 5px;
+  }
+  .radar-dashboard .campus-mobile-controls > span {
+    font-size: 8px;
+  }
+  .radar-dashboard .campus-mobile-controls .campus-dpad {
+    transform: scale(0.8);
+    transform-origin: right center;
+  }
+  .radar-dialog {
+    padding: 16px;
+  }
+}
+
+.radar-landscape-background {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 38%;
+  z-index: -1;
+  pointer-events: none;
+  image-rendering: pixelated;
+  mask-image: linear-gradient(transparent, black 24%);
+}
+@media (max-width: 800px) {
+  .radar-landscape-background {
+    height: 220px;
+  }
+}

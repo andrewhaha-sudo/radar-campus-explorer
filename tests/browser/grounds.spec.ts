@@ -32,6 +32,7 @@ test("clicking open grass routes the character there and allows manual walking a
     { name: "Pond", x: 247, y: 714 },
   ]) {
     await page.getByRole("button", { name: `Explore ${destination.name}`, exact: true }).click();
+    await page.getByRole("dialog").getByRole("button", { name: "Walk to entrance", exact: true }).click();
     await expect.poll(async () => {
       const point = await actorPosition();
       return Math.hypot(point.x - destination.x, point.y - destination.y);

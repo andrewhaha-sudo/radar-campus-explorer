@@ -1,14 +1,20 @@
-# Campus Explorer
+# RADAR Campus Explorer
 
-A standalone, interactive pixel-art school map. The home page opens directly to the
-campus. Walk between buildings, explore the supplied indoor hallways, choose a
-classroom, and travel between floors using the internal stairs.
+A standalone, interactive pixel-art school map inside the reference-inspired RADAR
+game dashboard. Walk between buildings, explore the supplied indoor hallways,
+choose a classroom, and travel between floors using the internal stairs.
 
-The map opens directly, without the RADAR dashboard or a login wall. Map navigation,
+This repository runs independently of the original RADAR application. The map opens
+directly without a login wall. Map navigation,
 room photos and a device-only student profile work in the browser. Separate student
 accounts use Supabase for private profiles, photos and shared campus characters.
 The public connection settings for your separate project are included; apply the
 [student database setup](docs/STUDENT-PROFILES.md) before using online accounts.
+
+The blue-and-purple dashboard includes navigation, building information, a mini-map,
+an actual clock, a profile menu, static assistant help and classroom-card missions.
+Weather, hazard, AI, messaging and emergency services explicitly show unavailable
+states until configured. See [dashboard behavior and integrations](docs/DASHBOARD.md).
 
 ## Run on your computer
 
@@ -27,7 +33,8 @@ again with `npm run dev`. There is no seed command or API server to start.
 
 ## Use the map
 
-- Click a building, walkway or open grass to walk there. The lawns, garden clearings,
+- Click a building to view information, then choose **Walk to entrance**, **Explore
+  building**, or **Floor plan**. Click a walkway or open grass to walk there. The lawns, garden clearings,
   court, pond bank, gazebo, flagpole and canteen entrance have connected routes.
 - Use **WASD**, **arrow keys**, or the on-screen direction buttons to move manually.
   Manual movement cancels an automatic route.
@@ -41,6 +48,11 @@ again with `npm run dev`. There is no seed command or API server to start.
   image, then click the same room later to see it. **Walk to this room** starts a route.
 - Open **Indoor floor plans** to view the complete source sheet or an individual building.
 - Use zoom, expand, or **Original artwork only** to inspect the maps.
+- Use **Inspect** for room and route controls, and **Settings** for identity, private
+  GPS and display controls. Breeze, route-arrow and walkable-area preferences persist
+  on this device. GPS permission is never enabled automatically.
+- Open three different room cards to complete **Current Mission**. Progress stays
+  on this device, separately for each signed-in account or the device profile.
 - Open **Student profile** or click your own character to create a trainer card,
   change your boy/girl character, and upload or take a profile photo.
 
@@ -154,6 +166,8 @@ installed on your machine, set `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` when runnin
 ## Source
 
 - `src/App.tsx`: standalone entry page
+- `src/components/dashboard/`: dashboard panels, navigation, assistant, mini-map and dialogs
+- `src/lib/dashboard-config.ts`: school represented by the supplied campus artwork
 - `src/components/map/CampusExplorer.tsx`: map, controls, character and scene transitions
 - `src/components/map/campus-data.ts`: map bounds, walking corridors, rooms and entrances
 - `src/components/map/navigation.ts`: collision checks and A* pathfinding
