@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { PreparednessHub } from "../preparedness/PreparednessHub";
 import * as Dialog from "@radix-ui/react-dialog";
 import {
   Building2,
@@ -184,6 +185,7 @@ const descriptions: Record<string, { title: string; text: string }> = {
   },
 };
 export function DashboardDialog({
+  ownerId,
   action,
   onClose,
   onRoom,
@@ -192,6 +194,7 @@ export function DashboardDialog({
   students,
   onStudent,
 }: {
+  ownerId: string;
   action: RadarAction;
   onClose: () => void;
   onRoom: (room: Room) => void;
@@ -309,27 +312,7 @@ export function DashboardDialog({
               </button>
             </div>
           )}
-          {action === "resources" && (
-            <ul>
-              <li>During earthquake shaking: drop, cover and hold on.</li>
-              <li>
-                Follow staff instructions and the school's approved evacuation
-                plan.
-              </li>
-              <li>
-                Keep exits clear and take part in school preparedness drills.
-              </li>
-              <li>
-                <a
-                  href="https://www.phivolcs.dost.gov.ph/"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Read current PHIVOLCS guidance ↗
-                </a>
-              </li>
-            </ul>
-          )}
+          {action === "resources" && <PreparednessHub key={ownerId} ownerId={ownerId} />}
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>

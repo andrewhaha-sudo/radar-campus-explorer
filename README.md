@@ -191,3 +191,10 @@ live app or verified emergency guidance.
 Map coordinates use the images' original pixels, independent of screen size or zoom.
 The `public/sw.js` file retires an old full-app service worker if this site previously
 hosted that version; the standalone app does not register a new service worker.
+
+## Preparedness practice
+
+Open **Resources** for earthquake, flood and fire quizzes, practice badges, a
+supervised-drill checklist and downloadable progress. This original module is
+inspired by ResQverse; it stores practice locally and adds no live alert or SOS
+service. See [feature scope and storage](docs/RESQVERSE.md).

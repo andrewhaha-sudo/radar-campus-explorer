@@ -1721,6 +1721,7 @@ export function CampusExplorer() {
       )}
       {dashboardDialog && (
         <DashboardDialog
+          ownerId={ownerId}
           action={dashboardDialog}
           onClose={() => setDashboardDialog(null)}
           onRoom={(room) => {
