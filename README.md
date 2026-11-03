@@ -165,6 +165,12 @@ installed on your machine, set `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` when runnin
 
 ## Source
 
+The [nine-repository evaluation](docs/research/REPOSITORY-EVALUATION.md) compares
+external mapping and routing bases with pinned revisions and actual test results.
+The isolated [LifeRouter compatibility prototype](experiments/liferouter/README.md)
+exports the existing campus geometry for simulation; it is not connected to the
+live app or verified emergency guidance.
+
 - `src/App.tsx`: standalone entry page
 - `src/components/dashboard/`: dashboard panels, navigation, assistant, mini-map and dialogs
 - `src/lib/dashboard-config.ts`: school represented by the supplied campus artwork
