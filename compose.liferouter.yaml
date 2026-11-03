@@ -1,0 +1,16 @@
+services:
+  router:
+    build:
+      context: .
+      dockerfile: services/liferouter/Dockerfile
+    restart: unless-stopped
+  web:
+    build:
+      context: .
+      dockerfile: deploy/liferouter/Dockerfile.web
+    ports:
+      - "127.0.0.1:8080:80"
+    depends_on:
+      router:
+        condition: service_healthy
+    restart: unless-stopped

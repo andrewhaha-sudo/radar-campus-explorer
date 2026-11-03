@@ -3,7 +3,8 @@
 This original adapter reuses RADAR's existing walkability geometry, room IDs,
 building entrances and stair connections. It targets LifeRouter commit
 `99e468e4ae7b382832dcf0026914c4d08ce53ff0` (Apache-2.0).
-No LifeRouter source is copied into this app, and no new runtime dependency is added.
+The generator itself has no engine dependency. The companion Go service now imports
+LifeRouter v1.0.0: see [integration and running instructions](../../docs/LIFEROUTER.md).
 
 Generate with Node.js 24 from the repository root:
 
@@ -45,15 +46,10 @@ portal endpoints, and flood-fills the grids to verify that all 35 rooms reach a
 portal. It does **not** establish that every room reaches a real safe outdoor exit,
 particularly Building 6. The test passed during this evaluation.
 
-## What remains for integration
+## Runtime integration
 
-LifeRouter is a Go/NATS service, not a Vercel browser component. It requires an
-adapter to its external position/region/cost services, authenticated HTTP/WebSocket
-access for the web app, approved destinations and versioned hazard restrictions.
-Do not expose NATS directly to students or publish the app's private GPS readings.
-The current app remains unchanged and uses its existing local navigation engine.
-
-The engine's grid, agent and emergency package tests passed. The initial API
-integration run failed `TestAPI_EmergencyFlowWatch_MultipleFloors` with "no responders";
-three isolated retries passed. Resolve that startup/readiness race before selecting
-it for a live deployment. This is a compatibility experiment, not a deployed routing service.
+The tested adapter is now used by `services/liferouter`, which embeds the public
+LifeRouter API behind a bounded HTTP bridge. It checks subscription readiness,
+uses temporary simulated agents, and never accepts GPS positions. See
+[LifeRouter integration](../../docs/LIFEROUTER.md) for setup, API tests and limitations.
+The compatibility export remains simulation geometry, not a verified evacuation plan.

@@ -29,7 +29,11 @@ npm run dev
 
 Open the **Local** address printed by Vite. If you already cloned this repository,
 stop the previous development server, run `git pull` and `npm ci`, then start it
-again with `npm run dev`. There is no seed command or API server to start.
+again with `npm run dev`. There is no seed command. Local routing needs no API server.
+
+For the optional LifeRouter engine, see [LifeRouter setup](docs/LIFEROUTER.md).
+Run the complete app and routing service with `docker compose -f compose.liferouter.yaml up --build -d`,
+then open http://localhost:8080 and select **LifeRouter (simulation)** in the routing controls.
 
 ## Use the map
 
