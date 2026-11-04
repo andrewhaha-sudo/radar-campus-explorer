@@ -4,7 +4,7 @@
 // array. Two parallel stacks (annotations vs map markers) share this algorithm.
 // Ported verbatim from v1 pushUndo/undo/redo, capped at UNDO_CAP=50.
 
-import { UNDO_CAP } from './types';
+import { UNDO_CAP } from './types.ts';
 
 /** A history holds the undo and redo stacks (arrays of JSON snapshots). */
 export interface History {

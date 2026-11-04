@@ -4,7 +4,7 @@
 // Ported verbatim from v1 canvasXY/toNorm. Parametrized on dims/rect instead
 // of reading DOM globals, so it is pure and unit-testable.
 
-import type { CanvasDims, ElementRect } from './types';
+import type { CanvasDims, ElementRect } from './types.ts';
 
 /** Screen client coords -> canvas pixel coords, accounting for CSS scaling of
  *  the canvas element (v1 canvasXY). */

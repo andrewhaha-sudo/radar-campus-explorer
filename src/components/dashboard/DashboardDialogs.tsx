@@ -1,4 +1,5 @@
-import { useRef, useState } from "react";
+import { lazy, Suspense, useRef, useState } from "react";
+const PreparednessSuite = lazy(() => import("../preparedness/PreparednessSuite").then(module => ({default: module.PreparednessSuite})));
 import * as Dialog from "@radix-ui/react-dialog";
 import {
   Building2,
@@ -152,15 +153,15 @@ const descriptions: Record<string, { title: string; text: string }> = {
   },
   alerts: {
     title: "Alerts & Updates",
-    text: "No live school alert or disaster feed is configured. Campus safety status is unverified; this screen cannot confirm that conditions are safe.",
+    text: "Government disaster feeds are not configured. School notices are available below when school services are activated. Campus safety status remains unverified.",
   },
   emergency: {
     title: "Emergency assistance",
-    text: "No emergency dispatch or school contact is configured. No alert has been sent. In an emergency, contact local emergency services directly using your phone and follow school staff instructions.",
+    text: "No alert has been sent. School help requests do not dispatch emergency services. In an emergency, contact local emergency services directly using your phone and follow school staff instructions.",
   },
   report: {
     title: "Report Hazard",
-    text: "Hazard reporting is unavailable until a school reporting service is configured. No report has been submitted. You can keep a room photo on this device using a classroom card.",
+    text: "No report has been submitted. Use the school report form below when school services are activated, or keep a reference photo using a classroom card.",
   },
   message: {
     title: "Message School",
@@ -184,6 +185,7 @@ const descriptions: Record<string, { title: string; text: string }> = {
   },
 };
 export function DashboardDialog({
+  ownerId,
   action,
   onClose,
   onRoom,
@@ -192,6 +194,7 @@ export function DashboardDialog({
   students,
   onStudent,
 }: {
+  ownerId: string;
   action: RadarAction;
   onClose: () => void;
   onRoom: (room: Room) => void;
@@ -309,27 +312,7 @@ export function DashboardDialog({
               </button>
             </div>
           )}
-          {action === "resources" && (
-            <ul>
-              <li>During earthquake shaking: drop, cover and hold on.</li>
-              <li>
-                Follow staff instructions and the school's approved evacuation
-                plan.
-              </li>
-              <li>
-                Keep exits clear and take part in school preparedness drills.
-              </li>
-              <li>
-                <a
-                  href="https://www.phivolcs.dost.gov.ph/"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Read current PHIVOLCS guidance ↗
-                </a>
-              </li>
-            </ul>
-          )}
+          {["resources","alerts","report","emergency"].includes(action) && <Suspense fallback={<p role="status">Loading preparedness tools…</p>}><PreparednessSuite key={`${ownerId}:${action}`} ownerId={ownerId} onSignIn={onProfile} initial={action==="emergency"?"emergency":action==="resources"?"learn":"school"} /></Suspense>}
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>

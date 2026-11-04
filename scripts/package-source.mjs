@@ -22,7 +22,7 @@ async function collect(dir) {
     else if (entry.isFile()) files.push(name);
   }
 }
-for (const dir of ["src", "public", "scripts", "tests", "docs", ".github"])
+for (const dir of ["src", "public", "scripts", "tests", "docs", ".github", "services", "experiments", "supabase", "deploy"])
   await collect(dir);
 for (const name of [
   "package.json",
@@ -38,6 +38,8 @@ for (const name of [
   "README.md",
   "LICENSE",
   "THIRD_PARTY_NOTICES.md",
+  "compose.liferouter.yaml",
+  ".dockerignore",
 ])
   files.push(name);
 for (const dir of [

@@ -5,7 +5,7 @@
 // numbering is GLOBAL by createdAt across all pages (v1 _commentNums), not
 // per-page. Pure - no DOM.
 
-import type { Annotation } from './types';
+import type { Annotation } from './types.ts';
 
 const r4 = (n: number) => +n.toFixed(4);
 

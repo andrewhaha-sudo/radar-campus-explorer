@@ -11,8 +11,10 @@ delete it. Undo/redo supports additions, edits, deletions and imported replaceme
 For keyboard placement, focus the drawing, use arrow keys and press Enter.
 
 Annotations save locally on this browser/device, independently per floor. They
-are shown over the corresponding indoor exploration scene. They are not uploaded
-to student accounts or a shared school database. Storage failures are displayed;
+are shown over the corresponding indoor exploration scene. They stay local until
+a staff member chooses **Publish new shared draft**, which creates a separate
+Pathfinder document without replacing the base floor. They are not uploaded to
+student accounts. Storage failures are displayed;
 export before closing if changes are only in memory. No safety resources are
 invented or seeded. A marker is a draft note, not a verified inspection finding
 or an evacuation route constraint.
@@ -25,7 +27,8 @@ invalid coordinates, unknown tools, duplicate IDs and excessive data. Import
 replaces the current floor's annotations; Undo restores the prior draft. Raw
 standalone Pathfinder exports require an explicit registration step and are not
 silently attached to a campus floor. Raster/PDF replacement and 3D registration
-are not part of this integration.
+are not performed by the device-draft editor; shared documents and scans use the
+full Pathfinder workspace.
 
 Coordinates are normalized relative to the displayed floor crop. Rendering maps
 them back to scene coordinates using the crop origin; synthesized interiors use

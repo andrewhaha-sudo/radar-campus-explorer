@@ -12,3 +12,7 @@ See ../../docs/PATHFINDER-PLATFORM.md for runtime and deployment requirements.
 The scan runtime now allows its embedded Wasm/blob worker on scan pages only,
 surfaces failed loads, supplies the stored filename to the decoder and reloads
 when switching scans. The integrated navigation wraps at phone widths.
+
+The annotation engine is now canonical for both the Svelte viewer and React
+device-draft editor. Internal imports use explicit TypeScript extensions for
+Node 24 tests. The optional same-origin LifeRouter proxy is a local addition.

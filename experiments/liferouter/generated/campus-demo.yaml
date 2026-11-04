@@ -1,0 +1,207 @@
+{
+  "app": {
+    "serverurl": "nats://127.0.0.1:4222"
+  },
+  "grid": {
+    "rows": 314,
+    "cols": 512,
+    "pxpercell": 1,
+    "cellsizem": 0.2,
+    "wallauracells": 0,
+    "layers": [
+      {
+        "name": "campus",
+        "img": "./campus.png"
+      },
+      {
+        "name": "a1",
+        "img": "./a1.png"
+      },
+      {
+        "name": "b1",
+        "img": "./b1.png"
+      },
+      {
+        "name": "b2",
+        "img": "./b2.png"
+      },
+      {
+        "name": "c1",
+        "img": "./c1.png"
+      },
+      {
+        "name": "c2",
+        "img": "./c2.png"
+      },
+      {
+        "name": "lab1",
+        "img": "./lab1.png"
+      },
+      {
+        "name": "d1",
+        "img": "./d1.png"
+      },
+      {
+        "name": "e1",
+        "img": "./e1.png"
+      },
+      {
+        "name": "e2",
+        "img": "./e2.png"
+      },
+      {
+        "name": "six1",
+        "img": "./six1.png"
+      },
+      {
+        "name": "six2",
+        "img": "./six2.png"
+      }
+    ],
+    "portals": [
+      {
+        "from": [
+          36.7,
+          26.900000000000002
+        ],
+        "fromlayer": 2,
+        "to": [
+          36.7,
+          19.1
+        ],
+        "tolayer": 3,
+        "traversalcost": 15,
+        "bidirectional": true
+      },
+      {
+        "from": [
+          66.7,
+          26.900000000000002
+        ],
+        "fromlayer": 4,
+        "to": [
+          66.7,
+          19.1
+        ],
+        "tolayer": 5,
+        "traversalcost": 15,
+        "bidirectional": true
+      },
+      {
+        "from": [
+          66.7,
+          26.900000000000002
+        ],
+        "fromlayer": 8,
+        "to": [
+          66.7,
+          19.1
+        ],
+        "tolayer": 9,
+        "traversalcost": 15,
+        "bidirectional": true
+      },
+      {
+        "from": [
+          66.7,
+          26.900000000000002
+        ],
+        "fromlayer": 10,
+        "to": [
+          66.7,
+          19.1
+        ],
+        "tolayer": 11,
+        "traversalcost": 15,
+        "bidirectional": true
+      },
+      {
+        "from": [
+          9.1,
+          20.5
+        ],
+        "fromlayer": 0,
+        "to": [
+          81.30000000000001,
+          30.3
+        ],
+        "tolayer": 4,
+        "traversalcost": 15,
+        "bidirectional": true
+      },
+      {
+        "from": [
+          20.5,
+          20.5
+        ],
+        "fromlayer": 0,
+        "to": [
+          16.5,
+          30.3
+        ],
+        "tolayer": 6,
+        "traversalcost": 15,
+        "bidirectional": true
+      },
+      {
+        "from": [
+          30.3,
+          20.5
+        ],
+        "fromlayer": 0,
+        "to": [
+          46.900000000000006,
+          30.3
+        ],
+        "tolayer": 2,
+        "traversalcost": 15,
+        "bidirectional": true
+      },
+      {
+        "from": [
+          43.5,
+          20.5
+        ],
+        "fromlayer": 0,
+        "to": [
+          16.5,
+          30.3
+        ],
+        "tolayer": 1,
+        "traversalcost": 15,
+        "bidirectional": true
+      },
+      {
+        "from": [
+          55.7,
+          20.5
+        ],
+        "fromlayer": 0,
+        "to": [
+          16.5,
+          30.3
+        ],
+        "tolayer": 7,
+        "traversalcost": 15,
+        "bidirectional": true
+      },
+      {
+        "from": [
+          17.3,
+          35.9
+        ],
+        "fromlayer": 0,
+        "to": [
+          81.30000000000001,
+          30.3
+        ],
+        "tolayer": 8,
+        "traversalcost": 15,
+        "bidirectional": true
+      }
+    ]
+  },
+  "pathfinding": {
+    "freemoveheight": 0
+  }
+}

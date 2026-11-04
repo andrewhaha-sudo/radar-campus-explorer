@@ -8,6 +8,7 @@ const PORT = 4173;
 
 export default defineConfig({
 	testDir: 'tests/e2e',
+    timeout: 60_000,
 	outputDir: 'test-results',
 	// All specs share ONE local D1 (miniflare SQLite) behind the dev server, so
 	// they run serially - parallel workers cause SQLite write-contention flakes

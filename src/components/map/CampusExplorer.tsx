@@ -37,6 +37,7 @@ import { useCampusStudents } from "../student/useCampusStudents";
 import type { Character, Direction } from "../../lib/student-profile";
 import type { Place, Room, SceneId } from "./campus-data";
 import { canTravel, findPath, isWalkable } from "./navigation";
+import { requestLifeRoute } from "./liferouter";
 import type { Point } from "./navigation";
 import "./campus-explorer.css";
 import { cn } from "../../lib/cn";
@@ -199,6 +200,10 @@ export function CampusExplorer() {
     "Welcome! Choose a building, or walk in through the main gate.",
   );
   const [route, setRoute] = useState<Point[]>([]);
+  const [routeEngine, setRouteEngine] = useState<"local" | "liferouter">("local");
+  const [routeLoading, setRouteLoading] = useState(false);
+  const routeRequest = useRef<AbortController | null>(null);
+  useEffect(() => () => routeRequest.current?.abort(), []);
   const [showRoute, setShowRoute] = useState(() =>
     readPreference("showRoute", true),
   );
@@ -313,6 +318,9 @@ export function CampusExplorer() {
   }, []);
 
   const cancelMovement = useCallback(() => {
+    routeRequest.current?.abort();
+    routeRequest.current = null;
+    setRouteLoading(false);
     path.current = [];
     arrival.current = null;
     pendingRoom.current = null;
@@ -328,6 +336,9 @@ export function CampusExplorer() {
   };
 
   const changeScene = useCallback((id: SceneId, spawn?: Point) => {
+    routeRequest.current?.abort();
+    routeRequest.current = null;
+    setRouteLoading(false);
     const point = spawn ?? scenes[id].spawn;
     path.current = [];
     arrival.current = null;
@@ -348,6 +359,40 @@ export function CampusExplorer() {
   const walkTo = useCallback(
     (point: Point, onArrival?: () => void) => {
       if (locationView) return false;
+      if (routeEngine === "liferouter") {
+        if (privateSession || correction) return false;
+        routeRequest.current?.abort();
+        const controller = new AbortController();
+        routeRequest.current = controller;
+        held.current.clear();
+        path.current = [];
+        arrival.current = null;
+        setRoute([]);
+        setMoving(false);
+        setRouteLoading(true);
+        void requestLifeRoute(sceneId, { x: player.current.x, y: player.current.y }, point, scenes[sceneId].walkable, controller.signal)
+          .then((next) => {
+            if (controller.signal.aborted) return;
+            path.current = next.slice(1);
+            arrival.current = onArrival ?? null;
+            setRoute(next);
+            setMoving(true);
+            setMessage("Following LifeRouter simulation route…");
+          })
+          .catch((error: unknown) => {
+            if (controller.signal.aborted) return;
+            pendingRoom.current = null;
+            setMessage(error instanceof Error && error.name !== "TypeError" ? error.message :
+              "LifeRouter is unavailable. Start the routing service or select Local routing.");
+          })
+          .finally(() => {
+            if (routeRequest.current === controller) {
+              routeRequest.current = null;
+              setRouteLoading(false);
+            }
+          });
+        return true;
+      }
       const next = findPath(player.current, point, scenes[sceneId].walkable);
       if (!next) {
         setMessage(
@@ -362,7 +407,7 @@ export function CampusExplorer() {
       setMoving(true);
       return true;
     },
-    [sceneId, locationView],
+    [sceneId, locationView, routeEngine, privateSession, correction],
   );
 
   const choosePlace = (place: Place) => {
@@ -864,6 +909,7 @@ export function CampusExplorer() {
         cancelMovement();
         held.current.clear();
         setPrivateSession(true);
+        setRouteEngine("local");
         setCorrection(false);
         if (sceneId !== "campus") changeScene("campus");
         setFloorSheet(false);
@@ -894,6 +940,8 @@ export function CampusExplorer() {
         );
       }}
       onCorrect={() => {
+        setPrivateSession(true);
+        setRouteEngine("local");
         location.stop();
         cancelMovement();
         held.current.clear();
@@ -1171,13 +1219,27 @@ export function CampusExplorer() {
           />{" "}
           Show route arrows
         </label>
+        <label>
+          Routing engine{" "}
+          <select aria-label="Routing engine" value={routeEngine}
+            disabled={locationView || artOnly || floorSheet}
+            onChange={(event) => {
+              cancelMovement();
+              setRouteEngine(event.target.value as "local" | "liferouter");
+              setMessage("Simulation routing selected. Click an open area or room to walk there.");
+            }}>
+            <option value="local">Local</option>
+            <option value="liferouter" disabled={privateSession || correction}>LifeRouter (simulation)</option>
+          </select>
+          {privateSession && <small> LifeRouter stays off during this private location session.</small>}
+        </label>
       </div>
       {!artOnly && !floorSheet && (
         <div className="campus-status" role="status">
           <span className="campus-status-icon">
             <Footprints size={18} />
           </span>
-          <p>{message}</p>
+          <p>{routeLoading ? "LifeRouter is calculating a simulation route…" : message}</p>
           {!locationView && (nearbyBuilding || nearStairs || nearExit) && (
             <button className="campus-primary" onClick={interact}>
               {nearbyBuilding
@@ -1629,7 +1691,6 @@ export function CampusExplorer() {
         <a href="/campus-workspace">
           Shared floorplans, collaboration and 3D scans
         </a>{" "}
-        · <a href="/dashboard">Facilities dashboard</a>
         · <a href="/indoor-map/">Indoor Map</a>
       </p>
       <footer className="campus-footer">
@@ -1705,6 +1766,7 @@ export function CampusExplorer() {
       )}
       {dashboardDialog && (
         <DashboardDialog
+          ownerId={ownerId}
           action={dashboardDialog}
           onClose={() => setDashboardDialog(null)}
           onRoom={(room) => {

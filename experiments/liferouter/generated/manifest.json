@@ -1,0 +1,347 @@
+{
+  "mode": "SIMULATION ONLY",
+  "physicalCalibration": false,
+  "sourcePixelsPerCell": 4,
+  "demoMetersPerPixel": 0.05,
+  "engineCommit": "99e468e4ae7b382832dcf0026914c4d08ce53ff0",
+  "layers": [
+    "campus",
+    "a1",
+    "b1",
+    "b2",
+    "c1",
+    "c2",
+    "lab1",
+    "d1",
+    "e1",
+    "e2",
+    "six1",
+    "six2"
+  ],
+  "rooms": [
+    {
+      "id": "A-101",
+      "scene": "a1",
+      "layer": 1,
+      "demoMeters": [
+        9.1,
+        20.1
+      ]
+    },
+    {
+      "id": "A-102",
+      "scene": "a1",
+      "layer": 1,
+      "demoMeters": [
+        24.1,
+        20.1
+      ]
+    },
+    {
+      "id": "B-101",
+      "scene": "b1",
+      "layer": 2,
+      "demoMeters": [
+        45.1,
+        26.700000000000003
+      ]
+    },
+    {
+      "id": "B-102",
+      "scene": "b1",
+      "layer": 2,
+      "demoMeters": [
+        55.1,
+        26.700000000000003
+      ]
+    },
+    {
+      "id": "B-201",
+      "scene": "b2",
+      "layer": 3,
+      "demoMeters": [
+        45.1,
+        18.900000000000002
+      ]
+    },
+    {
+      "id": "B-202",
+      "scene": "b2",
+      "layer": 3,
+      "demoMeters": [
+        55.1,
+        18.900000000000002
+      ]
+    },
+    {
+      "id": "C-101",
+      "scene": "c1",
+      "layer": 4,
+      "demoMeters": [
+        74.7,
+        26.700000000000003
+      ]
+    },
+    {
+      "id": "C-102",
+      "scene": "c1",
+      "layer": 4,
+      "demoMeters": [
+        79.9,
+        26.700000000000003
+      ]
+    },
+    {
+      "id": "C-103",
+      "scene": "c1",
+      "layer": 4,
+      "demoMeters": [
+        85.10000000000001,
+        26.700000000000003
+      ]
+    },
+    {
+      "id": "C-104",
+      "scene": "c1",
+      "layer": 4,
+      "demoMeters": [
+        90.10000000000001,
+        26.700000000000003
+      ]
+    },
+    {
+      "id": "C-105",
+      "scene": "c1",
+      "layer": 4,
+      "demoMeters": [
+        95.30000000000001,
+        26.700000000000003
+      ]
+    },
+    {
+      "id": "C-201",
+      "scene": "c2",
+      "layer": 5,
+      "demoMeters": [
+        74.7,
+        18.900000000000002
+      ]
+    },
+    {
+      "id": "C-202",
+      "scene": "c2",
+      "layer": 5,
+      "demoMeters": [
+        79.9,
+        18.900000000000002
+      ]
+    },
+    {
+      "id": "C-203",
+      "scene": "c2",
+      "layer": 5,
+      "demoMeters": [
+        85.10000000000001,
+        18.900000000000002
+      ]
+    },
+    {
+      "id": "C-204",
+      "scene": "c2",
+      "layer": 5,
+      "demoMeters": [
+        90.10000000000001,
+        18.900000000000002
+      ]
+    },
+    {
+      "id": "C-205",
+      "scene": "c2",
+      "layer": 5,
+      "demoMeters": [
+        95.30000000000001,
+        18.900000000000002
+      ]
+    },
+    {
+      "id": "LAB-101",
+      "scene": "lab1",
+      "layer": 6,
+      "demoMeters": [
+        9.1,
+        20.1
+      ]
+    },
+    {
+      "id": "D-101",
+      "scene": "d1",
+      "layer": 7,
+      "demoMeters": [
+        9.1,
+        20.1
+      ]
+    },
+    {
+      "id": "D-102",
+      "scene": "d1",
+      "layer": 7,
+      "demoMeters": [
+        24.1,
+        20.1
+      ]
+    },
+    {
+      "id": "E-101",
+      "scene": "e1",
+      "layer": 8,
+      "demoMeters": [
+        74.7,
+        26.700000000000003
+      ]
+    },
+    {
+      "id": "E-102",
+      "scene": "e1",
+      "layer": 8,
+      "demoMeters": [
+        79.9,
+        26.700000000000003
+      ]
+    },
+    {
+      "id": "E-103",
+      "scene": "e1",
+      "layer": 8,
+      "demoMeters": [
+        85.10000000000001,
+        26.700000000000003
+      ]
+    },
+    {
+      "id": "E-201",
+      "scene": "e2",
+      "layer": 9,
+      "demoMeters": [
+        74.7,
+        18.900000000000002
+      ]
+    },
+    {
+      "id": "E-202",
+      "scene": "e2",
+      "layer": 9,
+      "demoMeters": [
+        79.9,
+        18.900000000000002
+      ]
+    },
+    {
+      "id": "E-203",
+      "scene": "e2",
+      "layer": 9,
+      "demoMeters": [
+        85.10000000000001,
+        18.900000000000002
+      ]
+    },
+    {
+      "id": "6-101",
+      "scene": "six1",
+      "layer": 10,
+      "demoMeters": [
+        74.7,
+        26.700000000000003
+      ]
+    },
+    {
+      "id": "6-102",
+      "scene": "six1",
+      "layer": 10,
+      "demoMeters": [
+        79.9,
+        26.700000000000003
+      ]
+    },
+    {
+      "id": "6-103",
+      "scene": "six1",
+      "layer": 10,
+      "demoMeters": [
+        85.10000000000001,
+        26.700000000000003
+      ]
+    },
+    {
+      "id": "6-104",
+      "scene": "six1",
+      "layer": 10,
+      "demoMeters": [
+        90.10000000000001,
+        26.700000000000003
+      ]
+    },
+    {
+      "id": "6-105",
+      "scene": "six1",
+      "layer": 10,
+      "demoMeters": [
+        95.30000000000001,
+        26.700000000000003
+      ]
+    },
+    {
+      "id": "6-201",
+      "scene": "six2",
+      "layer": 11,
+      "demoMeters": [
+        74.7,
+        18.900000000000002
+      ]
+    },
+    {
+      "id": "6-202",
+      "scene": "six2",
+      "layer": 11,
+      "demoMeters": [
+        79.9,
+        18.900000000000002
+      ]
+    },
+    {
+      "id": "6-203",
+      "scene": "six2",
+      "layer": 11,
+      "demoMeters": [
+        85.10000000000001,
+        18.900000000000002
+      ]
+    },
+    {
+      "id": "6-204",
+      "scene": "six2",
+      "layer": 11,
+      "demoMeters": [
+        90.10000000000001,
+        18.900000000000002
+      ]
+    },
+    {
+      "id": "6-205",
+      "scene": "six2",
+      "layer": 11,
+      "demoMeters": [
+        95.30000000000001,
+        18.900000000000002
+      ]
+    }
+  ],
+  "portalCount": 10,
+  "unlinkedBuildings": [
+    "Building 6: outdoor entrance unassigned"
+  ],
+  "checks": [
+    "35 room endpoints on free cells",
+    "10 stair/entrance portal pairs on free cells",
+    "whole-cell walkability sampling"
+  ]
+}

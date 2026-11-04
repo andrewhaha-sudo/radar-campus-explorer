@@ -53,6 +53,12 @@ import/export. [Editor details and source licensing](docs/PATHFINDER.md).
 The combined web application incorporates AGPL-3.0-or-later code; see
 [third-party notices](THIRD_PARTY_NOTICES.md) and [LICENSE](LICENSE).
 
+Local campus routing needs no API server. Local Facilities uses the D1/R2 setup above.
+
+For the optional LifeRouter engine, see [LifeRouter setup](docs/LIFEROUTER.md).
+Run the optional campus-only simulation and routing service with `docker compose -f compose.liferouter.yaml up --build -d`,
+then open http://localhost:8080 and select **LifeRouter (simulation)** in the routing controls.
+
 ## Use the map
 
 - Click a building to view information, then choose **Walk to entrance**, **Explore
@@ -178,6 +184,11 @@ See the platform guide for browser installation and deployment limitations.
 - `scripts/campus-registry.mjs`: stable campus-to-document registration
 
 
+The [nine-repository evaluation](docs/research/REPOSITORY-EVALUATION.md) compares
+external mapping and routing bases with pinned revisions and actual test results.
+The isolated [LifeRouter compatibility prototype](experiments/liferouter/README.md)
+exports the existing campus geometry for simulation; the separate LifeRouter bridge connects simulation routing to the app. It is not verified emergency guidance.
+
 - `src/App.tsx`: standalone entry page
 - `src/components/dashboard/`: dashboard panels, navigation, assistant, mini-map and dialogs
 - `src/lib/dashboard-config.ts`: school represented by the supplied campus artwork
@@ -198,3 +209,15 @@ hosted that version; the standalone app does not register a new service worker.
 Indoor Map is available at `/indoor-map/` alongside Facilities and the existing
 campus explorer, with local room search, floor switching and walking paths.
 See [integration notes](apps/indoor-map/UPSTREAM.md) for scope and licensing.
+
+## Preparedness suite
+
+Open **Resources** for learning quizzes, children's activities, records, school
+notices and drills, a geographic facilities map, moderated community support,
+help requests and administration. The existing campus map and LifeRouter remain
+available. Local activities need no backend; shared services require the new
+Supabase migration and staff grants. Donations require a verified recipient and
+the receipt-verification function.
+
+See [feature scope and activation instructions](docs/RESQVERSE.md). This is an
+original implementation inspired by ResQverse, whose repository has no reuse license.

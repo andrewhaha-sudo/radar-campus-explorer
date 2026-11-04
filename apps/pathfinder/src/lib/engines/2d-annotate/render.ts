@@ -12,7 +12,7 @@ import {
 	PIN_TIP_OFFSET,
 	type Annotation,
 	type CanvasDims
-} from './types';
+} from './types.ts';
 
 type Ctx = CanvasRenderingContext2D;
 

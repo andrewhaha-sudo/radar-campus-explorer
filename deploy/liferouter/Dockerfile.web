@@ -1,0 +1,18 @@
+# Optional campus-only simulation image; full Facilities targets Cloudflare.
+FROM node:24-alpine AS build
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN --mount=type=secret,id=proxy_ca \
+    if [ -f /run/secrets/proxy_ca ]; then export NODE_EXTRA_CA_CERTS=/run/secrets/proxy_ca; fi; \
+    npm ci --ignore-scripts
+COPY . .
+RUN --mount=type=secret,id=proxy_ca \
+    if [ -f /run/secrets/proxy_ca ]; then export NODE_EXTRA_CA_CERTS=/run/secrets/proxy_ca; fi; \
+    npm --prefix apps/indoor-map ci --no-audit --no-fund && npm run build:indoor
+RUN node scripts/package-source.mjs && npx tsc -b && npx vite build
+FROM nginx:1.28-alpine
+COPY --from=build /app/dist /usr/share/nginx/html
+COPY --from=build /app/apps/indoor-map/dist /usr/share/nginx/html/indoor-map
+COPY --from=build /app/apps/indoor-map/LICENSE.txt /usr/share/nginx/html/indoor-map/LICENSE.txt
+COPY deploy/liferouter/nginx.conf /etc/nginx/conf.d/default.conf
+RUN chmod -R a+rX /usr/share/nginx/html && chmod a+r /etc/nginx/conf.d/default.conf

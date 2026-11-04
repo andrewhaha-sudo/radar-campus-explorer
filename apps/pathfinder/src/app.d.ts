@@ -33,6 +33,7 @@ declare global {
 			env?: {
 				DB: D1Database;
 				JWT_SECRET?: string;
+                LIFEROUTER_ORIGIN?: string;
 				DOCUMENTS?: R2Bucket;
 				CACHE?: KVNamespace;
 				RESEND_API_KEY?: string;

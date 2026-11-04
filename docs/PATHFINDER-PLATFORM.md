@@ -107,3 +107,26 @@ and copy its assets beside the campus and Pathfinder worker. `npm run
 build:indoor` builds only its bundle; root build/dev is needed to refresh the
 unified application. Both OSL and AGPL notices and sources remain in the source
 archive. No Pathfinder documents, migrations, annotations or scans are removed.
+
+## Preserved preparedness and LifeRouter features
+
+The merged application retains Resources (learning, children, school notices,
+drills, reports, community, help, records and school administration), nearby
+outdoor facilities, private student accounts/GPS, and optional LifeRouter.
+Shared school services still require the Supabase activation described in
+`docs/RESQVERSE.md`; Pathfinder staff sessions do not grant Supabase school roles.
+
+The annotation model, renderer, history and JSON format now have one canonical
+implementation in Pathfinder. The campus editor uses compatibility re-exports
+for device drafts; publishing remains additive. The extra dashboard shortcut was
+removed from the campus footer; shared Facilities tools have one main link there.
+Indoor Map uses the existing campus room registry and walking geometry. Nearby
+facilities stays separate because it maps outdoor services rather than rooms.
+
+Set `LIFEROUTER_ORIGIN=http://127.0.0.1:8091` in local `.dev.vars` after starting
+the existing Go bridge to enable simulation routing through the unified app.
+Production requires a reachable HTTPS LifeRouter origin configured by the operator.
+No external origin is enabled by default. The proxy forwards only route/health
+requests, does not forward staff credentials and rejects redirects and large bodies.
+The optional Docker Compose deployment remains a campus-only simulation; the
+complete Facilities backend still uses Cloudflare. See `docs/LIFEROUTER.md`.

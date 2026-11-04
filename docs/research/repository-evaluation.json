@@ -1,0 +1,107 @@
+{
+  "date": "2026-11-03",
+  "scope": "Local source inspection and listed tests; not a production security audit or emergency certification",
+  "repositories": [
+    {
+      "repository": "melonmelonz/pathfinder",
+      "commit": "d07b3fcf96c3dd04f9ffc5e59120a61d93e99e5a",
+      "url": "https://github.com/melonmelonz/pathfinder",
+      "license_inspection": "AGPL-3.0-or-later (package); AGPL v3 license file",
+      "checks": [
+        "build PASS",
+        "typecheck PASS",
+        "331 unit tests PASS; 1 todo",
+        "63 local browser tests PASS"
+      ]
+    },
+    {
+      "repository": "Evangelisches-Schulzentrum-Leipzig/indoor-map",
+      "commit": "8b921c37642da24ba52a5ec857f6026543e583ae",
+      "url": "https://github.com/Evangelisches-Schulzentrum-Leipzig/indoor-map",
+      "license_inspection": "OSL-3.0",
+      "checks": [
+        "build PASS",
+        "stubbed route request confirms ignored start/end arguments"
+      ]
+    },
+    {
+      "repository": "Kentalives/LifeRouter",
+      "commit": "99e468e4ae7b382832dcf0026914c4d08ce53ff0",
+      "url": "https://github.com/Kentalives/LifeRouter",
+      "license_inspection": "Apache-2.0",
+      "checks": [
+        "grid/agent/emergency package tests PASS",
+        "API integration FAILED once: no responders",
+        "failing test PASS on 3 isolated retries",
+        "RADAR export compatibility PASS"
+      ]
+    },
+    {
+      "repository": "Prasi24bms017/resqverse-ready",
+      "commit": "bfb50406630450d8a9df345e1be0d976a7293550",
+      "url": "https://github.com/Prasi24bms017/resqverse-ready",
+      "license_inspection": "No reuse license found",
+      "checks": [
+        "npm ci FAIL: stale lock",
+        "npm install --package-lock=false retry PASS",
+        "1 example test PASS",
+        "build PASS"
+      ]
+    },
+    {
+      "repository": "0-robert/Evacuation-Optimiser",
+      "commit": "f22fc6ceaae041680dcf259aece57e8f7daa7d26",
+      "url": "https://github.com/0-robert/Evacuation-Optimiser",
+      "license_inspection": "MIT",
+      "checks": [
+        "original classes loaded with synthetic GeoJSON",
+        "route Room\u2192Exit PASS",
+        "2 requested students create 4 people: BUG",
+        "GUI/GA full simulation not run"
+      ]
+    },
+    {
+      "repository": "mishanilkazreen/water-watch",
+      "commit": "acae77ad4e42c3b9d012493a031d3aa276997198",
+      "url": "https://github.com/mishanilkazreen/water-watch",
+      "license_inspection": "MIT",
+      "checks": [
+        "build FAIL: TypeScript declarations/ImportMeta errors",
+        "no upstream test files",
+        "local API report insert 201",
+        "invalid coordinates [999,999] also accepted 201"
+      ]
+    },
+    {
+      "repository": "Andrii-Samiilenko/RouteOut",
+      "commit": "c8f234c66c4e752ca0ef314c2fb609ee7d29ee3a",
+      "url": "https://github.com/Andrii-Samiilenko/RouteOut",
+      "license_inspection": "No reuse license found",
+      "checks": [
+        "dashboard frontend build PASS",
+        "backend/notification deployment not run"
+      ]
+    },
+    {
+      "repository": "Kaiserzanmato/ResilienceMapAI",
+      "commit": "b4f0898626c50249c6fd5e9c7208c77086995acb",
+      "url": "https://github.com/Kaiserzanmato/ResilienceMapAI",
+      "license_inspection": "No reuse license found",
+      "checks": [
+        "frontend build PASS",
+        "46 frontend tests PASS",
+        "live provider/database integrations not run"
+      ]
+    },
+    {
+      "repository": "HyLuthfi/disaster-response-gis",
+      "commit": "809ef51861e53bebfacfd192781dac3cca9989da",
+      "url": "https://github.com/HyLuthfi/disaster-response-gis",
+      "license_inspection": "MIT",
+      "checks": [
+        "frontend build PASS",
+        "PostGIS/pgRouting backend not run"
+      ]
+    }
+  ]
+}

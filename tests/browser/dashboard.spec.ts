@@ -15,7 +15,7 @@ test("dashboard navigation opens real controls and explicitly unavailable servic
   for (const [label, message] of [
     ["Hazard Map", "Verified hazard assessments are not connected"],
     ["Room Scan (AI)", "AI room analysis is not connected"],
-    ["Alerts & Updates", "No live school alert or disaster feed"],
+    ["Alerts & Updates", "Government disaster feeds are not configured"],
     [
       "Evacuation Routes",
       "Verified evacuation routes have not been configured",

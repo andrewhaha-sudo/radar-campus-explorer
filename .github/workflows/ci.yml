@@ -12,6 +12,7 @@ jobs:
           cache-dependency-path: |
             package-lock.json
             apps/pathfinder/package-lock.json
+            apps/indoor-map/package-lock.json
       - run: npm ci
       - run: npm run lint
       - run: npm run check:pathfinder
@@ -22,3 +23,10 @@ jobs:
         env:
           PLAYWRIGHT_SOFTWARE_WEBGL: '1'
           CLOUDFLARE_SEND_METRICS: 'false'
+      - run: npm run test:e2e:campus
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: services/liferouter/go.mod
+          cache-dependency-path: services/liferouter/go.sum
+      - run: go test ./...
+        working-directory: services/liferouter

@@ -12,7 +12,7 @@ import {
 	PIN_TIP_OFFSET,
 	type Annotation,
 	type CanvasDims
-} from './types';
+} from './types.ts';
 
 const isPin = (t: string) => t === 'comment' || MARKER_TOOLS.includes(t as Annotation['type']);
 

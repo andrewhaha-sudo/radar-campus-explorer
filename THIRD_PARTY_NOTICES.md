@@ -7,7 +7,8 @@ The combined web application is provided under AGPL-3.0-or-later. See LICENSE.
 Existing third-party dependencies and artwork retain their respective notices
 and rights; see package metadata and public/maps/README.md for asset provenance.
 
-Ported source files under `src/vendor/pathfinder/`:
+Compatibility exports under `src/vendor/pathfinder/` use the single canonical engine in
+`apps/pathfinder/src/lib/engines/2d-annotate/`:
 
 - types.ts: annotation model and safety-marker metadata
 - coords.ts: normalized page coordinates
@@ -16,7 +17,7 @@ Ported source files under `src/vendor/pathfinder/`:
 - undo.ts: snapshot-based history
 - export-json.ts: Pathfinder JSON envelope and import/export
 
-The upstream comments and license are preserved. Local changes add explicit
+The upstream comments and license are preserved in the canonical engine. Local changes add explicit
 `.ts` imports so the modules also run in the Node.js test suite. The React editor,
 per-floor registration, browser persistence, validation and integration wrappers
 are local additions. The complete upstream Svelte UI, Cloudflare backend, auth and 3D viewer are
@@ -35,3 +36,10 @@ is required to obtain the offered source.
 ## Indoor Map
 
 Evangelisches-Schulzentrum-Leipzig/indoor-map, revision 8b921c37642da24ba52a5ec857f6026543e583ae, OSL-3.0. Original source and notices are retained in apps/indoor-map/upstream. RADAR adapters are marked in apps/indoor-map/UPSTREAM.md. MapLibre dependencies retain their own license notices.
+
+## LifeRouter and preparedness
+
+The retained LifeRouter bridge uses the Apache-2.0 LifeRouter dependency; see
+services/liferouter/NOTICE.md and services/liferouter/licenses/. Preparedness
+features are the existing original implementation; no unlicensed ResQverse
+source is included. See docs/RESQVERSE.md for provenance and activation.
