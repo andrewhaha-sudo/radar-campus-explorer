@@ -13,6 +13,13 @@ describe('unified LifeRouter bridge', () => {
   expect(send.mock.calls[0][1].headers).toEqual({'content-type':'application/json'});
   expect(send.mock.calls[0][1].redirect).toBe('error');
  });
+ it('allows the configured Compose service but rejects arbitrary insecure origins', async () => {
+  const send=vi.fn().mockResolvedValue(new Response('{}',{headers:{'content-type':'application/json'}}));
+  expect((await forwardLifeRouter(new Request('https://radar.test'),'health','http://router:8091',send)).status).toBe(200);
+  send.mockClear();
+  expect((await forwardLifeRouter(new Request('https://radar.test'),'health','http://example.org',send)).status).toBe(503);
+  expect(send).not.toHaveBeenCalled();
+ });
  it('rejects oversized requests, unsupported operations and invalid JSON before forwarding', async () => {
   const send=vi.fn();
   expect((await forwardLifeRouter(new Request('https://radar.test',{method:'POST',body:'x'.repeat(4097)}),'route','http://127.0.0.1:8091',send)).status).toBe(413);

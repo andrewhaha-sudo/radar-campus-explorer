@@ -173,12 +173,10 @@ async function setup(fixtures = false) {
         );
     };
     const existingAdmin = await proxy.env.DB.prepare(
-      "SELECT id FROM users WHERE email = ?",
-    )
-      .bind("test@test.com")
-      .first();
+      "SELECT id FROM users WHERE role = 'admin' LIMIT 1",
+    ).first();
     for (const script of [
-      ...(fixtures || !existingAdmin ? ["seed-dev.mjs"] : []),
+      ...(fixtures || (!existingAdmin && env.RADAR_PRIVATE_SETUP !== "1") ? ["seed-dev.mjs"] : []),
       ...(fixtures ? ["seed-hierarchy.mjs"] : []),
     ]) {
       const result = spawnSync(

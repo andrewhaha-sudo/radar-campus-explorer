@@ -38,3 +38,9 @@ existing Go service plus LIFEROUTER_ORIGIN; local pathfinding remains the defaul
 No cloud deployment, payment, live emergency feed or provider activation is
 performed by this merge. Paths and synthetic scan fixtures are not surveyed
 emergency guidance. See PATHFINDER-PLATFORM.md and LIFEROUTER.md for operation.
+
+The later companion-portal commit is also retained. Its Resources tab now opens
+the built-in shared workspace; saved external portals remain under compatibility
+details. The optional companion Docker service builds the same canonical code,
+preserves its existing volume and resource IDs, and uses private bootstrap rather
+than demo accounts. See PATHFINDER-COMPANION.md.

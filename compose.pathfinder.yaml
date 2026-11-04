@@ -1,0 +1,20 @@
+# Add this file to the existing stack; it does not replace any service or volume.
+services:
+  web:
+    build:
+      args:
+        VITE_PATHFINDER_URL: ${VITE_PATHFINDER_URL:-http://localhost:8082}
+  pathfinder:
+    build:
+      context: .
+      dockerfile: integrations/pathfinder/Dockerfile
+    environment:
+      LIFEROUTER_ORIGIN: http://router:8091
+    ports:
+      - "127.0.0.1:8082:8082"
+    volumes:
+      - pathfinder-data:/app/.wrangler
+    restart: unless-stopped
+    init: true
+volumes:
+  pathfinder-data:

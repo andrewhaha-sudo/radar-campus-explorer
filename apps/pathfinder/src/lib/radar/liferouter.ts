@@ -14,8 +14,9 @@ export async function forwardLifeRouter(
  try {
   base = new URL(origin);
   const local = ['localhost', '127.0.0.1', '[::1]'].includes(base.hostname);
-  if ((base.protocol !== 'https:' && !(local && base.protocol === 'http:')) || base.username || base.password || base.pathname !== '/' || base.search || base.hash)
-   return reply(503, 'LifeRouter origin must be an HTTPS origin or local development server.');
+  const composeRouter = base.hostname === 'router' && base.port === '8091';
+  if ((base.protocol !== 'https:' && !((local || composeRouter) && base.protocol === 'http:')) || base.username || base.password || base.pathname !== '/' || base.search || base.hash)
+   return reply(503, 'LifeRouter origin must be an HTTPS origin or the local simulation service.');
  } catch { return reply(503, 'Invalid LifeRouter configuration.'); }
  let body: string | undefined;
  if (operation === 'route') {

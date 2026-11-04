@@ -59,6 +59,20 @@ For the optional LifeRouter engine, see [LifeRouter setup](docs/LIFEROUTER.md).
 Run the optional campus-only simulation and routing service with `docker compose -f compose.liferouter.yaml up --build -d`,
 then open http://localhost:8080 and select **LifeRouter (simulation)** in the routing controls.
 
+## Optional Pathfinder companion deployment
+
+The main platform already includes Pathfinder at `/campus-workspace`. An optional
+Docker deployment uses the same source with private staff login and persistent
+facility storage. See [companion setup](docs/PATHFINDER-COMPANION.md) for
+credentials, backups, licensing and hosted deployment.
+
+```bash
+sudo docker compose -f compose.liferouter.yaml -f compose.pathfinder.yaml up --build -d
+```
+
+Open http://localhost:8080 and choose **Resources > Pathfinder**, or open
+http://localhost:8082 directly.
+
 ## Use the map
 
 - Click a building to view information, then choose **Walk to entrance**, **Explore

@@ -126,6 +126,7 @@ facilities stays separate because it maps outdoor services rather than rooms.
 Set `LIFEROUTER_ORIGIN=http://127.0.0.1:8091` in local `.dev.vars` after starting
 the existing Go bridge to enable simulation routing through the unified app.
 Production requires a reachable HTTPS LifeRouter origin configured by the operator.
+The optional Compose companion also permits its internal `http://router:8091` service.
 No external origin is enabled by default. The proxy forwards only route/health
 requests, does not forward staff credentials and rejects redirects and large bodies.
 The optional Docker Compose deployment remains a campus-only simulation; the

@@ -9,6 +9,8 @@ COPY . .
 RUN --mount=type=secret,id=proxy_ca \
     if [ -f /run/secrets/proxy_ca ]; then export NODE_EXTRA_CA_CERTS=/run/secrets/proxy_ca; fi; \
     npm --prefix apps/indoor-map ci --no-audit --no-fund && npm run build:indoor
+ARG VITE_PATHFINDER_URL
+ENV VITE_PATHFINDER_URL=$VITE_PATHFINDER_URL
 RUN node scripts/package-source.mjs && npx tsc -b && npx vite build
 FROM nginx:1.28-alpine
 COPY --from=build /app/dist /usr/share/nginx/html

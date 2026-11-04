@@ -1,6 +1,7 @@
 import { lazy, Suspense, useState } from "react";
 import { PreparednessHub } from "./PreparednessHub";
 import { KidsActivities } from "./KidsActivities";
+import { PathfinderPortal } from "./PathfinderPortal";
 import { SchoolPortal } from "./SchoolPortal";
 import "./preparedness.css";
 const FacilitiesMap = lazy(() =>
@@ -15,6 +16,7 @@ const sections = [
   ["community", "Community"],
   ["emergency", "Help"],
   ["admin", "Admin"],
+  ["pathfinder", "Pathfinder"],
 ] as const;
 type Section = (typeof sections)[number][0];
 export function PreparednessSuite({
@@ -45,6 +47,8 @@ export function PreparednessSuite({
         <PreparednessHub ownerId={ownerId} />
       ) : section === "kids" ? (
         <KidsActivities ownerId={ownerId} />
+      ) : section === "pathfinder" ? (
+        <PathfinderPortal />
       ) : section === "facilities" ? (
         <Suspense fallback={<p role="status">Loading map tools…</p>}>
           <FacilitiesMap />
