@@ -14,3 +14,17 @@
 .preparedness-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 16px; }
 .preparedness-hub button { min-height: 44px; }
 .preparedness-hub button:disabled { opacity: .55; cursor: not-allowed; }
+.suite-navigation { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0; }
+.suite-navigation button { min-height: 44px; }
+.suite-navigation [aria-pressed="true"] { background: #d9ecff; color: #10264e; border-color: #a4e8ff; }
+.school-form, .school-field { display: grid; gap: 12px; margin-block: 16px; }
+.school-form label, .school-field { display: grid; gap: 6px; }
+.school-form input, .school-form select, .school-form textarea, .school-field input, .school-portal select { width: 100%; min-height: 44px; padding: 10px; color: #10264e; background: #f6f8ff; border: 1px solid #81b5e4; border-radius: 8px; box-sizing: border-box; }
+.school-form textarea { min-height: 110px; resize: vertical; }
+.school-wallet, .school-portal li, .school-portal p { overflow-wrap: anywhere; }
+.school-portal button, .preparedness-suite button { min-height: 44px; }
+.school-portal > h3 { margin-top: 24px; }
+.facilities-map { height: 320px; border-radius: 12px; isolation: isolate; }
+.facilities-list { padding-left: 20px; }
+.facilities-list li { margin-block: 12px; }
+.preparedness-suite :focus-visible { outline: 3px solid #a4e8ff; outline-offset: 3px; }

@@ -192,9 +192,14 @@ Map coordinates use the images' original pixels, independent of screen size or z
 The `public/sw.js` file retires an old full-app service worker if this site previously
 hosted that version; the standalone app does not register a new service worker.
 
-## Preparedness practice
+## Preparedness suite
 
-Open **Resources** for earthquake, flood and fire quizzes, practice badges, a
-supervised-drill checklist and downloadable progress. This original module is
-inspired by ResQverse; it stores practice locally and adds no live alert or SOS
-service. See [feature scope and storage](docs/RESQVERSE.md).
+Open **Resources** for learning quizzes, children's activities, records, school
+notices and drills, a geographic facilities map, moderated community support,
+help requests and administration. The existing campus map and LifeRouter remain
+available. Local activities need no backend; shared services require the new
+Supabase migration and staff grants. Donations require a verified recipient and
+the receipt-verification function.
+
+See [feature scope and activation instructions](docs/RESQVERSE.md). This is an
+original implementation inspired by ResQverse, whose repository has no reuse license.
