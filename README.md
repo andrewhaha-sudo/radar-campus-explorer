@@ -35,6 +35,19 @@ For the optional LifeRouter engine, see [LifeRouter setup](docs/LIFEROUTER.md).
 Run the complete app and routing service with `docker compose -f compose.liferouter.yaml up --build -d`,
 then open http://localhost:8080 and select **LifeRouter (simulation)** in the routing controls.
 
+## Full Pathfinder facility portal
+
+Pathfinder runs alongside the existing app and LifeRouter, with its own staff login
+and persistent floorplan/scan storage. See [Pathfinder setup](docs/PATHFINDER.md) for
+credentials, backups, licensing and hosted deployment.
+
+```bash
+sudo docker compose -f compose.liferouter.yaml -f compose.pathfinder.yaml up --build -d
+```
+
+Open http://localhost:8080 and choose **Resources > Pathfinder**, or open
+http://localhost:8082 directly.
+
 ## Use the map
 
 - Click a building to view information, then choose **Walk to entrance**, **Explore

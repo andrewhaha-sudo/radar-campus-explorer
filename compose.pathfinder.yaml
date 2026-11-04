@@ -1,0 +1,14 @@
+# Add this file to the existing stack; it does not replace any service or volume.
+services:
+  pathfinder:
+    build:
+      context: .
+      dockerfile: integrations/pathfinder/Dockerfile
+    ports:
+      - "127.0.0.1:8082:8082"
+    volumes:
+      - pathfinder-data:/app/.wrangler
+    restart: unless-stopped
+    init: true
+volumes:
+  pathfinder-data:

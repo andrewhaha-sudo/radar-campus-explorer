@@ -21,3 +21,6 @@ app/build/
 local.properties
 
 
+# Pathfinder local facility data and private runtime secrets
+.wrangler/
+.dev.vars
