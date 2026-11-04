@@ -1,0 +1,45 @@
+{
+  "name": "pathfinder",
+  "version": "0.1.0",
+  "description": "Pathfinder - white-label web platform for emergency floorplan mapping and 3D facility documentation. Open Source Community Edition.",
+  "type": "module",
+  "license": "AGPL-3.0-or-later",
+  "scripts": {
+    "dev": "vite dev",
+    "build": "vite build",
+    "preview": "vite preview",
+    "deploy": "node ../../scripts/platform.mjs deploy",
+    "test:unit": "vitest run",
+    "test:e2e": "playwright test",
+    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+    "db:migrate:local": "wrangler d1 migrations apply pathfinder --local",
+    "db:migrate": "wrangler d1 migrations apply pathfinder --remote",
+    "migrate:v1:dryrun": "node scripts/migrate-v1.mjs",
+    "db:seed:local": "node scripts/seed-dev.mjs > .wrangler/seed.sql && wrangler d1 execute pathfinder --local --file=.wrangler/seed.sql",
+    "db:seed:hierarchy:local": "node scripts/seed-hierarchy.mjs > .wrangler/seed-hierarchy.sql && wrangler d1 execute pathfinder --local --file=.wrangler/seed-hierarchy.sql",
+    "e2e:serve": "node ../../scripts/platform.mjs test-server"
+  },
+  "devDependencies": {
+    "@fontsource-variable/bricolage-grotesque": "^5.2.10",
+    "@fontsource-variable/hanken-grotesk": "^5.2.8",
+    "@fontsource-variable/jetbrains-mono": "^5.2.8",
+    "@playwright/test": "^1.49.1",
+    "@sveltejs/adapter-cloudflare": "^4.9.0",
+    "@sveltejs/kit": "^2.15.1",
+    "@sveltejs/vite-plugin-svelte": "^5.0.3",
+    "@types/node": "^22.10.5",
+    "svelte": "^5.16.0",
+    "svelte-check": "^4.1.1",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.7",
+    "vitest": "^2.1.8",
+    "wrangler": "^3.99.0"
+  },
+  "dependencies": {
+    "@sparkjsdev/spark": "^2.1.0",
+    "@types/three": "^0.180.0",
+    "jspdf": "^2.5.2",
+    "pdfjs-dist": "^3.11.174",
+    "three": "^0.180.0"
+  }
+}

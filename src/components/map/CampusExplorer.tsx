@@ -61,6 +61,8 @@ import {
 } from "../dashboard/RadarDashboard";
 import type { RadarAction } from "../dashboard/RadarDashboard";
 import { BuildingPopup, DashboardDialog } from "../dashboard/DashboardDialogs";
+import { FloorplanOverlay } from "../floorplan/FloorplanOverlay";
+import { FloorplanEditor } from "../floorplan/FloorplanEditor";
 
 const distance = (a: Point, b: Point) => Math.hypot(a.x - b.x, a.y - b.y);
 const movementKeys: Record<string, Point> = {
@@ -212,6 +214,8 @@ export function CampusExplorer() {
     readPreference("showAreas", false),
   );
   const [floorSheet, setFloorSheet] = useState(false);
+  const [floorplanOpen, setFloorplanOpen] = useState(false);
+  const floorplanReturnFocus = useRef<HTMLButtonElement>(null);
   const [expanded, setExpanded] = useState(false);
   const [query, setQuery] = useState("");
   const [dashboardAction, setDashboardAction] = useState<RadarAction>("map");
@@ -459,7 +463,8 @@ export function CampusExplorer() {
       locationView ||
       locationDialog ||
       buildingPopup ||
-      dashboardDialog
+      dashboardDialog ||
+      floorplanOpen
     )
       return;
     let frame = 0,
@@ -573,6 +578,7 @@ export function CampusExplorer() {
     locationDialog,
     buildingPopup,
     dashboardDialog,
+    floorplanOpen,
   ]);
 
   useEffect(() => {
@@ -587,7 +593,8 @@ export function CampusExplorer() {
         !studentId &&
         !locationDialog &&
         !buildingPopup &&
-        !dashboardDialog
+        !dashboardDialog &&
+        !floorplanOpen
       )
         setExpanded(false);
     };
@@ -603,6 +610,7 @@ export function CampusExplorer() {
     locationDialog,
     buildingPopup,
     dashboardDialog,
+    floorplanOpen,
   ]);
 
   const nearbyBuilding =
@@ -642,6 +650,7 @@ export function CampusExplorer() {
       locationDialog ||
       buildingPopup ||
       dashboardDialog ||
+      floorplanOpen ||
       (event.target as HTMLElement).matches("input, select, textarea, button")
     )
       return;
@@ -664,7 +673,8 @@ export function CampusExplorer() {
       locationView ||
       locationDialog ||
       buildingPopup ||
-      dashboardDialog
+      dashboardDialog ||
+      floorplanOpen
     )
       return;
     const matrix = svg.current?.getScreenCTM();
@@ -1231,6 +1241,18 @@ export function CampusExplorer() {
               </span>
               <div>
                 <button
+                  className="campus-floorplan-edit"
+                  ref={floorplanReturnFocus}
+                  disabled={locationView}
+                  onClick={() => {
+                    cancelMovement();
+                    held.current.clear();
+                    setFloorplanOpen(true);
+                  }}
+                >
+                  <Layers size={16} /> Edit floorplan
+                </button>
+                <button
                   aria-label="Zoom out"
                   disabled={zoom <= 1}
                   onClick={() => setZoom((z) => Math.max(1, z - 0.25))}
@@ -1350,10 +1372,11 @@ export function CampusExplorer() {
                       <CampusBreeze
                         paused={Boolean(
                           photoRoom ||
-                          studentId ||
-                          locationDialog ||
-                          buildingPopup ||
-                          dashboardDialog,
+                            studentId ||
+                            locationDialog ||
+                            buildingPopup ||
+                            dashboardDialog ||
+                            floorplanOpen,
                         )}
                       />
                     )}
@@ -1535,12 +1558,16 @@ export function CampusExplorer() {
                           !photoRoom &&
                           !locationDialog &&
                           !buildingPopup &&
-                          !dashboardDialog
+                          !dashboardDialog &&
+                          !floorplanOpen
                         }
                         onOpen={() => openStudent("self")}
                       />
                     )}
                   </>
+                )}
+                {!floorSheet && !artOnly && sceneId !== "campus" && (
+                  <FloorplanOverlay key={sceneId} sceneId={sceneId} />
                 )}
               </svg>
             </div>
@@ -1598,12 +1625,31 @@ export function CampusExplorer() {
         </div>
         {explorerTools}
       </div>
+      <p className="campus-facility-link">
+        <a href="/campus-workspace">
+          Shared floorplans, collaboration and 3D scans
+        </a>{" "}
+        · <a href="/dashboard">Facilities dashboard</a>
+        · <a href="/indoor-map/">Indoor Map</a>
+      </p>
       <footer className="campus-footer">
         <span>
           Campus Explorer <i>✦</i> A familiar place. A new perspective.
         </span>
-        <span>Click to explore · E to interact</span>
+        <span>
+          Click to explore · E to interact ·{" "}
+          <a href="/source/radar-campus-explorer.tar.gz" download>
+            Source code (AGPL)
+          </a>
+        </span>
       </footer>
+      {floorplanOpen && (
+        <FloorplanEditor
+          initialFloor={sceneId}
+          onClose={() => setFloorplanOpen(false)}
+          onRestoreFocus={() => floorplanReturnFocus.current?.focus()}
+        />
+      )}
       {photoRoom && (
         <RoomPhotoDialog
           key={photoRoom.id}

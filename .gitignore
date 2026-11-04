@@ -21,3 +21,14 @@ app/build/
 local.properties
 
 
+
+# Generated corresponding-source archive (created by prebuild)
+public/source/
+
+# Full Pathfinder platform runtime and generated campus assets
+.build/
+.wrangler/
+.svelte-kit/
+.dev.vars
+apps/pathfinder/static/
+apps/pathfinder/tests/e2e/__screenshots__/

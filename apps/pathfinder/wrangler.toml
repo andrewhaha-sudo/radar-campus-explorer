@@ -1,0 +1,30 @@
+name = "pathfinder"
+pages_build_output_dir = ".svelte-kit/cloudflare"
+compatibility_date = "2026-06-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Cloudflare bindings (canonical sec 3). Uncomment and fill IDs once the
+# backend lands in Sprint 1+. Never commit real resource IDs or secrets;
+# create resources with wrangler and store IDs in the CF dashboard / .dev.vars.
+
+# D1 database (binding DB) - app state, SQLite + FTS5 search.
+[[d1_databases]]
+binding = "DB"
+database_name = "pathfinder"
+database_id = "00000000-0000-0000-0000-000000000000"
+migrations_dir = "migrations"
+
+# R2 bucket (binding DOCUMENTS) - floorplans, SPZ/mp4 scans, master PLY cold
+# archive (Epic E7). Create with: wrangler r2 bucket create radar-pathfinder-documents
+[[r2_buckets]]
+binding = "DOCUMENTS"
+bucket_name = "radar-pathfinder-documents"
+
+# KV namespace (binding CACHE) - sessions, login rate-limit counters, brand
+# cache. Used by src/lib/server/ratelimit.ts for per-IP / per-email failed-login
+# throttling. Create with `wrangler kv namespace create CACHE` and paste the id.
+# Auth degrades gracefully (no lockout) if this binding is absent locally.
+[[kv_namespaces]]
+binding = "CACHE"
+id = "00000000000000000000000000000000"
+

@@ -1,0 +1,412 @@
+[
+  {
+    "sceneId": "a1",
+    "name": "Building A \u00b7 Floor 1",
+    "buildingId": "radar-building-a",
+    "documentId": "radar-doc-a1",
+    "projectId": "radar-project-a",
+    "floorId": "radar-floor-a1",
+    "roomIds": [
+      "A-101",
+      "A-102"
+    ],
+    "sourceRegistration": {
+      "image": "/maps/floor-plans.jpg",
+      "imageWidth": 2048,
+      "imageHeight": 682,
+      "crop": {
+        "x": 58,
+        "y": 286,
+        "width": 544,
+        "height": 357
+      },
+      "artworkPieces": []
+    },
+    "storageKey": "radar/floors/a1.pdf",
+    "sortOrder": 0
+  },
+  {
+    "sceneId": "b1",
+    "name": "Building B \u00b7 Floor 1",
+    "buildingId": "radar-building-b",
+    "documentId": "radar-doc-b1",
+    "projectId": "radar-project-b",
+    "floorId": "radar-floor-b1",
+    "roomIds": [
+      "B-101",
+      "B-102"
+    ],
+    "sourceRegistration": {
+      "image": "/maps/floor-plans.jpg",
+      "imageWidth": 2048,
+      "imageHeight": 682,
+      "crop": {
+        "x": 637,
+        "y": 410,
+        "width": 567,
+        "height": 229
+      },
+      "artworkPieces": []
+    },
+    "storageKey": "radar/floors/b1.pdf",
+    "sortOrder": 0
+  },
+  {
+    "sceneId": "b2",
+    "name": "Building B \u00b7 Floor 2",
+    "buildingId": "radar-building-b",
+    "documentId": "radar-doc-b2",
+    "projectId": "radar-project-b",
+    "floorId": "radar-floor-b2",
+    "roomIds": [
+      "B-201",
+      "B-202"
+    ],
+    "sourceRegistration": {
+      "image": "/maps/floor-plans.jpg",
+      "imageWidth": 2048,
+      "imageHeight": 682,
+      "crop": {
+        "x": 637,
+        "y": 242,
+        "width": 567,
+        "height": 167
+      },
+      "artworkPieces": []
+    },
+    "storageKey": "radar/floors/b2.pdf",
+    "sortOrder": 1
+  },
+  {
+    "sceneId": "c1",
+    "name": "Building C \u00b7 Floor 1",
+    "buildingId": "radar-building-c",
+    "documentId": "radar-doc-c1",
+    "projectId": "radar-project-c",
+    "floorId": "radar-floor-c1",
+    "roomIds": [
+      "C-101",
+      "C-102",
+      "C-103",
+      "C-104",
+      "C-105"
+    ],
+    "sourceRegistration": {
+      "image": "/maps/floor-plans.jpg",
+      "imageWidth": 2048,
+      "imageHeight": 682,
+      "crop": {
+        "x": 1241,
+        "y": 410,
+        "width": 759,
+        "height": 229
+      },
+      "artworkPieces": []
+    },
+    "storageKey": "radar/floors/c1.pdf",
+    "sortOrder": 0
+  },
+  {
+    "sceneId": "c2",
+    "name": "Building C \u00b7 Floor 2",
+    "buildingId": "radar-building-c",
+    "documentId": "radar-doc-c2",
+    "projectId": "radar-project-c",
+    "floorId": "radar-floor-c2",
+    "roomIds": [
+      "C-201",
+      "C-202",
+      "C-203",
+      "C-204",
+      "C-205"
+    ],
+    "sourceRegistration": {
+      "image": "/maps/floor-plans.jpg",
+      "imageWidth": 2048,
+      "imageHeight": 682,
+      "crop": {
+        "x": 1241,
+        "y": 242,
+        "width": 759,
+        "height": 167
+      },
+      "artworkPieces": []
+    },
+    "storageKey": "radar/floors/c2.pdf",
+    "sortOrder": 1
+  },
+  {
+    "sceneId": "lab1",
+    "name": "Chemistry Lab \u00b7 Floor 1",
+    "buildingId": "radar-building-lab",
+    "documentId": "radar-doc-lab1",
+    "projectId": "radar-project-lab",
+    "floorId": "radar-floor-lab1",
+    "roomIds": [
+      "LAB-101"
+    ],
+    "sourceRegistration": {
+      "image": "/maps/floor-plans.jpg",
+      "imageWidth": 2048,
+      "imageHeight": 682,
+      "crop": {
+        "x": 58,
+        "y": 286,
+        "width": 422,
+        "height": 357
+      },
+      "artworkPieces": [
+        {
+          "source": {
+            "x": 58,
+            "y": 286,
+            "width": 360,
+            "height": 357
+          },
+          "target": {
+            "x": 58,
+            "y": 286
+          }
+        },
+        {
+          "source": {
+            "x": 540,
+            "y": 286,
+            "width": 62,
+            "height": 357
+          },
+          "target": {
+            "x": 418,
+            "y": 286
+          }
+        }
+      ]
+    },
+    "storageKey": "radar/floors/lab1.pdf",
+    "sortOrder": 0
+  },
+  {
+    "sceneId": "d1",
+    "name": "Building D \u00b7 Floor 1",
+    "buildingId": "radar-building-d",
+    "documentId": "radar-doc-d1",
+    "projectId": "radar-project-d",
+    "floorId": "radar-floor-d1",
+    "roomIds": [
+      "D-101",
+      "D-102"
+    ],
+    "sourceRegistration": {
+      "image": "/maps/floor-plans.jpg",
+      "imageWidth": 2048,
+      "imageHeight": 682,
+      "crop": {
+        "x": 58,
+        "y": 286,
+        "width": 544,
+        "height": 357
+      },
+      "artworkPieces": []
+    },
+    "storageKey": "radar/floors/d1.pdf",
+    "sortOrder": 0
+  },
+  {
+    "sceneId": "e1",
+    "name": "Building E \u00b7 Floor 1",
+    "buildingId": "radar-building-e",
+    "documentId": "radar-doc-e1",
+    "projectId": "radar-project-e",
+    "floorId": "radar-floor-e1",
+    "roomIds": [
+      "E-101",
+      "E-102",
+      "E-103"
+    ],
+    "sourceRegistration": {
+      "image": "/maps/floor-plans.jpg",
+      "imageWidth": 2048,
+      "imageHeight": 682,
+      "crop": {
+        "x": 1241,
+        "y": 410,
+        "width": 553,
+        "height": 229
+      },
+      "artworkPieces": [
+        {
+          "source": {
+            "x": 1241,
+            "y": 410,
+            "width": 491,
+            "height": 229
+          },
+          "target": {
+            "x": 1241,
+            "y": 410
+          }
+        },
+        {
+          "source": {
+            "x": 1938,
+            "y": 410,
+            "width": 62,
+            "height": 162
+          },
+          "target": {
+            "x": 1732,
+            "y": 410
+          }
+        },
+        {
+          "source": {
+            "x": 1732,
+            "y": 572,
+            "width": 62,
+            "height": 67
+          },
+          "target": {
+            "x": 1732,
+            "y": 572
+          }
+        },
+        {
+          "source": {
+            "x": 1720,
+            "y": 440,
+            "width": 12,
+            "height": 14
+          },
+          "target": {
+            "x": 1732,
+            "y": 440
+          }
+        }
+      ]
+    },
+    "storageKey": "radar/floors/e1.pdf",
+    "sortOrder": 0
+  },
+  {
+    "sceneId": "e2",
+    "name": "Building E \u00b7 Floor 2",
+    "buildingId": "radar-building-e",
+    "documentId": "radar-doc-e2",
+    "projectId": "radar-project-e",
+    "floorId": "radar-floor-e2",
+    "roomIds": [
+      "E-201",
+      "E-202",
+      "E-203"
+    ],
+    "sourceRegistration": {
+      "image": "/maps/floor-plans.jpg",
+      "imageWidth": 2048,
+      "imageHeight": 682,
+      "crop": {
+        "x": 1241,
+        "y": 242,
+        "width": 553,
+        "height": 167
+      },
+      "artworkPieces": [
+        {
+          "source": {
+            "x": 1241,
+            "y": 242,
+            "width": 491,
+            "height": 167
+          },
+          "target": {
+            "x": 1241,
+            "y": 242
+          }
+        },
+        {
+          "source": {
+            "x": 1938,
+            "y": 242,
+            "width": 62,
+            "height": 167
+          },
+          "target": {
+            "x": 1732,
+            "y": 242
+          }
+        },
+        {
+          "source": {
+            "x": 1720,
+            "y": 280,
+            "width": 12,
+            "height": 14
+          },
+          "target": {
+            "x": 1732,
+            "y": 280
+          }
+        }
+      ]
+    },
+    "storageKey": "radar/floors/e2.pdf",
+    "sortOrder": 1
+  },
+  {
+    "sceneId": "six1",
+    "name": "Building 6 \u00b7 Floor 1",
+    "buildingId": "radar-building-six",
+    "documentId": "radar-doc-six1",
+    "projectId": "radar-project-six",
+    "floorId": "radar-floor-six1",
+    "roomIds": [
+      "6-101",
+      "6-102",
+      "6-103",
+      "6-104",
+      "6-105"
+    ],
+    "sourceRegistration": {
+      "image": "/maps/floor-plans.jpg",
+      "imageWidth": 2048,
+      "imageHeight": 682,
+      "crop": {
+        "x": 1241,
+        "y": 410,
+        "width": 759,
+        "height": 229
+      },
+      "artworkPieces": []
+    },
+    "storageKey": "radar/floors/six1.pdf",
+    "sortOrder": 0
+  },
+  {
+    "sceneId": "six2",
+    "name": "Building 6 \u00b7 Floor 2",
+    "buildingId": "radar-building-six",
+    "documentId": "radar-doc-six2",
+    "projectId": "radar-project-six",
+    "floorId": "radar-floor-six2",
+    "roomIds": [
+      "6-201",
+      "6-202",
+      "6-203",
+      "6-204",
+      "6-205"
+    ],
+    "sourceRegistration": {
+      "image": "/maps/floor-plans.jpg",
+      "imageWidth": 2048,
+      "imageHeight": 682,
+      "crop": {
+        "x": 1241,
+        "y": 242,
+        "width": 759,
+        "height": 167
+      },
+      "artworkPieces": []
+    },
+    "storageKey": "radar/floors/six2.pdf",
+    "sortOrder": 1
+  }
+]

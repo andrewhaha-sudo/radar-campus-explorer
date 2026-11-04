@@ -1,6 +1,6 @@
-# RADAR Campus Explorer
+# RADAR Campus Explorer + Pathfinder
 
-A standalone, interactive pixel-art school map inside the reference-inspired RADAR
+The complete Pathfinder facilities platform, with an interactive pixel-art school map inside the RADAR
 game dashboard. Walk between buildings, explore the supplied indoor hallways,
 choose a classroom, and travel between floors using the internal stairs.
 
@@ -16,6 +16,18 @@ an actual clock, a profile menu, static assistant help and classroom-card missio
 Weather, hazard, AI, messaging and emergency services explicitly show unavailable
 states until configured. See [dashboard behavior and integrations](docs/DASHBOARD.md).
 
+## Complete facilities platform
+
+The full SvelteKit/Cloudflare Pathfinder application lives in `apps/pathfinder`.
+It includes staff accounts/permissions, shared documents, PDF editing/export,
+floor versions, project review, collaboration/sharing, audit/admin, search,
+media uploads and the 3D scan viewer. The React campus explorer is available
+without staff login at `/campus/`. Staff use `/campus-workspace` for its eleven
+linked floor documents and can publish device drafts as new shared documents.
+
+[Full platform setup, tests and deployment](docs/PATHFINDER-PLATFORM.md).
+The combined application is AGPL-3.0-or-later; see LICENSE and THIRD_PARTY_NOTICES.md.
+
 ## Run on your computer
 
 Install Node.js **24 LTS**, then:
@@ -27,9 +39,19 @@ npm ci
 npm run dev
 ```
 
-Open the **Local** address printed by Vite. If you already cloned this repository,
-stop the previous development server, run `git pull` and `npm ci`, then start it
-again with `npm run dev`. There is no seed command or API server to start.
+`npm ci` also installs the locked Pathfinder dependencies. `npm run dev`
+prepares local D1/R2/KV and starts RADAR Facilities; choose **Campus explorer**
+for the student map. Local setup uses upstream demo accounts only. For a built
+preview, run `npm run build`, `npm run setup:local`, then `npm start`.
+Live provider credentials and real scan assets are configured separately.
+
+## Floorplan editing
+
+Use **Edit floorplan** to annotate each indoor floor with Pathfinder safety markers,
+areas, arrows and notes. Drafts save on this device and support undo/redo and JSON
+import/export. [Editor details and source licensing](docs/PATHFINDER.md).
+The combined web application incorporates AGPL-3.0-or-later code; see
+[third-party notices](THIRD_PARTY_NOTICES.md) and [LICENSE](LICENSE).
 
 ## Use the map
 
@@ -123,47 +145,38 @@ add them to `public/room-photos/`, map room IDs to image paths in
 `public/room-photos.json`, then commit and deploy. See the
 [published photo instructions](public/room-photos/README.md) for an example.
 
-## Publish your own website
+## Deploy the complete application
 
-Import **andrewhaha-sudo/radar-campus-explorer**, branch **main**, into a Vercel project:
+The full platform targets Cloudflare Pages/Workers with D1, R2 and KV bindings.
+`npm run build` outputs the combined application into `dist`. Configure your own
+resources, admin accounts and secrets before `npm run deploy`; local defaults
+contain placeholder resource IDs and deployment is blocked until configured.
 
-| Setting | Value |
-| --- | --- |
-| Framework | Vite |
-| Root directory | Repository root |
-| Node.js | 24.x |
-| Install command | `npm ci` |
-| Build command | `npm run build` |
-| Output directory | `dist` |
-| Environment variables | Public student project settings are included; optional overrides are documented below |
-
-Click **Deploy** and open the address Vercel assigns. To update an existing Vercel
-project, deploy the latest commit on `main`. The former full RADAR server settings
-are not used. Student accounts use their own project and schema.
-[Full deployment instructions](docs/VERCEL.md).
-
-The generated `dist` directory also works on a static host at the site's root.
-The map itself does not call a school API. Signed-in profiles and shared characters
-communicate with the configured Supabase project over authenticated requests.
+The earlier Vercel static-host setup cannot run the facilities backend. Its
+configuration is retained only as `docs/VERCEL-STATIC-LEGACY.json`. See
+[the platform deployment guide](docs/PATHFINDER-PLATFORM.md).
 
 ## Checks
 
 ```bash
-npm test
 npm run lint
+npm run check:pathfinder
+npm test
 npm run build
-npx playwright install chromium
-npm run test:e2e
+PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium npm run test:e2e
 ```
 
-The browser tests serve the production build with a static file server and verify
-that the map works without signing in, and cover device profiles and mocked account
-flows. Database privacy tests run the actual migration and policies in PostgreSQL
-(PGlite). To use a Chromium binary already
-installed on your machine, set `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` when running
-`npm run test:e2e`. `npm run preview` previews the built app locally.
+The full-platform browser suite uses local D1/R2/KV, generated campus PDFs and
+synthetic scan data. `npm run test:e2e:campus` retains the separate campus-only
+suite; run `npm run build:campus` first. Both have local-only fixture accounts.
+See the platform guide for browser installation and deployment limitations.
 
 ## Source
+
+- `apps/pathfinder/`: complete Pathfinder frontend, backend, migrations and tests
+- `scripts/platform.mjs`: unified build and local binding setup
+- `scripts/campus-registry.mjs`: stable campus-to-document registration
+
 
 - `src/App.tsx`: standalone entry page
 - `src/components/dashboard/`: dashboard panels, navigation, assistant, mini-map and dialogs
@@ -181,3 +194,7 @@ installed on your machine, set `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` when runnin
 Map coordinates use the images' original pixels, independent of screen size or zoom.
 The `public/sw.js` file retires an old full-app service worker if this site previously
 hosted that version; the standalone app does not register a new service worker.
+
+Indoor Map is available at `/indoor-map/` alongside Facilities and the existing
+campus explorer, with local room search, floor switching and walking paths.
+See [integration notes](apps/indoor-map/UPSTREAM.md) for scope and licensing.

@@ -1,0 +1,66 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`AC-14.3.1 / AC-14.3.2 deterministic regression baseline > JSON export envelope matches the committed baseline 1`] = `
+{
+  "document": {
+    "exportedAt": "2026-01-01T00:00:00Z",
+    "id": "doc",
+    "name": "Floor 1",
+    "pages": [
+      {
+        "annotations": [
+          {
+            "color": "#B22234",
+            "createdAt": undefined,
+            "createdBy": undefined,
+            "h": 0.1,
+            "id": "a1",
+            "images": undefined,
+            "points": undefined,
+            "resolved": undefined,
+            "text": undefined,
+            "type": "circle",
+            "w": 0.1,
+            "x": 0.1235,
+            "y": 0.2,
+          },
+        ],
+        "pageNumber": 1,
+      },
+    ],
+    "totalAnnotations": 1,
+  },
+}
+`;
+
+exports[`AC-14.3.1 / AC-14.3.2 deterministic regression baseline > legend autofit layout matches the committed baseline 1`] = `
+{
+  "height": 44,
+  "layout": [
+    {
+      "blockH": 7.5,
+      "cell": {
+        "h": 7.5,
+        "hgap": 1.6,
+        "w": 11.5,
+      },
+      "perRow": 1,
+      "rowH": 16,
+      "rows": 1,
+      "type": "stairs",
+    },
+    {
+      "blockH": 10,
+      "cell": {
+        "h": 10,
+        "hgap": 1.4,
+        "w": 7,
+      },
+      "perRow": 2,
+      "rowH": 16,
+      "rows": 1,
+      "type": "door",
+    },
+  ],
+}
+`;

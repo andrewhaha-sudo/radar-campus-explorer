@@ -1,0 +1,293 @@
+.floorplan-overlay {
+  position: fixed;
+  inset: 0;
+  background: #211833ab;
+  z-index: 110;
+}
+.floorplan-dialog {
+  position: fixed;
+  z-index: 111;
+  inset: 24px max(16px, calc((100vw - 1260px) / 2));
+  overflow: auto;
+  padding: 24px;
+  background: #fcfaff;
+  color: #272338;
+  border: 1px solid #e0d6ea;
+  border-radius: 18px;
+  box-shadow: 0 20px 70px #21183355;
+}
+.floorplan-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+}
+.floorplan-heading h2 {
+  margin: 8px 0;
+  font-size: 26px;
+}
+.floorplan-heading p {
+  max-width: 820px;
+  font-size: 13px;
+  color: #71677d;
+  margin: 0 0 18px;
+  line-height: 1.6;
+}
+.floorplan-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 800;
+  font-size: 11px;
+  letter-spacing: 1.3px;
+  color: #725194;
+}
+.floorplan-dialog button,
+.floorplan-import {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 8px 12px;
+  border: 1px solid #d8cce4;
+  border-radius: 8px;
+  background: white;
+  color: #49375e;
+  font-size: 12px;
+  font-weight: 650;
+  cursor: pointer;
+}
+.floorplan-dialog button:hover,
+.floorplan-dialog button[aria-pressed="true"] {
+  background: #eee5f8;
+  border-color: #9872bf;
+}
+.floorplan-dialog button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.floorplan-dialog :focus-visible {
+  outline: 3px solid #8361b2;
+  outline-offset: 3px;
+}
+.floorplan-close {
+  flex-shrink: 0;
+}
+.floorplan-floor {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+.floorplan-floor select {
+  min-height: 40px;
+  max-width: 100%;
+  border: 1px solid #d8cce4;
+  border-radius: 8px;
+  padding: 8px;
+  background: white;
+  color: #49375e;
+}
+.floorplan-toolbar,
+.floorplan-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 10px 0;
+}
+.floorplan-actions {
+  padding-bottom: 10px;
+  border-bottom: 1px solid #e6ddeb;
+}
+.floorplan-import {
+  position: relative;
+}
+.floorplan-import input {
+  max-width: 200px;
+  font-size: 11px;
+}
+.floorplan-import:focus-within {
+  outline: 3px solid #8361b2;
+  outline-offset: 2px;
+}
+.floorplan-help,
+.floorplan-caption {
+  font-size: 12px;
+  line-height: 1.6;
+  color: #796a86;
+}
+.floorplan-workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 270px;
+  gap: 20px;
+  align-items: start;
+}
+.floorplan-board {
+  position: relative;
+  background: #f1ecd8;
+  border: 1px solid #e0d6ea;
+  border-radius: 8px;
+  overflow: hidden;
+}
+.floorplan-board svg,
+.floorplan-board canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.floorplan-board image {
+  image-rendering: pixelated;
+}
+.floorplan-board canvas {
+  touch-action: none;
+  cursor: crosshair;
+}
+.floorplan-board canvas:focus {
+  outline: 3px solid #8361b2;
+  outline-offset: -3px;
+}
+.floorplan-inspector {
+  background: white;
+  border: 1px solid #e0d6ea;
+  border-radius: 10px;
+  padding: 14px;
+  min-width: 0;
+}
+.floorplan-inspector h3 {
+  font-size: 14px;
+  margin: 0 0 10px;
+}
+.floorplan-inspector p {
+  font-size: 12px;
+  color: #796a86;
+  line-height: 1.6;
+}
+.floorplan-inspector ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 220px;
+  overflow: auto;
+}
+.floorplan-inspector li {
+  margin-bottom: 5px;
+}
+.floorplan-inspector li button {
+  width: 100%;
+  justify-content: flex-start;
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+.floorplan-inspector form {
+  border-top: 1px solid #e0d6ea;
+  margin-top: 12px;
+  padding-top: 8px;
+}
+.floorplan-inspector form > button {
+  margin: 10px 4px 0 0;
+}
+.floorplan-inspector label {
+  display: block;
+  font-size: 12px;
+  font-weight: 650;
+}
+.floorplan-inspector textarea,
+.floorplan-inspector input {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #d8cce4;
+  border-radius: 6px;
+  min-height: 36px;
+  padding: 8px;
+  margin-top: 5px;
+}
+.floorplan-inspector textarea {
+  min-height: 64px;
+  resize: vertical;
+}
+.floorplan-coordinates {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+.floorplan-coordinates label {
+  min-width: 0;
+  flex: 1;
+}
+.floorplan-status {
+  font-size: 12px;
+  color: #4f6a42;
+}
+.floorplan-error {
+  font-size: 13px;
+  color: #9d303e;
+  background: #fff0ef;
+  padding: 12px;
+  border-radius: 8px;
+}
+.floorplan-license {
+  font-size: 11px;
+  color: #796a86;
+  border-top: 1px solid #e0d6ea;
+  padding-top: 14px;
+  line-height: 1.9;
+}
+.floorplan-license a {
+  text-decoration: underline;
+  color: #725194;
+}
+@media (max-width: 760px) {
+  .floorplan-dialog {
+    inset: 10px;
+    padding: 16px;
+    border-radius: 12px;
+  }
+  .floorplan-heading h2 {
+    font-size: 22px;
+  }
+  .floorplan-workspace {
+    grid-template-columns: 1fr;
+  }
+  .floorplan-inspector ol {
+    max-height: 160px;
+  }
+  .floorplan-dialog button {
+    min-height: 44px;
+  }
+  .floorplan-import {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+  .floorplan-floor {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 6px;
+  }
+}
+
+.radar-dashboard .campus-map-toolbar button.campus-floorplan-edit {
+  display: inline-flex;
+  white-space: nowrap;
+  width: auto;
+  padding: 0 7px;
+  gap: 4px;
+  font-size: 10px;
+}
+.radar-dashboard .campus-map-toolbar > span {
+  min-width: 0;
+  flex: 1;
+}
+.radar-dashboard .campus-map-toolbar strong {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.radar-dashboard .campus-map-toolbar > div {
+  flex-shrink: 0;
+  gap: 5px;
+}

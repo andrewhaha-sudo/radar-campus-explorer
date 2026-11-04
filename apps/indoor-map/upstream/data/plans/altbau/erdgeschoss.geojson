@@ -1,0 +1,338 @@
+{
+  "type": "FeatureCollection",
+  "name": "altbau_eg",
+  "building": "altbau",
+  "level": 0,
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "altbau_eg_floor",
+        "external_id": "ALT-EG-FLOOR",
+        "level": 0,
+        "height": 0.1,
+        "min_height": 0,
+        "base_elev": 0,
+        "type": "floor",
+        "category": "floor",
+        "name": "Erdgeschoss",
+        "translations": {
+          "en": "Ground Floor",
+          "de": "Erdgeschoss"
+        },
+        "searchable": false,
+        "restrictions": [],
+        "icon": null
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [12.3710, 51.3314],
+          [12.3720, 51.3314],
+          [12.3720, 51.3310],
+          [12.3710, 51.3310],
+          [12.3710, 51.3314]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "altbau_eg_wall_north",
+        "external_id": null,
+        "level": 0,
+        "height": 3.5,
+        "min_height": 0,
+        "base_elev": 0,
+        "type": "wall",
+        "category": null,
+        "name": "Nordwand",
+        "translations": {},
+        "searchable": false,
+        "restrictions": [],
+        "icon": null
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [12.3710, 51.33139],
+          [12.3720, 51.33139],
+          [12.3720, 51.3314],
+          [12.3710, 51.3314],
+          [12.3710, 51.33139]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "altbau_eg_wall_south",
+        "external_id": null,
+        "level": 0,
+        "height": 3.5,
+        "min_height": 0,
+        "base_elev": 0,
+        "type": "wall",
+        "category": null,
+        "name": "Südwand",
+        "translations": {},
+        "searchable": false,
+        "restrictions": [],
+        "icon": null
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [12.3710, 51.3310],
+          [12.3720, 51.3310],
+          [12.3720, 51.33101],
+          [12.3710, 51.33101],
+          [12.3710, 51.3310]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "altbau_eg_wall_west",
+        "external_id": null,
+        "level": 0,
+        "height": 3.5,
+        "min_height": 0,
+        "base_elev": 0,
+        "type": "wall",
+        "category": null,
+        "name": "Westwand",
+        "translations": {},
+        "searchable": false,
+        "restrictions": [],
+        "icon": null
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [12.3710, 51.3310],
+          [12.37101, 51.3310],
+          [12.37101, 51.3314],
+          [12.3710, 51.3314],
+          [12.3710, 51.3310]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "altbau_eg_wall_east",
+        "external_id": null,
+        "level": 0,
+        "height": 3.5,
+        "min_height": 0,
+        "base_elev": 0,
+        "type": "wall",
+        "category": null,
+        "name": "Ostwand",
+        "translations": {},
+        "searchable": false,
+        "restrictions": [],
+        "icon": null
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [12.37199, 51.3310],
+          [12.3720, 51.3310],
+          [12.3720, 51.3314],
+          [12.37199, 51.3314],
+          [12.37199, 51.3310]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "altbau_eg_room_101",
+        "external_id": "ALT-101",
+        "level": 0,
+        "height": 3.5,
+        "min_height": 0,
+        "base_elev": 0,
+        "type": "room",
+        "category": "classroom",
+        "name": "Raum 101",
+        "translations": {
+          "en": "Room 101",
+          "de": "Raum 101"
+        },
+        "searchable": true,
+        "restrictions": [],
+        "icon": "classroom"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [12.37105, 51.33135],
+          [12.3713, 51.33135],
+          [12.3713, 51.33105],
+          [12.37105, 51.33105],
+          [12.37105, 51.33135]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "altbau_eg_room_102",
+        "external_id": "ALT-102",
+        "level": 0,
+        "height": 3.5,
+        "min_height": 0,
+        "base_elev": 0,
+        "type": "room",
+        "category": "classroom",
+        "name": "Raum 102",
+        "translations": {
+          "en": "Room 102",
+          "de": "Raum 102"
+        },
+        "searchable": true,
+        "restrictions": [],
+        "icon": "classroom"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [12.3714, 51.33135],
+          [12.3717, 51.33135],
+          [12.3717, 51.33105],
+          [12.3714, 51.33105],
+          [12.3714, 51.33135]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "altbau_eg_room_103",
+        "external_id": "ALT-103",
+        "level": 0,
+        "height": 3.5,
+        "min_height": 0,
+        "base_elev": 0,
+        "type": "room",
+        "category": "office",
+        "name": "Sekretariat",
+        "translations": {
+          "en": "Secretary Office",
+          "de": "Sekretariat"
+        },
+        "searchable": true,
+        "restrictions": [],
+        "icon": "office"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [12.3718, 51.33135],
+          [12.37195, 51.33135],
+          [12.37195, 51.3312],
+          [12.3718, 51.3312],
+          [12.3718, 51.33135]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "altbau_eg_restroom",
+        "external_id": "ALT-WC-EG",
+        "level": 0,
+        "height": 3.5,
+        "min_height": 0,
+        "base_elev": 0,
+        "type": "room",
+        "category": "restroom",
+        "name": "WC EG",
+        "translations": {
+          "en": "Restroom Ground Floor",
+          "de": "WC Erdgeschoss"
+        },
+        "searchable": true,
+        "restrictions": [],
+        "icon": "restroom",
+        "gender": "unisex"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [12.3718, 51.33115],
+          [12.37195, 51.33115],
+          [12.37195, 51.33105],
+          [12.3718, 51.33105],
+          [12.3718, 51.33115]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "altbau_eg_entrance",
+        "external_id": "ALT-ENTRANCE-MAIN",
+        "level": 0,
+        "height": 2.5,
+        "min_height": 0,
+        "base_elev": 0,
+        "type": "door",
+        "category": "entrance",
+        "name": "Haupteingang",
+        "translations": {
+          "en": "Main Entrance",
+          "de": "Haupteingang"
+        },
+        "searchable": true,
+        "restrictions": [],
+        "icon": "entrance"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [12.3714, 51.3310],
+          [12.3716, 51.3310],
+          [12.3716, 51.33101],
+          [12.3714, 51.33101],
+          [12.3714, 51.3310]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "altbau_eg_stairs",
+        "external_id": "ALT-STAIRS-MAIN",
+        "level": 0,
+        "height": 3.5,
+        "min_height": 0,
+        "base_elev": 0,
+        "type": "room",
+        "category": "stairs",
+        "name": "Treppenhaus",
+        "translations": {
+          "en": "Stairwell",
+          "de": "Treppenhaus"
+        },
+        "searchable": false,
+        "restrictions": [],
+        "icon": "stairs"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [12.37105, 51.33105],
+          [12.3713, 51.33105],
+          [12.3713, 51.33102],
+          [12.37105, 51.33102],
+          [12.37105, 51.33105]
+        ]]
+      }
+    }
+  ]
+}

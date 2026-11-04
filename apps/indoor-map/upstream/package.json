@@ -1,0 +1,41 @@
+{
+  "name": "leipzig-school-digital-twin",
+  "version": "1.0.0",
+  "description": "Web-based 3D indoor navigation system for Leipzig school campus",
+  "keywords": [
+    "indoor-navigation",
+    "maplibre",
+    "threejs",
+    "digital-twin"
+  ],
+  "homepage": "https://github.com/Evangelisches-Schulzentrum-Leipzig/indoor-map#readme",
+  "bugs": {
+    "url": "https://github.com/Evangelisches-Schulzentrum-Leipzig/indoor-map/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Evangelisches-Schulzentrum-Leipzig/indoor-map.git"
+  },
+  "license": "OSL-3.0",
+  "author": "",
+  "type": "module",
+  "main": "js/main.js",
+  "scripts": {
+    "dev": "npx @tailwindcss/cli -i ./css/tailwind.css -o ./css/output.css && vite",
+    "build": "npx @tailwindcss/cli -i ./css/tailwind.css -o ./css/output.css && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@maplibre/maplibre-gl-inspect": "^1.8.2",
+    "@tailwindcss/cli": "^4.1.18",
+    "fuse.js": "^7.1.0",
+    "gl-matrix": "^3.4.4",
+    "maplibre-gl": "^5.15.0",
+    "sirv": "^3.0.2",
+    "tailwindcss": "^4.1.18",
+    "three": "^0.182.0"
+  },
+  "devDependencies": {
+    "vite": "^7.3.0"
+  }
+}

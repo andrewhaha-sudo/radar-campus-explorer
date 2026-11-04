@@ -1,0 +1,106 @@
+# Continuous integration + delivery (Epic E14 - Quality & Delivery Harness).
+# On every push/PR: the type/diagnostics gate + Vitest unit suite, and the
+# Playwright E2E suite (against a local wrangler pages dev with a local D1 +
+# seed). On push to main, after the unit gate passes, a direct deploy to
+# Cloudflare Pages (wrangler pages deploy - this project has no git provider
+# integration, so the deploy runs from CI with an API token).
+#
+# Deploy gates on `unit` (check + Vitest), not `e2e`: the Playwright suite needs
+# a JWT_SECRET that normally lives in gitignored .dev.vars; we inject a throwaway
+# one below so e2e can run in CI, but it is kept OUT of the deploy gate so a CI
+# infra hiccup never blocks delivery. Re-add `e2e` to `needs` once it is stably
+# green if you want it to gate too.
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  unit:
+    name: check + unit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run check
+      - run: npm run test:unit
+
+  e2e:
+    name: e2e (Playwright)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      # wrangler pages dev reads JWT_SECRET from .dev.vars (gitignored, so absent
+      # in CI). Without it, login can't mint a session and every authenticated
+      # test times out. Inject a throwaway secret for the local CI server only.
+      - name: Provision local dev vars for the e2e server
+        run: |
+          {
+            echo "JWT_SECRET=ci-e2e-throwaway-secret-not-for-prod-0123456789abcdef"
+          } > .dev.vars
+      # e2e:serve builds, applies the local D1 migrations, seeds, and serves via
+      # wrangler pages dev --local (no Cloudflare credentials required).
+      - run: npm run test:e2e
+        env:
+          CI: 'true'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
+
+  deploy:
+    name: deploy (Cloudflare Pages)
+    runs-on: ubuntu-latest
+    # Only on a real push to main, once the unit gate (check + Vitest) is green.
+    # e2e is intentionally not in the gate - see the header note.
+    needs: [unit]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+      # Secrets aren't available in a job-level `if`, so gate on them here: a
+      # repo without the Cloudflare secrets still gets a GREEN run (deploy is
+      # skipped with a warning) rather than a hard failure.
+      - name: Check deploy secrets
+        id: secrets
+        env:
+          CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          if [ -n "$CF_API_TOKEN" ] && [ -n "$CF_ACCOUNT_ID" ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::CLOUDFLARE_API_TOKEN / CLOUDFLARE_ACCOUNT_ID not set - skipping deploy. Add them in repo Settings > Secrets and variables > Actions."
+          fi
+      - uses: actions/setup-node@v4
+        if: steps.secrets.outputs.ready == 'true'
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+        if: steps.secrets.outputs.ready == 'true'
+      - run: npm run build
+        if: steps.secrets.outputs.ready == 'true'
+      - name: Deploy to Cloudflare Pages
+        if: steps.secrets.outputs.ready == 'true'
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy .svelte-kit/cloudflare --project-name=pathfinder --branch=main

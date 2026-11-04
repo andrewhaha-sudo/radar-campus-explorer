@@ -1,0 +1,55 @@
+services:
+  valhalla:
+    image: ghcr.io/valhalla/valhalla-scripted:latest
+    container_name: valhalla-routing
+    ports:
+      - "8002:8002"
+    volumes:
+      - ./valhalla/custom_files:/custom_files
+      - ./valhalla/data:/data
+    environment:
+      # Tile URL for OSM data - Leipzig area
+      # - tile_urls=https://download.geofabrik.de/europe/germany/sachsen-latest.osm.pbf
+      # Build tiles on startup if not present
+      - build_elevation=False
+      - build_admins=True
+      - build_time_zones=True
+      # Server configuration
+      - server_threads=2
+      - serve_tiles=True
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8002/status"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 120s
+  martin:
+    image: ghcr.io/maplibre/martin:1.2.0
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      # Map the local folder containing your .mbtiles to the container
+      - ./martin/tiles:/data
+    # Command tells Martin to serve all supported files in the /data folder
+    command: /data
+    environment:
+      - DATABASE_URL=postgres://postgres:password@db/db
+    depends_on:
+      - db
+
+  db:
+    image: postgis/postgis:17-3.5-alpine
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+    volumes:
+      - ./martin/db:/var/lib/postgresql/data
+
+
+networks:
+  default:
+    name: valhalla-network

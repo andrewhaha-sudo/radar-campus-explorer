@@ -1,0 +1,8 @@
+<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>RADAR Indoor Map</title></head><body>
+<header><a href="/">RADAR Facilities</a><a href="/campus/">Campus explorer</a><a href="/campus-workspace">Shared floorplans</a><h1>Indoor Map</h1></header>
+<main><aside aria-label="Indoor map controls"><p class="notice">Campus illustration. Paths are for exploration and have not been verified for emergency use.</p>
+<label>Search rooms<input id="search" type="search" placeholder="Room name or number"></label><ul id="results" aria-label="Room search results"></ul>
+<label>Floor<select id="floor" aria-label="Floor"></select></label><div class="actions"><button id="mode">Show 3D</button><button id="reset">Reset view</button></div>
+<label>Route from<select id="from" aria-label="Route from"></select></label><label>Route to<select id="to" aria-label="Route to"></select></label><button id="route">Show walking path</button><button id="clear">Clear path</button><p id="route-status" role="status"></p><ol id="steps"></ol>
+<a id="document">Open shared floorplan in Pathfinder</a><p><small>Indoor Map by Evangelisches Schulzentrum Leipzig, adapted for RADAR. <a href="/indoor-map/LICENSE.txt">OSL-3.0</a> · <a href="/source/radar-campus-explorer.tar.gz">Source</a></small></p>
+</aside><section class="map-panel" aria-label="Interactive indoor map"><div id="map-container"></div><p id="map-status" role="status">Loading map...</p></section></main><script type="module" src="/src/main.js"></script></body></html>

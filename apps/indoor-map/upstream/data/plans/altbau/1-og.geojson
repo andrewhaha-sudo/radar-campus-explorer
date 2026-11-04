@@ -1,0 +1,275 @@
+{
+  "type": "FeatureCollection",
+  "name": "altbau_1og",
+  "building": "altbau",
+  "level": 1,
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "altbau_1og_floor",
+        "external_id": "ALT-1OG-FLOOR",
+        "level": 1,
+        "height": 0.1,
+        "min_height": 3.5,
+        "base_elev": 0,
+        "type": "floor",
+        "category": "floor",
+        "name": "1. Obergeschoss",
+        "translations": {
+          "en": "First Floor",
+          "de": "1. Obergeschoss"
+        },
+        "searchable": false,
+        "restrictions": [],
+        "icon": null
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [12.3710, 51.3314],
+          [12.3720, 51.3314],
+          [12.3720, 51.3310],
+          [12.3710, 51.3310],
+          [12.3710, 51.3314]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "altbau_1og_wall_north",
+        "external_id": null,
+        "level": 1,
+        "height": 3.5,
+        "min_height": 3.5,
+        "base_elev": 0,
+        "type": "wall",
+        "category": null,
+        "name": "Nordwand",
+        "translations": {},
+        "searchable": false,
+        "restrictions": [],
+        "icon": null
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [12.3710, 51.33139],
+          [12.3720, 51.33139],
+          [12.3720, 51.3314],
+          [12.3710, 51.3314],
+          [12.3710, 51.33139]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "altbau_1og_wall_south",
+        "external_id": null,
+        "level": 1,
+        "height": 3.5,
+        "min_height": 3.5,
+        "base_elev": 0,
+        "type": "wall",
+        "category": null,
+        "name": "Südwand",
+        "translations": {},
+        "searchable": false,
+        "restrictions": [],
+        "icon": null
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [12.3710, 51.3310],
+          [12.3720, 51.3310],
+          [12.3720, 51.33101],
+          [12.3710, 51.33101],
+          [12.3710, 51.3310]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "altbau_1og_wall_west",
+        "external_id": null,
+        "level": 1,
+        "height": 3.5,
+        "min_height": 3.5,
+        "base_elev": 0,
+        "type": "wall",
+        "category": null,
+        "name": "Westwand",
+        "translations": {},
+        "searchable": false,
+        "restrictions": [],
+        "icon": null
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [12.3710, 51.3310],
+          [12.37101, 51.3310],
+          [12.37101, 51.3314],
+          [12.3710, 51.3314],
+          [12.3710, 51.3310]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "altbau_1og_wall_east",
+        "external_id": null,
+        "level": 1,
+        "height": 3.5,
+        "min_height": 3.5,
+        "base_elev": 0,
+        "type": "wall",
+        "category": null,
+        "name": "Ostwand",
+        "translations": {},
+        "searchable": false,
+        "restrictions": [],
+        "icon": null
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [12.37199, 51.3310],
+          [12.3720, 51.3310],
+          [12.3720, 51.3314],
+          [12.37199, 51.3314],
+          [12.37199, 51.3310]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "altbau_1og_room_201",
+        "external_id": "ALT-201",
+        "level": 1,
+        "height": 3.5,
+        "min_height": 3.5,
+        "base_elev": 0,
+        "type": "room",
+        "category": "classroom",
+        "name": "Raum 201",
+        "translations": {
+          "en": "Room 201",
+          "de": "Raum 201"
+        },
+        "searchable": true,
+        "restrictions": [],
+        "icon": "classroom"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [12.37105, 51.33135],
+          [12.3713, 51.33135],
+          [12.3713, 51.33105],
+          [12.37105, 51.33105],
+          [12.37105, 51.33135]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "altbau_1og_room_202",
+        "external_id": "ALT-202",
+        "level": 1,
+        "height": 3.5,
+        "min_height": 3.5,
+        "base_elev": 0,
+        "type": "room",
+        "category": "classroom",
+        "name": "Raum 202",
+        "translations": {
+          "en": "Room 202",
+          "de": "Raum 202"
+        },
+        "searchable": true,
+        "restrictions": [],
+        "icon": "classroom"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [12.3714, 51.33135],
+          [12.3717, 51.33135],
+          [12.3717, 51.33105],
+          [12.3714, 51.33105],
+          [12.3714, 51.33135]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "altbau_1og_room_203",
+        "external_id": "ALT-203",
+        "level": 1,
+        "height": 3.5,
+        "min_height": 3.5,
+        "base_elev": 0,
+        "type": "room",
+        "category": "office",
+        "name": "Lehrerzimmer",
+        "translations": {
+          "en": "Teachers' Lounge",
+          "de": "Lehrerzimmer"
+        },
+        "searchable": true,
+        "restrictions": ["teacher"],
+        "icon": "office"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [12.3718, 51.33135],
+          [12.37195, 51.33135],
+          [12.37195, 51.33105],
+          [12.3718, 51.33105],
+          [12.3718, 51.33135]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "altbau_1og_stairs",
+        "external_id": "ALT-STAIRS-1OG",
+        "level": 1,
+        "height": 3.5,
+        "min_height": 3.5,
+        "base_elev": 0,
+        "type": "room",
+        "category": "stairs",
+        "name": "Treppenhaus",
+        "translations": {
+          "en": "Stairwell",
+          "de": "Treppenhaus"
+        },
+        "searchable": false,
+        "restrictions": [],
+        "icon": "stairs"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [12.37105, 51.33105],
+          [12.3713, 51.33105],
+          [12.3713, 51.33102],
+          [12.37105, 51.33102],
+          [12.37105, 51.33105]
+        ]]
+      }
+    }
+  ]
+}

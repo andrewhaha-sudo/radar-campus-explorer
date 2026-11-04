@@ -1,0 +1,13 @@
+node_modules
+.svelte-kit
+.wrangler
+dist
+test-results
+playwright-report
+*.local
+.dev.vars
+
+# PDF build artifacts
+docs/pdf/node_modules
+docs/pdf/.render-*.html
+docs/pdf/package-lock.json

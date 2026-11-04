@@ -1,0 +1,139 @@
+{
+    "buildings": [
+        {
+            "id": 1,
+            "name": "Altbau",
+            "lat": 52.520008,
+            "lon": 13.404954,
+            "levels": [
+                {
+                    "level": -1,
+                    "name": "Keller",
+                    "short_name": "KG",
+                    "geojson_path": "/data/plans/altbau/keller.geojson"
+                },
+                {
+                    "level": 0,
+                    "name": "Erdgeschoss",
+                    "short_name": "EG",
+                    "geojson_path": "/data/plans/altbau/erdgeschoss.geojson"
+                },
+                {
+                    "level": 1,
+                    "name": "1. Obergeschoss",
+                    "short_name": "1",
+                    "geojson_path": "/data/plans/altbau/1-og.geojson"
+                },
+                {
+                    "level": 2,
+                    "name": "2. Obergeschoss",
+                    "short_name": "2",
+                    "geojson_path": "/data/plans/altbau/2-og.geojson"
+                },
+                {
+                    "level": 3,
+                    "name": "3. Obergeschoss",
+                    "short_name": "3",
+                    "geojson_path": "/data/plans/altbau/3-og.geojson"
+                },
+                {
+                    "level": 4,
+                    "name": "4. Obergeschoss",
+                    "short_name": "4",
+                    "geojson_path": "/data/plans/altbau/4-og.geojson"
+                }
+            ]
+        },
+        {
+            "id": 2,
+            "name": "Neubau",
+            "lat": 52.520500,
+            "lon": 13.405500,
+            "levels": [
+                {
+                    "level": -1,
+                    "name": "Keller",
+                    "short_name": "KG",
+                    "geojson_path": "/data/plans/neubau/keller.geojson"
+                },
+                {
+                    "level": 1,
+                    "name": "1. Obergeschoss",
+                    "short_name": "1",
+                    "geojson_path": "/data/plans/neubau/1-og.geojson"
+                },
+                {
+                    "level": 2,
+                    "name": "2. Obergeschoss",
+                    "short_name": "2",
+                    "geojson_path": "/data/plans/neubau/2-og.geojson"
+                },
+                {
+                    "level": 3,
+                    "name": "3. Obergeschoss",
+                    "short_name": "3",
+                    "geojson_path": "/data/plans/neubau/3-og.geojson"
+                },
+                {
+                    "level": 4,
+                    "name": "4. Obergeschoss",
+                    "short_name": "4",
+                    "geojson_path": "/data/plans/neubau/4-og.geojson"
+                }
+            ]
+        },
+        {
+            "id": 3,
+            "name": "Außengebäude",
+            "lat": 52.519500,
+            "lon": 13.403500,
+            "levels": [
+                {
+                    "level": 0,
+                    "name": "Erdgeschoss",
+                    "short_name": "EG",
+                    "geojson_path": "/data/plans/aussengebaeude/erdgeschoss.geojson"
+                },
+                {
+                    "level": 1,
+                    "name": "1. Obergeschoss",
+                    "short_name": "1",
+                    "geojson_path": "/data/plans/aussengebaeude/1-og.geojson"
+                }
+            ]
+        }
+    ],
+    "roles": [
+        {
+            "id": 1,
+            "name": "Besucher",
+            "emoji": "👤"
+        },
+        {
+            "id": 2,
+            "name": "Schüler",
+            "emoji": "🎓"
+        },
+        {
+            "id": 3,
+            "name": "Lehrer",
+            "emoji": "🧑‍🏫"
+        },
+        {
+            "id": 4,
+            "name": "Personal",
+            "emoji": "💼"
+        },
+        {
+            "id": 5,
+            "name": "Admin",
+            "emoji": "🔧"
+        }
+    ],
+    "default_role_id": 1,
+    "map_initial_view": {
+        "lat": 51.33056299679319,
+        "lon": 12.377246051620205,
+        "zoom": 18.766893399910582 
+    }
+}

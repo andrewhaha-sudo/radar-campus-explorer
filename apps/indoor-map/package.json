@@ -1,0 +1,1 @@
+{"name":"radar-indoor-map","private":true,"version":"1.0.0","type":"module","license":"OSL-3.0","scripts":{"build":"vite build --base /indoor-map/"},"dependencies":{"maplibre-gl":"5.15.0","@maplibre/maplibre-gl-inspect":"1.8.2"},"devDependencies":{"vite":"7.3.0"}}

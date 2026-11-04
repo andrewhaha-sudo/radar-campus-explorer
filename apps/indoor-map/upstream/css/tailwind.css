@@ -1,0 +1,48 @@
+@import "tailwindcss";
+
+#map-container {
+  @apply absolute top-0 left-0 w-full h-full;
+}
+
+#overlay-container header {
+  @apply bg-white p-4 shadow-md top-0 left-0 w-full flex items-center justify-between gap-x-2 absolute z-10;
+}
+#overlay-container header h1 {
+  @apply text-xl font-bold w-fit whitespace-nowrap;
+}
+#overlay-container header input#search-box {
+  @apply border border-gray-300 rounded px-2 py-1 w-full;
+}
+#overlay-container header select#role-selector {
+  @apply border border-gray-300 rounded px-2 py-1;
+}
+
+#overlay-container .panel {
+  @apply bg-white p-2 shadow-md rounded-md w-fit h-fit;
+}
+#overlay-container .panel.horizontal {
+  @apply flex flex-row items-center gap-x-2;
+}
+#overlay-container .panel.vertical {
+  @apply flex flex-col items-center gap-y-2;
+}
+#overlay-container .panel .panel-option {
+  @apply cursor-pointer px-3 py-1 rounded hover:bg-gray-200;
+}
+#overlay-container .panel .panel-option.selected {
+  @apply bg-blue-500 text-white;
+}
+
+#overlay-container #building-selector {
+  @apply absolute top-24 left-4;
+}
+#overlay-container #floor-selector {
+  @apply absolute bottom-4 left-4;
+}
+#overlay-container #map-controls {
+  @apply absolute bottom-12 right-4;
+}
+#overlay-container #floor-selector .panel-option,
+#overlay-container #map-controls .panel-option {
+  @apply aspect-square flex items-center justify-center;
+}

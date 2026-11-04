@@ -1,0 +1,22 @@
+name = "radar-campus-explorer"
+pages_build_output_dir = "dist"
+compatibility_date = "2026-06-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Local defaults. Replace placeholder IDs with resources in YOUR account before deployment.
+[[d1_databases]]
+binding = "DB"
+database_name = "pathfinder"
+database_id = "00000000-0000-0000-0000-000000000000"
+migrations_dir = "apps/pathfinder/migrations"
+
+[[r2_buckets]]
+binding = "DOCUMENTS"
+bucket_name = "radar-pathfinder-documents"
+
+[[kv_namespaces]]
+binding = "CACHE"
+id = "00000000000000000000000000000000"
+
+# Optional Workers AI, email and observability services use the existing Pathfinder
+# configuration interfaces. No external provider is enabled or billed by this file.

@@ -4,7 +4,7 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-const root = fileURLToPath(new URL("../../dist/", import.meta.url));
+const root = fileURLToPath(new URL("../../.build/campus/", import.meta.url));
 const mime = {
   ".html": "text/html",
   ".js": "application/javascript",
@@ -16,9 +16,10 @@ const mime = {
 http
   .createServer(async (req, res) => {
     try {
-      const pathname = decodeURIComponent(
+      let pathname = decodeURIComponent(
         new URL(req.url, "http://localhost").pathname,
       );
+      pathname = pathname.replace(/^\/campus(?=\/)/, "");
       const file = path.resolve(
         root,
         `.${pathname === "/" ? "/index.html" : pathname}`,

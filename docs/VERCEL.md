@@ -1,3 +1,5 @@
+> Historical campus-only deployment guide. The full Pathfinder backend targets Cloudflare; see [PATHFINDER-PLATFORM.md](PATHFINDER-PLATFORM.md). The commands below predate the unified build.
+
 # Deploy the standalone Campus Explorer
 
 Campus Explorer is a static React/Vite app. It opens directly to the interactive map.
